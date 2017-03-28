@@ -45,6 +45,9 @@ const (
 	S8ELogLevelInfo = S8ELogLevel(logrus.InfoLevel)
 	S8ELogLevelWarn = S8ELogLevel(logrus.WarnLevel)
 	S8ELogLevelError = S8ELogLevel(logrus.ErrorLevel)
+
+	// 设置全局日志设定
+	S8ELogLevelDefault = S8ELogLevelDebug
 )
 
 // 日志通用接口
