@@ -1,10 +1,12 @@
-hash: 13aa402a4627e28bdd4746e591bbf30b29becf5f70bcef26447e4713c9a52ca2
-updated: 2017-03-28T18:08:54.156195648+08:00
+hash: 0d1694b593e59405165a0749e74691f66dc3b885c2211f2445ebc28d9fbb9927
+updated: 2017-03-28T19:55:24.794012015+08:00
 imports:
 - name: github.com/gorilla/websocket
   version: 3ab3a8b8831546bd18fd182c20687ca853b2bb13
 - name: github.com/Sirupsen/logrus
   version: ba1b36c82c5e05c4f912a88eab0dcd91a171688f
+- name: github.com/spf13/viper
+  version: 84f94806c67f59dd7ae87bc5351f7a9c94a4558d
 - name: golang.org/x/sys
   version: afadfcc7779c1f4db0f6f6438afcb108d9c9c7cd
   subpackages:
