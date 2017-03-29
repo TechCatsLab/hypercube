@@ -24,11 +24,34 @@
 
 /*
  * Revision History:
- *     Initial: 2017/03/28        Feng Yifei
+ *     Initial: 2017/03/29        Feng Yifei
  */
 
 package main
 
-func main() {
-	sigHandler.Wait()
+import (
+	"os"
+	"syscall"
+	"hypercube/common/interrupt"
+)
+
+var (
+	sigHandler *interrupt.Handler
+)
+
+func init() {
+	sigHandler = interrupt.New(finalHandler, func(){})
+	logger.Debug("Interrupt handler initialized")
+}
+
+func finalHandler(sig os.Signal) {
+	switch sig {
+	case syscall.SIGQUIT, syscall.SIGTERM, syscall.SIGINT:
+		logger.Info("Signal quit/term/int captured")
+		return
+
+	case syscall.SIGHUP:
+		logger.Info("Signal hup captured")
+		return
+	}
 }
