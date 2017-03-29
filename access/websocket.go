@@ -29,13 +29,77 @@
 
 package main
 
+import (
+	"net/http"
+	"github.com/gorilla/websocket"
+	ws "hypercube/common/server/websocket"
+)
+
+var (
+	upgrader              *websocket.Upgrader
+	mux                   *http.ServeMux
+	webSocketServers      []*ws.WebSocketServer
+)
 
 func init() {
+	var err error
+
 	readConfiguration()
 
-	logger.Debug("Configuration finished, websocket read buffer size:", configuration.WSReadBufferSize)
+	upgrader = &websocket.Upgrader{
+		ReadBufferSize:     configuration.WSReadBufferSize,
+		WriteBufferSize:    configuration.WSWriteBufferSize,
+		CheckOrigin:        func(r *http.Request) bool {
+			return true
+		},
+	}
+
+	mux = http.NewServeMux()
+	mux.HandleFunc("/join", serveWebSocket)
+
+	logger.Debug("Configuration finished, starting servers...")
+
+	if err = initWebSocketServer(); err != nil {
+		panic(err)
+	}
 }
 
 func initWebSocketServer() error {
-	return nil
+	var (
+		server    *ws.WebSocketServer
+		err       error
+	)
+
+	webSocketServers = make([]*ws.WebSocketServer, len(configuration.Addrs))
+
+	for index, address := range configuration.Addrs {
+		server, err = ws.CreateWebSocketServer(address, mux)
+
+		if err != nil {
+			logger.Error("start websocket server error:", err, " , address:", address)
+
+			break
+		}
+
+		logger.Debug("start websocket server succeed at address:", address)
+
+		webSocketServers[index] = server
+	}
+
+	return err
+}
+
+func serveWebSocket(w http.ResponseWriter, req *http.Request) {
+	if req.Method == "GET" {
+		// TODO: 考虑加入黑名单逻辑
+		http.Error(w, "Method Not Allowed", 405)
+		return
+	}
+
+	connection, err := upgrader.Upgrade(w, req, nil)
+	if err != nil {
+		logger.Error("websocket upgrade error:", err)
+		return
+	}
+	defer connection.Close()
 }
