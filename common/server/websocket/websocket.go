@@ -88,12 +88,11 @@ func (this *WebSocketServer) Run() error {
 	this.server = &http.Server{Handler: this.mux}
 
 	go func() {
-		logger.Debug("WebSocket Server starting on:", this.address)
-
 		if err = this.server.Serve(listener); err != nil {
 			logger.Error("WebSocket Server start on:", this.address, " with error ", err)
 			panic(err)
 		}
+		logger.Debug("WebSocket Server started on:", this.address)
 	}()
 
 	return nil

@@ -84,13 +84,16 @@ func initWebSocketServer() error {
 		logger.Debug("start websocket server succeed at address:", address)
 
 		webSocketServers[index] = server
+		server.Run()
 	}
 
 	return err
 }
 
 func serveWebSocket(w http.ResponseWriter, req *http.Request) {
-	if req.Method == "GET" {
+	logger.Debug("New connection")
+
+	if req.Method != "GET" {
 		// TODO: 考虑加入黑名单逻辑
 		http.Error(w, "Method Not Allowed", 405)
 		return
@@ -102,4 +105,11 @@ func serveWebSocket(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 	defer connection.Close()
+
+	webSocketConnectionHandler(connection)
+}
+
+func webSocketConnectionHandler(conn *websocket.Conn) {
+	for {
+	}
 }
