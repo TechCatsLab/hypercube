@@ -24,47 +24,18 @@
 
 /*
  * Revision History:
- *     Initial: 2017/03/28        Feng Yifei
+ *     Initial: 2017/03/29        Feng Yifei
  */
 
 package main
 
-import (
-	"hypercube/common/log"
-	"github.com/spf13/viper"
-)
 
-var (
-	logger *log.S8ELogger = log.S8ECreateLogger(
-		&log.S8ELogTag{
-			log.LogTagService: "access layer",
-			log.LogTagType: "config",
-		},
-		log.S8ELogLevelDefault)
+func init() {
+	readConfiguration()
 
-	configuration *AccessLayerConfig
-)
-
-// 配置文件结构
-type AccessLayerConfig struct {
-	Addrs               []string
-	WSReadBufferSize	uint16
-	WSWriteBufferSize   uint16
+	logger.Debug("Configuration finished, websocket read buffer size:", configuration.WSReadBufferSize)
 }
 
-// 初始化配置
-func readConfiguration() {
-	viper.AddConfigPath("./")
-	viper.SetConfigName("config")
-
-	if err := viper.ReadInConfig(); err != nil {
-		logger.Error("Read configuration file with error:", err)
-		panic(err)
-	}
-
-	configuration = &AccessLayerConfig{
-		Addrs:                 viper.GetStringSlice("addrs"),
-		WSReadBufferSize:      uint16(viper.GetInt("websocket.readBufferSize")),
-		WSWriteBufferSize:     uint16(viper.GetSizeInBytes("websocket.writeBufferSize")),
-	}
+func initWebSocketServer() error {
+	return nil
 }
