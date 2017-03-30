@@ -33,6 +33,7 @@ import (
 	"net/http"
 	"github.com/gorilla/websocket"
 	ws "hypercube/common/server/websocket"
+	"hypercube/common/pprof"
 )
 
 var (
@@ -44,6 +45,7 @@ var (
 func init() {
 	var err error
 
+	pprof.HttpPprof()
 	readConfiguration()
 
 	upgrader = &websocket.Upgrader{

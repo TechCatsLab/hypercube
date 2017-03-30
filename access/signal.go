@@ -33,6 +33,7 @@ import (
 	"os"
 	"syscall"
 	"hypercube/common/interrupt"
+	"hypercube/common/pprof"
 )
 
 var (
@@ -40,6 +41,7 @@ var (
 )
 
 func init() {
+	pprof.HttpPprof()
 	sigHandler = interrupt.New(finalHandler, func(){})
 	logger.Debug("Interrupt handler initialized")
 }
