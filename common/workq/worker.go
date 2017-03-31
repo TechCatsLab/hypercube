@@ -30,14 +30,13 @@
 package workq
 
 import (
-	"os"
+	"runtime"
 
 	"hypercube/common/log"
 )
 
 var (
-	MaxWorker = int(os.Getenv("MAX_WORKERS"))
-	MaxQueue  = int(os.Getenv("MAX_QUEUE"))
+	maxWorker = runtime.NumCPU()
 )
 
 type Worker struct {
@@ -54,7 +53,7 @@ func NewWorker(workerPool chan chan Job) Worker {
 	}
 }
 
-func (this Worker) Start() {
+func (this *Worker) Start() {
 	go func() {
 		for {
 			this.WorkerPool <- this.JobChannel
@@ -71,7 +70,7 @@ func (this Worker) Start() {
 	}()
 }
 
-func (this Worker) Stop() {
+func (this *Worker) Stop() {
 	go func() {
 		this.quit <- true
 	}()

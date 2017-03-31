@@ -33,4 +33,15 @@ type Job interface {
 	Do() error
 }
 
-var JobQueue chan Job
+var jobQueue *chan Job
+
+func PushToJobQ(job Job) {
+	go func() {
+		for {
+			select {
+			case job:
+				*jobQueue <- job
+			}
+		}
+	}()
+}
