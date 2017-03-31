@@ -40,15 +40,15 @@ var (
 )
 
 type Worker struct {
-	WorkerPool chan chan Job
-	JobChannel chan Job
+	workerPool chan chan *Job
+	jobChannel chan *Job
 	quit       chan bool
 }
 
-func NewWorker(workerPool chan chan Job) Worker {
+func NewWorker(workerPool chan chan *Job) Worker {
 	return Worker{
-		WorkerPool: workerPool,
-		JobChannel: make(chan Job),
+		workerPool: workerPool,
+		jobChannel: make(chan *Job),
 		quit:       make(chan bool),
 	}
 }
@@ -56,11 +56,11 @@ func NewWorker(workerPool chan chan Job) Worker {
 func (this *Worker) Start() {
 	go func() {
 		for {
-			this.WorkerPool <- this.JobChannel
+			this.workerPool <- this.jobChannel
 
 			select {
-			case job := <-this.JobChannel:
-				if err := job.Do(); err != nil {
+			case job := <-this.jobChannel:
+				if err := (*job).Do(); err != nil {
 					log.S8ELogger.Debug(err)
 				}
 			case <-this.quit:

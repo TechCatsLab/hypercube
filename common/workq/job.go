@@ -32,16 +32,3 @@ package workq
 type Job interface {
 	Do() error
 }
-
-var jobQueue *chan Job
-
-func PushToJobQ(job Job) {
-	go func() {
-		for {
-			select {
-			case job:
-				*jobQueue <- job
-			}
-		}
-	}()
-}
