@@ -1,4 +1,4 @@
-package pprof
+package main
 
 import (
 	_"net/http/pprof"
@@ -8,7 +8,6 @@ import (
 
 func HttpPprof()  {
 	go func() {
-		log.Println(http.ListenAndServe("localhost:6060", nil))
+		log.Println(http.ListenAndServe(configuration.PprofAddrs, nil))
 	}()
 }
-

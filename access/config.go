@@ -50,6 +50,7 @@ type AccessLayerConfig struct {
 	Addrs               []string
 	WSReadBufferSize	int
 	WSWriteBufferSize   int
+	PprofAddrs          string
 }
 
 // 初始化配置
@@ -66,5 +67,6 @@ func readConfiguration() {
 		Addrs:                 viper.GetStringSlice("addrs"),
 		WSReadBufferSize:      viper.GetInt("websocket.readBufferSize"),
 		WSWriteBufferSize:     viper.GetInt("websocket.writeBufferSize"),
+		PprofAddrs:            viper.GetString("pprofaddrs"),
 	}
 }
