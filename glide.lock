@@ -1,5 +1,5 @@
-hash: 89b5f418e97c7ae15a1bfb898f4076747a6715056e931ff7eeffabe75ef3d7d7
-updated: 2017-03-31T20:02:32.907615818+08:00
+hash: 60af037b7532d464ca875081c5d28aebabaebe71bc40eb7aedf1acbca8e06ccb
+updated: 2017-03-31T20:15:03.174042614+08:00
 imports:
 - name: github.com/fsnotify/fsnotify
   version: 4da3e2cfbabc9f751898f250b49f2439785783a1
@@ -24,6 +24,8 @@ imports:
   version: c37440a7cf42ac63b919c752ca73a85067e05992
 - name: github.com/pelletier/go-toml
   version: e32a2e04744250647a72bf17da1b09befc03b6b1
+- name: github.com/prometheus/client_golang
+  version: c5b7fccd204277076155f10851dad72b76a49317
 - name: github.com/Sirupsen/logrus
   version: ba1b36c82c5e05c4f912a88eab0dcd91a171688f
 - name: github.com/spf13/afero
