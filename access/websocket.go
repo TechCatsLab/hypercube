@@ -43,10 +43,9 @@ var (
 
 func init() {
 	var err error
-
-	HttpPprof()
 	
 	readConfiguration()
+	HttpPprof()
 
 	upgrader = &websocket.Upgrader{
 		ReadBufferSize:     configuration.WSReadBufferSize,
