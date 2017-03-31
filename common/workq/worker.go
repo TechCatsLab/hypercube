@@ -31,8 +31,6 @@ package workq
 
 import (
 	"runtime"
-
-	"hypercube/common/log"
 )
 
 var (
@@ -42,14 +40,12 @@ var (
 type Worker struct {
 	workerPool chan chan *Job
 	jobChannel chan *Job
-	quit       chan bool
 }
 
 func NewWorker(workerPool chan chan *Job) Worker {
 	return Worker{
 		workerPool: workerPool,
-		jobChannel: make(chan *Job),
-		quit:       make(chan bool),
+		jobChannel: make(chan *Job, 1),
 	}
 }
 
@@ -60,18 +56,8 @@ func (this *Worker) Start() {
 
 			select {
 			case job := <-this.jobChannel:
-				if err := (*job).Do(); err != nil {
-					log.S8ELogger.Debug(err)
-				}
-			case <-this.quit:
-				return
+				(*job).Do()
 			}
 		}
-	}()
-}
-
-func (this *Worker) Stop() {
-	go func() {
-		this.quit <- true
 	}()
 }

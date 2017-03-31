@@ -35,14 +35,13 @@ type Dispatcher struct {
 }
 
 func NewDispatcher(maxWorkers int) *Dispatcher {
-	if maxWorkers > maxWorker {
+	if (maxWorkers <= 0) || (maxWorkers > maxWorker) {
 		maxWorkers = maxWorker
 	}
 
-	pool := make(chan chan *Job, maxWorkers)
-
 	return &Dispatcher{
-		workerPool: pool,
+		workerPool: make(chan chan *Job, maxWorkers),
+		jobQueue:   make(chan *Job, 1),
 	}
 }
 
@@ -59,11 +58,9 @@ func (this *Dispatcher) dispatch() {
 	for {
 		select {
 		case job := <-this.jobQueue:
-			go func(job *Job) {
-				jobChannel := <-this.workerPool
+			jobChannel := <-this.workerPool
 
-				jobChannel <- job
-			}(job)
+			jobChannel <- job
 		}
 	}
 }
