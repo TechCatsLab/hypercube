@@ -22,4 +22,15 @@
  * SOFTWARE.
  */
 
+/*
+ * Revision History:
+ *     Initial: 2017/03/30        Jia Chenhui
+ */
+
 package workq
+
+type Job interface {
+	Do() error
+}
+
+var JobQueue chan Job

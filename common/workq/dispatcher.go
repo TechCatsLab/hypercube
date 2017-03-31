@@ -22,4 +22,43 @@
  * SOFTWARE.
  */
 
+/*
+ * Revision History:
+ *     Initial: 2017/03/30        Jia Chenhui
+ */
+
 package workq
+
+type Dispatcher struct {
+	WorkerPool chan chan Job
+}
+
+func NewDispatcher(maxWorkers int) *Dispatcher {
+	pool := make(chan chan Job, maxWorkers)
+
+	return &Dispatcher{
+		WorkerPool: pool,
+	}
+}
+
+func (this *Dispatcher) Run() {
+	for i := 0; i < MaxWorker; i++ {
+		worker := NewWorker(this.WorkerPool)
+		worker.Start()
+	}
+
+	go this.dispatch()
+}
+
+func (this *Dispatcher) dispatch() {
+	for {
+		select {
+		case job := <-JobQueue:
+			go func(job Job) {
+				jobChannel := <-this.WorkerPool
+
+				jobChannel <- job
+			}(job)
+		}
+	}
+}

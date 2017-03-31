@@ -22,4 +22,57 @@
  * SOFTWARE.
  */
 
+/*
+ * Revision History:
+ *     Initial: 2017/03/30        Jia Chenhui
+ */
+
 package workq
+
+import (
+	"os"
+
+	"hypercube/common/log"
+)
+
+var (
+	MaxWorker = int(os.Getenv("MAX_WORKERS"))
+	MaxQueue  = int(os.Getenv("MAX_QUEUE"))
+)
+
+type Worker struct {
+	WorkerPool chan chan Job
+	JobChannel chan Job
+	quit       chan bool
+}
+
+func NewWorker(workerPool chan chan Job) Worker {
+	return Worker{
+		WorkerPool: workerPool,
+		JobChannel: make(chan Job),
+		quit:       make(chan bool),
+	}
+}
+
+func (this Worker) Start() {
+	go func() {
+		for {
+			this.WorkerPool <- this.JobChannel
+
+			select {
+			case job := <-this.JobChannel:
+				if err := job.Do(); err != nil {
+					log.S8ELogger.Debug(err)
+				}
+			case <-this.quit:
+				return
+			}
+		}
+	}()
+}
+
+func (this Worker) Stop() {
+	go func() {
+		this.quit <- true
+	}()
+}
