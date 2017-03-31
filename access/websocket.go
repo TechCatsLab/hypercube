@@ -46,6 +46,7 @@ func init() {
 	var err error
 
 	pprof.HttpPprof()
+	
 	readConfiguration()
 
 	upgrader = &websocket.Upgrader{
