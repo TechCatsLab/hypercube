@@ -2,11 +2,11 @@ package: hypercube
 import:
 - package: golang.org/x/text
   subpackages:
-    - transform
-    - unicode/norm
+  - transform
+  - unicode/norm
 - package: golang.org/x/sys
   subpackages:
-    - unix
+  - unix
 - package: github.com/Sirupsen/logrus
   version: ^0.11.5
 - package: github.com/gorilla/websocket
@@ -17,3 +17,5 @@ import:
 - package: github.com/prometheus/common
 - package: github.com/nats-io/go-nats-streaming
   version: v0.3.4
+- package: github.com/nats-io/go-nats
+  version: ^1.2.2

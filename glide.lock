@@ -1,5 +1,5 @@
-hash: 12085e5211cf289c3172ed52278877cd1729586fe32382fcb66ae48bb4b0dd2f
-updated: 2017-04-01T11:30:40.31664148+08:00
+hash: 8d7be83c6b2b014d82c7b6e585ef1bf76f596ae5a327676d947961ca4693b0a6
+updated: 2017-04-01T11:33:11.718640721+08:00
 imports:
 - name: github.com/beorn7/perks
   version: 4c0e84591b9aa9e6dcfdf3e020114cd81f89d5f9
@@ -32,6 +32,8 @@ imports:
   - pbutil
 - name: github.com/mitchellh/mapstructure
   version: 53818660ed4955e899c0bcafa97299a388bd7c8e
+- name: github.com/nats-io/go-nats
+  version: 61923ed1eaf8398000991fbbee2ef11ab5a5be0d
 - name: github.com/nats-io/go-nats-streaming
   version: 6e620057a207bd61e992c1c5b6a2de7b6a4cb010
 - name: github.com/pelletier/go-buffruneio
