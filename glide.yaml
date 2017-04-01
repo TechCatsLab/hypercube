@@ -1,5 +1,12 @@
 package: hypercube
 import:
+- package: golang.org/x/text
+  subpackages:
+    - transform
+    - unicode/norm
+- package: golang.org/x/sys
+  subpackages:
+    - unix
 - package: github.com/Sirupsen/logrus
   version: ^0.11.5
 - package: github.com/gorilla/websocket
