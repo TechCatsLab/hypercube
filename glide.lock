@@ -1,5 +1,5 @@
-hash: 8d7be83c6b2b014d82c7b6e585ef1bf76f596ae5a327676d947961ca4693b0a6
-updated: 2017-04-01T11:33:11.718640721+08:00
+hash: 7474eaeb7b70aeb1919f50d55d2ae8f1dd60cbe599af8e2168c4d1844fb481b8
+updated: 2017-04-01T20:39:52.956968018+08:00
 imports:
 - name: github.com/beorn7/perks
   version: 4c0e84591b9aa9e6dcfdf3e020114cd81f89d5f9
@@ -36,6 +36,13 @@ imports:
   version: 61923ed1eaf8398000991fbbee2ef11ab5a5be0d
 - name: github.com/nats-io/go-nats-streaming
   version: 6e620057a207bd61e992c1c5b6a2de7b6a4cb010
+- name: github.com/nats-io/nats
+  version: 61923ed1eaf8398000991fbbee2ef11ab5a5be0d
+  subpackages:
+  - encoders/builtin
+  - util
+- name: github.com/nats-io/nuid
+  version: 3cf34f9fca4e88afa9da8eabd75e3326c9941b44
 - name: github.com/pelletier/go-buffruneio
   version: c37440a7cf42ac63b919c752ca73a85067e05992
 - name: github.com/pelletier/go-toml
