@@ -45,7 +45,7 @@ const (
 
 var common *log.S8ELogger = log.S8ECreateLogger(
     &log.S8ELogTag{
-        log.LogTagService: "access layer",
+        log.LogTagService: "common",
         log.LogTagType: "timer",
     },
     log.S8ELogLevelDefault)
@@ -258,7 +258,7 @@ func (tb *TimeBasic) expire() {
 
         bb = tb.timers[0]
 
-        if bb.Expired() {
+        if !bb.Expired() {
             break
         }
         fn = bb.fn
