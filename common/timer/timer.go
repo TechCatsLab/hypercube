@@ -43,7 +43,7 @@ const (
     infiniteDuration = time.Duration(1<<63 - 1)
 )
 
-var logger *log.S8ELogger = log.S8ECreateLogger(
+var common *log.S8ELogger = log.S8ECreateLogger(
     &log.S8ELogTag{
         log.LogTagService: "access layer",
         log.LogTagType: "timer",
@@ -70,10 +70,10 @@ func (bb *BlockBasic) Expired() bool {
     sub := bb.expire.Sub(time.Now())
 
     if sub > 0 {
-        return true
+        return false
     }
 
-    return false
+    return true
 }
 
 func (bb *BlockBasic) ExpiredString() string {
@@ -124,7 +124,7 @@ func (tb *TimeBasic) grow() {
     tb.free = &(bbs[0])
     bb = tb.free
 
-    for i = 1;i < tb.capacity; i++ {
+    for i = 1; i < tb.capacity; i++ {
         bb.next = &(bbs[i])
         bb = bb.next
     }
@@ -189,13 +189,13 @@ func (tb *TimeBasic) add(bb *BlockBasic) {
         d = bb.expire.Sub(time.Now())
         tb.signal.Reset(d)
         if false {
-            format := fmt.Sprintf("timer: add reset delay %d ms" , int64(d)/int64(time.Millisecond))
-            logger.Debug(format)
+            format := fmt.Sprintf("timer: add reset delay %d ms" , int64(d) / int64(time.Millisecond))
+            common.Debug(format)
         }
     }
     if false {
         format := fmt.Sprintf("timer: push item key: %s, expire: %s, index: %d", bb.Key, bb.ExpiredString(), bb.index)
-        logger.Debug(format)
+        common.Debug(format)
     }
 
 }
@@ -210,7 +210,7 @@ func (tb *TimeBasic) remove(bb *BlockBasic) {
         // 已经被移除，通常是因为到期 (expire)
         if false {
             format := fmt.Sprintf("timer remove i: %d, last: %d, %p", i, last, bb)
-            logger.Debug(format)
+            common.Debug(format)
         }
 
         return
@@ -226,7 +226,7 @@ func (tb *TimeBasic) remove(bb *BlockBasic) {
     tb.timers = tb.timers[:last]
     if false {
         format := fmt.Sprintf("timer: remove item key: %s, expire: %s, index: %d", bb.Key, bb.ExpiredString(), bb.index)
-        logger.Debug(format)
+        common.Debug(format)
     }
     return
 }
@@ -251,7 +251,7 @@ func (tb *TimeBasic) expire() {
        if len(tb.timers) == 0 {
            d = infiniteDuration
            if false {
-               logger.Debug("timer: no other instance")
+               common.Debug("timer: no other instance")
            }
            break
        }
@@ -267,11 +267,11 @@ func (tb *TimeBasic) expire() {
 
         if fn == nil {
 
-            logger.Warn("expire timer no fn")
+            common.Warn("expire timer no fn")
         } else {
             if false {
                 format := fmt.Sprintf("timer key: %s, expire: %s, index: %d expired, call fn", bb.Key, bb.ExpiredString(), bb.index)
-                logger.Debug(format)
+                common.Debug(format)
             }
             fn()
         }
@@ -280,8 +280,8 @@ func (tb *TimeBasic) expire() {
     tb.signal.Reset(d)
 
     if false {
-        format := fmt.Sprintf("timer: expire reset delay %d ms", int64(d)/int64(time.Millisecond))
-        logger.Debug(format)
+        format := fmt.Sprintf("timer: expire reset delay %d ms", int64(d) / int64(time.Millisecond))
+        common.Debug(format)
     }
 
     tb.lock.Unlock()
@@ -291,7 +291,7 @@ func (tb *TimeBasic) expire() {
 
 func (tb *TimeBasic) up(j int) {
     for {
-        i := (j - 1)/2
+        i := (j - 1) / 2
 
         if j <= 0 || !tb.less(j, i) {
             break
@@ -303,14 +303,14 @@ func (tb *TimeBasic) up(j int) {
 
 func (tb *TimeBasic) down(i, n int) {
             for {
-                jl := 2*i + 1
+                jl := 2 * i + 1
                 if jl >= n || jl < 0 {
             break
         }
-        j := jl                  // left child
+        j := jl
         jr := jl + 1
         if jr < n && !tb.less(jl, jr) {
-            j = jr  // =2*i + 2     right child
+            j = jr  // =2*i + 2
         }
         if !tb.less(j, i) {
             break
