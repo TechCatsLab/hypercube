@@ -8,3 +8,5 @@ import:
 - package: github.com/prometheus/client_golang
   version: ^0.8.0
 - package: github.com/prometheus/common
+- package: github.com/nats-io/go-nats-streaming
+  version: v0.3.4
