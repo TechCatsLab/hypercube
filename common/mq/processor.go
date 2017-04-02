@@ -24,12 +24,14 @@
 
 /*
  * Revision History:
- *     Initial: 2017/04/01        Feng Yifei
+ *     Initial: 2017/04/02        Feng Yifei
  */
 
 package mq
 
-type MessageQueue interface {
-	CreateRequester(v interface{}) (interface {}, error)
-	CreateProcessor(v interface{}) (interface {}, error)
+type RequestHandler func(req interface{}) interface{}
+
+type Processor interface {
+	SetRequestHandler(handler RequestHandler) error
+	Stop() error
 }

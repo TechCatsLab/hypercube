@@ -30,46 +30,19 @@
 package mq
 
 import (
-	"strings"
-	"github.com/nats-io/go-nats"
 	"errors"
+	"strings"
+	"time"
+	"github.com/nats-io/go-nats"
 )
 
 var (
 	ErrMessageQueueFull = errors.New("Message queue full ")
 )
 
+// Nats Message Queue with JSON_ENCODER
 type NatsJsonMQ struct {
 	conn *nats.EncodedConn
-}
-
-type NatsPublisher struct {
-	subject   *string
-	sender    chan interface{}
-}
-
-func newNatsPublisher(subject *string) *NatsPublisher {
-	sender := make(chan interface{}, 1)
-
-	return &NatsPublisher{
-		subject: subject,
-		sender: sender,
-	}
-}
-
-func (this *NatsPublisher) SendMessage(v interface{}) error {
-	this.sender <- v
-	return nil
-}
-
-func (this *NatsPublisher) PostMessage(v interface{}) error {
-	select {
-	case this.sender <-v:
-		return nil
-
-	default:
-		return ErrMessageQueueFull
-	}
 }
 
 func NewNatsMQ(urls *string) (*NatsJsonMQ, error) {
@@ -102,9 +75,9 @@ func NewNatsMQ(urls *string) (*NatsJsonMQ, error) {
 	return q, nil
 }
 
-func (this *NatsJsonMQ) CreateProducer(v interface{}) (interface {}, error) {
+func (this *NatsJsonMQ) CreateRequester(v interface{}) (*NatsRequester, error) {
 	subject, _ := v.(*string)
-	producer := newNatsPublisher(subject)
+	producer := newNatsRequester(this, subject)
 
 	err := this.conn.BindSendChan(*subject, producer.sender)
 
@@ -113,4 +86,74 @@ func (this *NatsJsonMQ) CreateProducer(v interface{}) (interface {}, error) {
 	}
 
 	return producer, nil
+}
+
+func (this *NatsJsonMQ) CreateProcessor(v interface{}) (*NatsProcessor, error) {
+	subject, _ := v.(*string)
+	processor := newNatsProcessor(this, subject)
+
+	return processor, nil
+}
+
+// Nats Publisher
+type NatsRequester struct {
+	mq        *NatsJsonMQ
+	subject   *string
+	sender    chan interface{}
+}
+
+func newNatsRequester(mq *NatsJsonMQ, subject *string) *NatsRequester {
+	sender := make(chan interface{}, 1)
+
+	return &NatsRequester{
+		mq: mq,
+		subject: subject,
+		sender: sender,
+	}
+}
+
+func (this *NatsRequester) SendMessage(v interface{}) error {
+	this.sender <- v
+	return nil
+}
+
+func (this *NatsRequester) Request(v interface{}, r interface{}, timeout time.Duration) error {
+	return this.mq.conn.Request(*this.subject, v, r, timeout)
+}
+
+// Nats Subscriber
+type NatsProcessor struct {
+	mq        *NatsJsonMQ
+	subject   *string
+	receiver  chan interface{}
+	sub       *nats.Subscription
+}
+
+func newNatsProcessor(mq *NatsJsonMQ, subject *string) *NatsProcessor {
+	receiver := make(chan interface{}, 1)
+
+	return &NatsProcessor{
+		mq: mq,
+		subject: subject,
+		receiver: receiver,
+	}
+}
+
+func (this *NatsProcessor) SetRequestHandler(handler RequestHandler) error {
+	var err error
+
+	cb := func(sub, reply string, req interface{}) {
+		resp := handler(req)
+		this.mq.conn.Publish(reply, resp)
+	}
+
+	if this.sub, err = this.mq.conn.Subscribe(*this.subject, cb); err != nil {
+		this.sub = nil
+	}
+
+	return err
+}
+
+func (this *NatsProcessor) Stop() error {
+	return this.sub.Unsubscribe()
 }

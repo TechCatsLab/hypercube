@@ -24,12 +24,16 @@
 
 /*
  * Revision History:
- *     Initial: 2017/04/01        Feng Yifei
+ *     Initial: 2017/04/02        Feng Yifei
  */
 
 package mq
 
-type Producer interface {
+import (
+	"time"
+)
+
+type Requester interface {
 	SendMessage(v interface{}) error
-	PostMessage(v interface{}) error
+	Request(v interface{}, r interface{}, timeout time.Duration) error
 }
