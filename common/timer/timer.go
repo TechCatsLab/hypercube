@@ -329,4 +329,3 @@ func (tb *TimeBasic) swap(i, j int) {
     tb.timers[i].index = i
     tb.timers[j].index = j
 }
-s
