@@ -4,5 +4,6 @@
     "readBufferSize": 4096,
     "writeBufferSize": 4096
   },
-  "pprofaddrs": "localhost:6060"
+  "pprofaddrs": "localhost:6060",
+  "prometheusListen": ":9200"
 }
