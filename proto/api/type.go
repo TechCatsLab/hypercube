@@ -24,16 +24,12 @@
 
 /*
  * Revision History:
- *     Initial: 2017/04/02        Feng Yifei
+ *     Initial: 2017/04/04        Feng Yifei
  */
 
 package api
 
-import (
-	"encoding/json"
+const (
+	ApiTypeUserLogin               = 0x100
+	ApiTypeUserLogout              = 0x101
 )
-
-type Request struct {
-	Type       uint32
-	Content    json.RawMessage
-}

@@ -24,16 +24,16 @@
 
 /*
  * Revision History:
- *     Initial: 2017/04/02        Feng Yifei
+ *     Initial: 2017/04/04        Feng Yifei
  */
 
 package api
 
-import (
-	"encoding/json"
-)
+type UserLogin struct {
+	UserID        uint64
+	ServerIP      string
+}
 
-type Request struct {
-	Type       uint32
-	Content    json.RawMessage
+type UserLogout struct {
+	UserID        uint64
 }
