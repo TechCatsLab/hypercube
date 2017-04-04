@@ -74,6 +74,6 @@ func init() {
 
 	go func() {
 		http.Handle("/metrics", promhttp.Handler())
-		log.Fatal(http.ListenAndServe(configuration.PrometheusListen, nil))
+		log.Fatal(http.ListenAndServe(configuration.PrometheusPort, nil))
 	}()
 }

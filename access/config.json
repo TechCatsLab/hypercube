@@ -1,9 +1,18 @@
 {
   "addrs": ["0.0.0.0:20001", "0.0.0.0:20002"],
+
   "websocket": {
     "readBufferSize": 4096,
     "writeBufferSize": 4096
   },
-  "pprofaddrs": "localhost:6060",
-  "prometheusListen": ":9200"
+
+  "nats": {
+    "urls": "nats://10.0.0.254:4223",
+    "apiChannel": "logic.hypercube.s8e.io"
+  },
+
+  "monitor": {
+    "pprofAddrs": "localhost:6060",
+    "prometheusPort": ":9200"
+  }
 }
