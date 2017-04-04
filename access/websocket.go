@@ -45,6 +45,8 @@ func init() {
 	var err error
 	
 	readConfiguration()
+	initRPC()
+
 	HttpPprof()
 
 	upgrader = &websocket.Upgrader{
