@@ -1,4 +1,8 @@
 {
+  "nats": {
+    "urls": "nats://10.0.0.254:4223",
+    "apiChannel": "logic.hypercube.s8e.io"
+  },
   "monitoring": {
     "pprofAddrs": "localhost:6060",
     "prometheusPort": ":9400"

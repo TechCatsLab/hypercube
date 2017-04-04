@@ -29,45 +29,6 @@
 
 package main
 
-import (
-	"hypercube/common/log"
-	"github.com/spf13/viper"
-)
-
-var (
-	logger *log.S8ELogger = log.S8ECreateLogger(
-		&log.S8ELogTag{
-			log.LogTagService: "Logic Layer",
-			log.LogTagType: "common",
-		},
-		log.S8ELogLevelDefault)
-
-	configuration *LogicLayerConfig
-)
-
-// 配置文件结构
-type LogicLayerConfig struct {
-	NatsUrl             string
-	ApiChannel          string
-	PprofAddrs          string
-	PrometheusPort      string
+func requestProcessor(req interface{}) interface{} {
+	return nil
 }
-
-// 初始化配置
-func readConfiguration() {
-	viper.AddConfigPath("./")
-	viper.SetConfigName("config")
-
-	if err := viper.ReadInConfig(); err != nil {
-		logger.Error("Read configuration file with error:", err)
-		panic(err)
-	}
-
-	configuration = &LogicLayerConfig{
-		NatsUrl:               viper.GetString("nats.urls"),
-		ApiChannel:            viper.GetString("nats.apiChannel"),
-		PprofAddrs:            viper.GetString("monitoring.pprofAddrs"),
-		PrometheusPort:        viper.GetString("monitoring.prometheusPort"),
-	}
-}
-

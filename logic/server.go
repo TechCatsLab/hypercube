@@ -30,44 +30,45 @@
 package main
 
 import (
-	"hypercube/common/log"
-	"github.com/spf13/viper"
+	"hypercube/common/mq"
+	"os"
 )
 
 var (
-	logger *log.S8ELogger = log.S8ECreateLogger(
-		&log.S8ELogTag{
-			log.LogTagService: "Logic Layer",
-			log.LogTagType: "common",
-		},
-		log.S8ELogLevelDefault)
-
-	configuration *LogicLayerConfig
+	natsMQ           *mq.NatsJsonMQ
+	processor        *mq.NatsProcessor
 )
 
-// 配置文件结构
-type LogicLayerConfig struct {
-	NatsUrl             string
-	ApiChannel          string
-	PprofAddrs          string
-	PrometheusPort      string
+func init() {
+	readConfiguration()
+
+	setupApiServer()
 }
 
-// 初始化配置
-func readConfiguration() {
-	viper.AddConfigPath("./")
-	viper.SetConfigName("config")
+func setupApiServer() {
+	var (
+		err        error
+	)
 
-	if err := viper.ReadInConfig(); err != nil {
-		logger.Error("Read configuration file with error:", err)
-		panic(err)
+	natsMQ, err = mq.NewNatsMQ(&configuration.NatsUrl)
+	if err != nil {
+		logger.Error("Starting API Server error:", err)
+		goto exit
 	}
 
-	configuration = &LogicLayerConfig{
-		NatsUrl:               viper.GetString("nats.urls"),
-		ApiChannel:            viper.GetString("nats.apiChannel"),
-		PprofAddrs:            viper.GetString("monitoring.pprofAddrs"),
-		PrometheusPort:        viper.GetString("monitoring.prometheusPort"),
+	processor, err = natsMQ.CreateProcessor(&configuration.ApiChannel)
+	if err != nil {
+		logger.Error("Creating processor with error:", err)
+		goto exit
 	}
+
+	processor.SetRequestHandler(requestProcessor)
+	logger.Info("API Server setup finished!")
+	return
+
+exit:
+	if natsMQ != nil {
+		natsMQ.Close()
+	}
+	os.Exit(1)
 }
-
