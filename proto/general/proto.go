@@ -32,6 +32,7 @@ package general
 import (
 	"fmt"
 	"encoding/json"
+	"hypercube/vendor/github.com/gorilla/websocket"
 )
 
 var (
@@ -65,4 +66,9 @@ func (p *Proto) VerCheck() (*Proto, uint32) {
 	}
 
 	return p, ErrSucceed
+}
+
+func (p *Proto) ReadWebsocket(wr *websocket.Conn) (err error) {
+	err = wr.ReadJSON(p)
+	return
 }
