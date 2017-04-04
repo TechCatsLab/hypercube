@@ -95,6 +95,10 @@ func (this *NatsJsonMQ) CreateProcessor(v interface{}) (*NatsProcessor, error) {
 	return processor, nil
 }
 
+func (this *NatsJsonMQ) Close() {
+	this.conn.Close()
+}
+
 // Nats Publisher
 type NatsRequester struct {
 	mq        *NatsJsonMQ
@@ -144,7 +148,10 @@ func (this *NatsProcessor) SetRequestHandler(handler RequestHandler) error {
 
 	cb := func(sub, reply string, req interface{}) {
 		resp := handler(req)
-		this.mq.conn.Publish(reply, resp)
+
+		if resp != nil {
+			this.mq.conn.Publish(reply, resp)
+		}
 	}
 
 	if this.sub, err = this.mq.conn.Subscribe(*this.subject, cb); err != nil {
