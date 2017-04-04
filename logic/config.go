@@ -66,8 +66,8 @@ func readConfiguration() {
 	configuration = &LogicLayerConfig{
 		NatsUrl:               viper.GetString("nats.urls"),
 		ApiChannel:            viper.GetString("nats.apiChannel"),
-		PprofAddrs:            viper.GetString("monitoring.pprofAddrs"),
-		PrometheusPort:        viper.GetString("monitoring.prometheusPort"),
+		PprofAddrs:            viper.GetString("monitor.pprofAddrs"),
+		PrometheusPort:        viper.GetString("monitor.prometheusPort"),
 	}
 }
 
