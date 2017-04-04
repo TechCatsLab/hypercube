@@ -32,10 +32,9 @@ package general
 type Message struct {
 	From        uint64      `json:"fr"`
 	To          uint64      `json:"to"`
-	P           Proto       `json:"pr"`
+	Content     string      `json:"co"`
 }
 
 type Keepalive struct {
 	Uid         uint64      `json:"uid"`
-	Ver         uint16      `json:"ver"`
 }

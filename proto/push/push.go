@@ -29,24 +29,14 @@
 
 package push
 
-import (
-	"hypercube/proto/general"
-)
-
 // 推送一个消息到一个人
 type PushMsg struct {
-	Uid     uint64
-	P       general.Proto
+	Uid         uint64
+	Content     string
 }
 
 // 推送一个消息到多人
 type MPushMsg struct {
-	Uids     []uint64
-	P       general.Proto
-}
-
-// 推送多个消息到一个人
-type PushMsgs struct {
-	Uid     uint64
-	P       []general.Proto
+	Roomid      uint64
+	Content     string
 }
