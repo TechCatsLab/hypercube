@@ -31,13 +31,13 @@ package general
 
 const (
 	// heartbeat
-	TP_HEARTBEAT = uint32(0)
+	TpHeartbeat = uint32(0)
 	// user to user message
-	TP_UTU_MSG   = uint32(1)
+	TpUTUMsg    = uint32(1)
 	// proto ver conflict
-	TP_VER_CONF  = uint32(2)
+	TpVerConf   = uint32(2)
 	// server push message
-	TP_PUSH_MSG  = uint32(3)
+	TpPushMsg   = uint32(3)
 	// send to room
-	TP_ROOM_MSG  = uint32(4)
+	TpRoomMsg   = uint32(4)
 )
