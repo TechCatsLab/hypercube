@@ -24,21 +24,11 @@
 
 /*
  * Revision History:
- *     Initial: 2017/04/02        Feng Yifei
+ *     Initial: 2017/04/04        Feng Yifei
  */
 
 package api
 
-import (
-	"encoding/json"
+const (
+	ErrSucceed            = uint32(0x0)
 )
-
-type Request struct {
-	Type       uint32
-	Content    json.RawMessage
-}
-
-type Reply struct {
-	Code        uint32
-	Content     json.RawMessage
-}
