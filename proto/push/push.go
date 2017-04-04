@@ -24,29 +24,29 @@
 
 /*
  * Revision History:
- *     Initial: 2017/04/02        Liu Jiachang
+ *     Initial: 2017/04/04        Liu Jiachang
  */
 
-package access
+package push
 
-import "fmt"
-
-var (
-	emptyProto = Proto{}
-	emptyJSONBody = []byte("{}")
+import (
+	"hypercube/proto/general"
 )
 
-type Proto struct {
-	Ver     int16       `json:"ver"`
-	Type    int32       `json:"type"`
-	SeqId   int32       `json:"seqid"`
-	Body    string      `json:"body"`
+// 推送一个消息到一个人
+type PushMsg struct {
+	Uid     uint64
+	P       general.Proto
 }
 
-func (p *Proto) Reset() {
-	*p = emptyProto
+// 推送一个消息到多人
+type MPushMsg struct {
+	Uids     []uint64
+	P       general.Proto
 }
 
-func (p *Proto) String() string {
-	return fmt.Sprintf("\n-------- proto --------\nver: %d\ntype: %d\nseq: %d\nbody: %v\n--------------------", p.Ver, p.Type, p.SeqId, p.Body)
+// 推送多个消息到一个人
+type PushMsgs struct {
+	Uid     uint64
+	P       []general.Proto
 }

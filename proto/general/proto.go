@@ -27,13 +27,27 @@
  *     Initial: 2017/04/02        Liu Jiachang
  */
 
-package access
+package general
 
-type NoCont struct {
+import (
+	"fmt"
+	"encoding/json"
+)
+
+var (
+	emptyProto = Proto{}
+)
+
+type Proto struct {
+	Ver     uint16              `json:"v"`
+	Type    uint32              `json:"t"`
+	Body    json.RawMessage     `json:"b"`
 }
 
-type SendMsg struct {
-	From        int64       `json:"from"`
-	To          int64       `json:"to"`
-	P           Proto       `json:"proto"`
+func (p *Proto) Reset() {
+	*p = emptyProto
+}
+
+func (p *Proto) String() string {
+	return fmt.Sprintf("\n-------- proto --------\nver: %d\ntype: %d\nbody: %v\n--------------------", p.Ver, p.Type, p.Body)
 }
