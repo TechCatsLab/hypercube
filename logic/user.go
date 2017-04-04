@@ -31,47 +31,32 @@ package main
 
 import (
 	"hypercube/proto/api"
-	"encoding/json"
 )
 
-type handlerFunc func(interface{}) interface{}
-
-func requestProcessor(req []byte) interface{} {
+func userLoginRequestHandler(req interface{}) interface{} {
 	var (
-		err          error
-		request      api.Request
-		login        api.UserLogin
-		logout       api.UserLogout
-		v            interface{}
-		handler      handlerFunc
+		login    *api.UserLogin
 	)
 
-	err = json.Unmarshal(req, &request)
+	login = req.(*api.UserLogin)
 
-	if err != nil {
-		logger.Error("Logic request processor error:", err)
-		return nil
-	}
-
-	switch request.Type {
-	case api.ApiTypeUserLogin:
-		v = &login
-		handler = userLoginRequestHandler
-
-	case api.ApiTypeUserLogout:
-		v = &logout
-		handler = userLogoutRequestHandler
-	}
-
-	if v != nil {
-		err = json.Unmarshal(request.Content, v)
-		if err != nil {
-			logger.Error("Logic request processor content error:", err)
-			return nil
-		}
-
-		return handler(v)
-	}
+	logger.Debug("userLoginRequestHandler userID:", login.UserID)
 
 	return nil
+}
+
+func userLogoutRequestHandler(req interface{}) interface{} {
+	var (
+		reply        *api.Reply
+		logout       *api.UserLogout
+	)
+
+	logout = req.(*api.UserLogout)
+	logger.Debug("userLogoutRequestHandler userID:", logout.UserID)
+
+	reply = &api.Reply{
+		Code: api.ErrSucceed,
+	}
+
+	return reply
 }
