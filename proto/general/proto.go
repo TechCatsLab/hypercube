@@ -68,7 +68,6 @@ func (p *Proto) VerCheck() (*Proto, uint32) {
 	return p, ErrSucceed
 }
 
-func (p *Proto) ReadWebsocket(wr *websocket.Conn) (err error) {
-	err = wr.ReadJSON(p)
-	return
+func (p *Proto) ReadWebSocket(wr *websocket.Conn) error {
+	return wr.ReadJSON(p)
 }
