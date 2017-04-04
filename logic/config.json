@@ -1,0 +1,6 @@
+{
+  "monitoring": {
+    "pprofAddrs": "localhost:6060",
+    "prometheusPort": ":9400"
+  }
+}
