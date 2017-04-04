@@ -30,6 +30,7 @@
 package general
 
 const (
-	ErrSucceed = uint32(0)
-	ErrVerConf = uint32(1)     // Protocol conflict
+	ErrSucceed   = uint32(0)
+	ErrVerConf   = uint32(1)     // Protocol conflict
+	ErrSpiteAtt  = uint32(2)     // someone spite attack
 )

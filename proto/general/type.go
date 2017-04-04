@@ -36,8 +36,10 @@ const (
 	TpUTUMsg    = uint32(1)
 	// proto ver conflict
 	TpVerConf   = uint32(2)
+	// spite attack
+	TpSpiteAtt  = uint32(3)
 	// server push message
-	TpPushMsg   = uint32(3)
+	TpPushMsg   = uint32(4)
 	// send to room
-	TpRoomMsg   = uint32(4)
+	TpRoomMsg   = uint32(5)
 )
