@@ -29,7 +29,7 @@
 
 package mq
 
-type RequestHandler func(req interface{}) interface{}
+type RequestHandler func(req []byte) interface{}
 
 type Processor interface {
 	SetRequestHandler(handler RequestHandler) error

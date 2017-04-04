@@ -30,14 +30,9 @@
 package mq
 
 import (
-	"errors"
 	"strings"
 	"time"
 	"github.com/nats-io/go-nats"
-)
-
-var (
-	ErrMessageQueueFull = errors.New("Message queue full ")
 )
 
 // Nats Message Queue with JSON_ENCODER
@@ -129,24 +124,20 @@ func (this *NatsRequester) Request(v interface{}, r interface{}, timeout time.Du
 type NatsProcessor struct {
 	mq        *NatsJsonMQ
 	subject   *string
-	receiver  chan interface{}
 	sub       *nats.Subscription
 }
 
 func newNatsProcessor(mq *NatsJsonMQ, subject *string) *NatsProcessor {
-	receiver := make(chan interface{}, 1)
-
 	return &NatsProcessor{
 		mq: mq,
 		subject: subject,
-		receiver: receiver,
 	}
 }
 
 func (this *NatsProcessor) SetRequestHandler(handler RequestHandler) error {
 	var err error
 
-	cb := func(sub, reply string, req interface{}) {
+	cb := func(sub, reply string, req []byte) {
 		resp := handler(req)
 
 		if resp != nil {
