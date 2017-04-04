@@ -24,43 +24,20 @@
 
 /*
  * Revision History:
- *     Initial: 2017/04/02        Liu Jiachang
- *     Change:  2017/04/04        Liu Jiachang
+ *     Initial: 2017/04/04        Liu Jiachang
  */
 
 package general
 
-import (
-	"fmt"
-	"encoding/json"
-	"github.com/pkg/errors"
+const (
+	// heartbeat
+	TP_HEARTBEAT = uint32(0)
+	// user to user message
+	TP_UTU_MSG   = uint32(1)
+	// proto ver conflict
+	TP_VER_CONF  = uint32(2)
+	// server push message
+	TP_PUSH_MSG  = uint32(3)
+	// send to room
+	TP_ROOM_MSG  = uint32(4)
 )
-
-var (
-	VerConfErr = errors.New("Protocol is too old")
-	curVer     = uint16(1)
-	emptyProto = Proto{}
-)
-
-type Proto struct {
-	Ver     uint16              `json:"v"`
-	Type    uint32              `json:"t"`
-	Body    json.RawMessage     `json:"b"`
-}
-
-func (p *Proto) Reset() {
-	*p = emptyProto
-}
-
-func (p *Proto) String() string {
-	return fmt.Sprintf("\n-------- proto --------\nver: %d\ntype: %d\nbody: %v\n--------------------", p.Ver, p.Type, p.Body)
-}
-
-func (p *Proto) VerCheck() (*Proto, error) {
-	if p.Ver != curVer {
-		p.Type = TP_VER_CONF
-		return  p, VerConfErr
-	}
-
-	return p, nil
-}
