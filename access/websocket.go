@@ -33,6 +33,9 @@ import (
 	"net/http"
 	"github.com/gorilla/websocket"
 	ws "hypercube/common/server/websocket"
+	"hypercube/proto/general"
+	"encoding/json"
+	"hypercube/proto/push"
 )
 
 var (
@@ -107,7 +110,48 @@ func serveWebSocket(w http.ResponseWriter, req *http.Request) {
 	webSocketConnectionHandler(connection)
 }
 
+type handlerFunc func(p interface{},req interface{}) interface{}
+
 func webSocketConnectionHandler(conn *websocket.Conn) {
+	var (
+		err        error
+		p          *general.Proto = &general.Proto{}
+		ver        *general.Keepalive = &general.Keepalive{}
+		mes        *general.Message = &general.Message{}
+		pushmany   *push.MPushMsg = &push.MPushMsg{}
+		pushone    *push.PushMsg = &push.PushMsg{}
+		v          interface{}
+		handler    handlerFunc
+	)
+
 	for {
+		if err = p.ReadWebSocket(conn); err != nil {
+			logger.Error("conn read error:", err)
+			break
+		}
+
+		switch p.Type {
+		case general.TpHeartbeat:
+			v = ver
+			handler = keepAliveRequestHandler
+		case general.TpUTUMsg:
+			v = mes
+			handler = userToUserRequestHandler
+		case general.TpRoomMsg:
+			v = pushmany
+			handler = pushManyRequestHandler
+		case general.TpPushMsg:
+			v = pushone
+			handler = pushOneRequestHandler
+		}
+
+		if v != nil {
+			err = json.Unmarshal(p.Body, v)
+			if err != nil {
+				continue
+			} else {
+				handler(p,v)
+			}
+		}
 	}
 }
