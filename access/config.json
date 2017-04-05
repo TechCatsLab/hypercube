@@ -11,6 +11,11 @@
     "apiChannel": "logic.hypercube.s8e.io"
   },
 
+  "natss": {
+    "urls": "nats://10.0.0.253:4222",
+    "clientID": "clientid"
+  },
+
   "monitor": {
     "pprofAddrs": "localhost:6060",
     "prometheusPort": ":9200"
