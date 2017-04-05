@@ -34,6 +34,7 @@ import (
     "time"
     "github.com/nats-io/go-nats-streaming"
     "github.com/nats-io/go-nats-streaming/pb"
+    "hypercube/proto/general"
 )
 
 var (
@@ -44,27 +45,31 @@ var (
     READ_TIMEOUT = time.Second * 5
 )
 
+const (
+    clusterID = "test-cluster"
+    subject = "chatmessage"
+    durable = "chatmessage"
+)
+
 type NatsStreaming struct {
     subject     *string
     durable		*string
     conn 		*stan.Conn
 }
 
-func ConnectToServer(urls, clusterID, clientID, subject, durable  string) (*NatsStreaming, error) {
-    sc, err := stan.Connect(clusterID, clientID, stan.NatsURL(urls))
+func ConnectToServer(urls, clientID  *string) (*NatsStreaming, error) {
+    sc, err := stan.Connect(clusterID, *clientID, stan.NatsURL(*urls))
 
     if err != nil {
         return nil, err
     }
-    return &NatsStreaming{
-        subject: &subject,
-        durable: &durable,
-        conn: &sc,
-    }, nil
+    return &NatsStreaming{conn: &sc}, nil
 }
 
 func (ns *NatsStreaming)WriteMessage(msg interface{}) error  {
-    err := (*ns.conn).Publish(*ns.subject, []byte(msg))
+
+    m, _ := msg.(general.Proto)
+    err := (*ns.conn).Publish(subject, []byte(m))
 
     if err != nil {
         return err
@@ -72,32 +77,32 @@ func (ns *NatsStreaming)WriteMessage(msg interface{}) error  {
     return nil
 }
 
-func (ns *NatsStreaming)ReadMessage() (msg string,  err error) {
+func (ns *NatsStreaming)ReadMessage() (msg interface{},  err error) {
 
     startOpt := stan.StartAt(pb.StartPosition_NewOnly)
-    readMessage := make(chan string, 1)
+    readMessage := make(chan general.Proto, 1)
     var (
         sub stan.Subscription
     )
 
     messageHandle := func(msg *stan.Msg){
-        readMessage <- string(msg.Data)
+        readMessage <- (general.Proto)(msg.Data)
     }
 
-    sub, err = (*ns.conn).Subscribe(*ns.subject, messageHandle, startOpt, stan.DurableName(*ns.durable))
+    sub, err = (*ns.conn).Subscribe(subject, messageHandle, startOpt, stan.DurableName(durable))
     if err != nil {
         (*ns.conn).Close()
-        return "", err
+        return nil, err
     }
 
     select {
     case <- time.After(READ_TIMEOUT):
         sub.Unsubscribe()
-        return "", ErrMessageEmpty
+        return nil, ErrMessageEmpty
     case msg = <-readMessage:
         sub.Unsubscribe()
         return msg, nil
     }
 
-    return "", ErrMessageEmpty
+    return nil, ErrMessageEmpty
 }

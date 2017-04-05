@@ -37,6 +37,7 @@ import (
 var (
 	natsMQ        *mq.NatsJsonMQ
 	requester     *mq.NatsRequester
+	natsStreaming *mq.NatsStreaming
 )
 
 func initRPC() {
@@ -62,6 +63,24 @@ func initRPC() {
 exit:
 	if natsMQ != nil {
 		natsMQ.Close()
-		os.Exit(1)
 	}
+	os.Exit(1)
+}
+
+func initMsg() {
+	var (
+		err        error
+	)
+
+	natsStreaming, err = mq.ConnectToServer(&configuration.NatssUrl, &configuration.NatssClientID)
+	if err != nil {
+		logger.Error("initialize nats-streaming with error ", err)
+		goto exit
+	}
+
+	logger.Debug("connect to nats-streaming server ")
+	return
+
+exit:
+	os.Exit(1)
 }
