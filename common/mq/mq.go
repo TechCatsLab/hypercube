@@ -30,6 +30,6 @@
 package mq
 
 type MessageQueue interface {
-	CreateRequester(v interface{}) (interface {}, error)
-	CreateProcessor(v interface{}) (interface {}, error)
+	CreateRequester(v interface{}) (interface{}, error)
+	CreateProcessor(v interface{}) (interface{}, error)
 }
