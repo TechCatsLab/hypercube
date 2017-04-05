@@ -24,34 +24,20 @@
 
 /*
  * Revision History:
- *     Initial: 2017/03/29        Feng Yifei
+ *     Initial: 2017/04/05      HeCJ
  */
 
 package main
 
-import (
-	"os"
-	"syscall"
-	"hypercube/common/interrupt"
-)
+func init()  {
+    initSignal()
 
-var (
-	sigHandler *interrupt.Handler
-)
+    readConfiguration()
 
-func initSignal() {
-	sigHandler = interrupt.New(finalHandler, func(){})
-	logger.Debug("Interrupt handler initialized")
-}
+    initRPC()
+    initMsg()
 
-func finalHandler(sig os.Signal) {
-	switch sig {
-	case syscall.SIGQUIT, syscall.SIGTERM, syscall.SIGINT:
-		logger.Info("Signal quit/term/int captured")
-		return
-
-	case syscall.SIGHUP:
-		logger.Info("Signal hup captured")
-		return
-	}
+    HttpPprof()
+    initWebsocket()
+    initPrometheus()
 }

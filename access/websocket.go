@@ -41,13 +41,8 @@ var (
 	webSocketServers      []*ws.WebSocketServer
 )
 
-func init() {
+func initWebsocket()  {
 	var err error
-	
-	readConfiguration()
-	initRPC()
-
-	HttpPprof()
 
 	upgrader = &websocket.Upgrader{
 		ReadBufferSize:     configuration.WSReadBufferSize,

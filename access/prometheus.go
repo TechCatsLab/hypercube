@@ -66,9 +66,7 @@ var (
 	})
 )
 
-func init() {
-	readConfiguration()
-
+func initPrometheus() {
 	prometheus.MustRegister(rpcDurations)
 	prometheus.MustRegister(rpcDurationsHistogram)
 

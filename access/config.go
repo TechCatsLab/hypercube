@@ -54,6 +54,8 @@ type AccessLayerConfig struct {
 	ApiChannel          string
 	PprofAddrs          string
 	PrometheusPort      string
+	NatssUrl			string
+	NatssClientID		string
 }
 
 // 初始化配置
@@ -74,5 +76,7 @@ func readConfiguration() {
 		ApiChannel:            viper.GetString("nats.apiChannel"),
 		PprofAddrs:            viper.GetString("monitor.pprofAddrs"),
 		PrometheusPort:        viper.GetString("monitor.prometheusPort"),
+		NatssUrl:      		   viper.GetString("natss.urls"),
+		NatssClientID:         viper.GetString("natss.clientID"),
 	}
 }
