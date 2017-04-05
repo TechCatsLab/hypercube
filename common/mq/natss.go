@@ -32,11 +32,9 @@ package mq
 import (
     "errors"
     "time"
-    "bytes"
-    "encoding/binary"
+    "encoding/json"
     "github.com/nats-io/go-nats-streaming"
     "github.com/nats-io/go-nats-streaming/pb"
-    "hypercube/proto/general"
 )
 
 var (
@@ -70,9 +68,12 @@ func ConnectToServer(urls, clientID  *string) (*NatsStreaming, error) {
 
 func (ns *NatsStreaming)WriteMessage(msg interface{}) error  {
 
-    m, _ := msg.(*general.Proto)
-    mBytes,_ := protpToBytes(m)
-    err := (*ns.conn).Publish(subject, mBytes)
+    m, err := json.Marshal(msg)
+    if err != nil {
+        return err
+    }
+
+    err = (*ns.conn).Publish(subject, m)
 
     if err != nil {
         return err
@@ -83,14 +84,13 @@ func (ns *NatsStreaming)WriteMessage(msg interface{}) error  {
 func (ns *NatsStreaming)ReadMessage() (msg interface{},  err error) {
 
     startOpt := stan.StartAt(pb.StartPosition_NewOnly)
-    readMessage := make(chan *general.Proto, 1)
+    readMessage := make(chan interface{}, 1)
     var (
         sub stan.Subscription
     )
 
     messageHandle := func(msg *stan.Msg){
-        m, _ := bytesToProto(msg.Data)
-        readMessage <- m
+        readMessage <- msg
     }
 
     sub, err = (*ns.conn).Subscribe(subject, messageHandle, startOpt, stan.DurableName(durable))
@@ -109,27 +109,4 @@ func (ns *NatsStreaming)ReadMessage() (msg interface{},  err error) {
     }
 
     return nil, ErrMessageEmpty
-}
-
-func bytesToProto(buffer []byte) (*general.Proto, error)  {
-    var proto general.Proto
-
-    buf := bytes.NewReader(buffer)
-    err := binary.Read(buf, binary.BigEndian, &proto)
-
-    if err != nil {
-        return nil, err
-    }
-    return &proto, nil
-}
-
-func protpToBytes(proto *general.Proto) ([]byte, error)  {
-    buf := new(bytes.Buffer)
-
-    err := binary.Write(buf, binary.BigEndian, *proto)
-
-    if err != nil {
-        return nil, err
-    }
-    return buf.Bytes(), nil
 }
