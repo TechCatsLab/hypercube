@@ -32,7 +32,7 @@ package general
 import (
 	"fmt"
 	"encoding/json"
-	"hypercube/vendor/github.com/gorilla/websocket"
+	"github.com/gorilla/websocket"
 )
 
 var (
