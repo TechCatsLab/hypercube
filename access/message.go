@@ -72,7 +72,13 @@ func initMsg() {
 		err        error
 	)
 
-	natsStreaming, err = mq.ConnectToServer(&configuration.NatssUrl, &configuration.NatssClientID)
+	natsStreaming, err = mq.ConnectToServer(
+		&configuration.NatssUrl,
+		&configuration.NatssClusterID,
+		&configuration.NatssClientID,
+		&configuration.NatssSubject,
+		&configuration.NatssDurable,
+		uint32(configuration.NatssTimeout))
 	if err != nil {
 		logger.Error("initialize nats-streaming with error ", err)
 		goto exit

@@ -41,29 +41,32 @@ var (
     ErrMessageEmpty = errors.New("message queue is empty ")
 )
 
-var (
-    READ_TIMEOUT = time.Second * 5
-)
-
-const (
-    clusterID = "test-cluster"
-    subject = "chatmessage"
-    durable = "chatmessage"
-)
-
 type NatsStreaming struct {
     subject     *string
     durable		*string
     conn 		*stan.Conn
+    timeout     uint32
+    readMessage chan interface{}
 }
 
-func ConnectToServer(urls, clientID  *string) (*NatsStreaming, error) {
-    sc, err := stan.Connect(clusterID, *clientID, stan.NatsURL(*urls))
+type Proto struct {
+    Ver     uint32
+    Body    []byte
+}
+
+func ConnectToServer(urls, clusterID, clientID, subject, durable  *string, timeout uint32) (*NatsStreaming, error) {
+    sc, err := stan.Connect(*clusterID, *clientID, stan.NatsURL(*urls))
 
     if err != nil {
         return nil, err
     }
-    return &NatsStreaming{conn: &sc}, nil
+    return &NatsStreaming{
+        subject: subject,
+        durable: durable,
+        conn: &sc,
+        readMessage: make(chan interface{}, 1),
+        timeout: timeout,
+    }, nil
 }
 
 func (ns *NatsStreaming)WriteMessage(msg interface{}) error  {
@@ -73,7 +76,7 @@ func (ns *NatsStreaming)WriteMessage(msg interface{}) error  {
         return err
     }
 
-    err = (*ns.conn).Publish(subject, m)
+    err = (*ns.conn).Publish(*ns.subject, m)
 
     if err != nil {
         return err
@@ -81,29 +84,39 @@ func (ns *NatsStreaming)WriteMessage(msg interface{}) error  {
     return nil
 }
 
-func (ns *NatsStreaming)ReadMessage() (msg interface{},  err error) {
+func (ns *NatsStreaming)ReadMessage(startPosition uint64, count uint32) (msg interface{},  err error) {
 
     startOpt := stan.StartAt(pb.StartPosition_NewOnly)
-    readMessage := make(chan interface{}, 1)
+    if startPosition > 0 {
+        startOpt = stan.StartAtSequence(startPosition)
+    }
+
     var (
         sub stan.Subscription
+        msgs []*stan.Msg
     )
 
     messageHandle := func(msg *stan.Msg){
-        readMessage <- msg
+        msgs = append(msgs, msg)
+        if uint32(len(msgs)) >= count {
+            ns.readMessage <- msgs
+        }
     }
 
-    sub, err = (*ns.conn).Subscribe(subject, messageHandle, startOpt, stan.DurableName(durable))
+    sub, err = (*ns.conn).Subscribe(*ns.subject, messageHandle, startOpt, stan.DurableName(*ns.durable))
     if err != nil {
         (*ns.conn).Close()
         return nil, err
     }
 
     select {
-    case <- time.After(READ_TIMEOUT):
+    case <- time.After(time.Millisecond * time.Duration(ns.timeout)):
         sub.Unsubscribe()
+        if len(msgs) > 0 {
+            return msgs, nil
+        }
         return nil, ErrMessageEmpty
-    case msg = <-readMessage:
+    case msg = <-ns.readMessage:
         sub.Unsubscribe()
         return msg, nil
     }

@@ -56,6 +56,10 @@ type AccessLayerConfig struct {
 	PrometheusPort      string
 	NatssUrl			string
 	NatssClientID		string
+	NatssClusterID		string
+	NatssSubject		string
+	NatssDurable		string
+	NatssTimeout		int
 }
 
 // 初始化配置
@@ -78,5 +82,9 @@ func readConfiguration() {
 		PrometheusPort:        viper.GetString("monitor.prometheusPort"),
 		NatssUrl:      		   viper.GetString("natss.urls"),
 		NatssClientID:         viper.GetString("natss.clientID"),
+		NatssClusterID:        viper.GetString("natss.clusterID"),
+		NatssSubject:		   viper.GetString("natss.subject"),
+		NatssDurable:          viper.GetString("natss.durable"),
+		NatssTimeout:          viper.GetInt("natss.timeout"),
 	}
 }

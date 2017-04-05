@@ -13,7 +13,11 @@
 
   "natss": {
     "urls": "nats://10.0.0.253:4222",
-    "clientID": "clientid"
+    "clientID": "clientid",
+    "clusterID" : "test-cluster",
+    "subject" : "chatmessage",
+    "durable" : "chatmessage",
+    "timeout" : 100
   },
 
   "monitor": {
