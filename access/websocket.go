@@ -25,6 +25,7 @@
 /*
  * Revision History:
  *     Initial: 2017/03/29        Feng Yifei
+ *	   AddFunction: 2017/04/06    Yusan Kurban
  */
 
 package main
@@ -107,6 +108,7 @@ func serveWebSocket(w http.ResponseWriter, req *http.Request) {
 	}
 	defer connection.Close()
 
+	webSocketUserHandler(connection)
 	webSocketConnectionHandler(connection)
 }
 
@@ -154,4 +156,28 @@ func webSocketConnectionHandler(conn *websocket.Conn) {
 			}
 		}
 	}
+}
+
+type user struct {
+	Userid 		string
+}
+
+func webSocketUserHandler (conn *websocket.Conn) {
+	var (
+		p 		*general.Proto = &general.Proto{}
+		err 	error
+		user 	user
+	)
+
+	err = p.ReadWebSocket(conn)
+	if err != nil {
+		logger.Error(err)
+	}
+
+	err = json.Unmarshal(p.Body, user)
+	if err != nil {
+		logger.Error(err)
+	}
+
+	OnLineUser.OnConnect(user.Userid, conn)
 }

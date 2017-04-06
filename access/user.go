@@ -31,28 +31,28 @@ package main
 
 import (
 	"sync"
-	. "hypercube/proto/general"
+	"github.com/gorilla/websocket"
 )
 
 var OnLineUser *OnLineManager
 
 type OnLineManager struct {
-	locker 		*sync.Mutex
-	onLineMap	map[string]UserConnect
+	locker 		*sync.RWMutex
+	onLineMap	map[string]*websocket.Conn
 }
 
 func init() {
 	OnLineUser = &OnLineManager{
-		locker: &sync.Mutex{},
-		onLineMap: map[string]UserConnect{},
+		locker: &sync.RWMutex{},
+		onLineMap: map[string]*websocket.Conn{},
 	}
 }
 
-func (this *OnLineManager) OnConnect(userID string, user UserConnect) {
+func (this *OnLineManager) OnConnect(userID string, conn *websocket.Conn) {
 	this.locker.Lock()
 	defer this.locker.Unlock()
 
-	this.onLineMap[userID] = user
+	this.onLineMap[userID] = conn
 }
 
 func (this *OnLineManager) OnDisconnect(userID string) {
@@ -64,7 +64,7 @@ func (this *OnLineManager) OnDisconnect(userID string) {
 	}
 }
 
-func (this *OnLineManager) IsUserOnline(userID string) (UserConnect, bool) {
+func (this *OnLineManager) IsUserOnline(userID string) (*websocket.Conn, bool) {
 	this.locker.Lock()
 	defer this.locker.Unlock()
 
