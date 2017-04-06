@@ -29,6 +29,16 @@
 
 package main
 
-func userToUserRequestHandler( p interface{}, req interface{}) interface{} {
-	return req
+import "hypercube/proto/general"
+
+func userToUserRequestHandler(p interface{}, req interface{}) interface{} {
+	var (
+		user *general.Message
+	)
+
+	user = req.(*general.Message)
+
+	natsStreaming.WriteMessage(user)
+
+	return nil
 }
