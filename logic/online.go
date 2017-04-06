@@ -48,7 +48,7 @@ func (this *OnLineUserMagServer) Add(user api.UserLogin) error {
 	return ParamErr
 }
 
-func (this *OnLineUserMagServer) Rmove(uid uint64) error {
+func (this *OnLineUserMagServer) Remove(uid uint64) error {
 	if uid != 0 {
 		this.rmchan <- uid
 		repl := <-this.replychan
