@@ -21,7 +21,7 @@ func init() {
 		replychan:  make(chan chanreply),
 	}
 
-	OnLineUserMag.loop()
+	go OnLineUserMag.loop()
 }
 
 type OnLineUserMagServer struct {
