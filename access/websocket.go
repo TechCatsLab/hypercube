@@ -108,7 +108,6 @@ func serveWebSocket(w http.ResponseWriter, req *http.Request) {
 	}
 	defer connection.Close()
 
-	webSocketUserHandler(connection) // Todo: 与下面函数合并
 	webSocketConnectionHandler(connection)
 }
 
@@ -122,6 +121,7 @@ func webSocketConnectionHandler(conn *websocket.Conn) {
 		mes        *general.Message = &general.Message{}
 		pushmany   *push.MPushMsg = &push.MPushMsg{}
 		pushone    *push.PushMsg = &push.PushMsg{}
+		user       *general.User = &general.User{}
 		v          interface{}
 		handler    handlerFunc
 	)
@@ -145,6 +145,8 @@ func webSocketConnectionHandler(conn *websocket.Conn) {
 		case general.TpPushMsg: // Todo: Push 消息处理不在这里
 			v = pushone
 			handler = pushOneRequestHandler
+		case general.TpUserId:
+			v = user
 		}
 
 		if v != nil {
@@ -153,32 +155,14 @@ func webSocketConnectionHandler(conn *websocket.Conn) {
 				// Todo: 记录错误
 				continue
 			} else {
-				handler(p,v)
+				switch p.Type {
+				case general.TpUserId:
+					user = v.(*general.User)
+					OnLineUser.OnConnect(user.UserID, conn)
+				default:
+					handler(p,v)
+				}
 			}
 		}
 	}
-}
-
-type user struct {
-	Userid 		string
-}
-
-func webSocketUserHandler (conn *websocket.Conn) {
-	var (
-		p 		*general.Proto = &general.Proto{}
-		err 	error
-		user 	user
-	)
-
-	err = p.ReadWebSocket(conn)
-	if err != nil {
-		logger.Error(err)
-	}
-
-	err = json.Unmarshal(p.Body, user)
-	if err != nil {
-		logger.Error(err)
-	}
-
-	OnLineUser.OnConnect(user.Userid, conn)
 }

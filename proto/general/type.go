@@ -42,4 +42,6 @@ const (
 	TpPushMsg   = uint32(4)
 	// send to room
 	TpRoomMsg   = uint32(5)
+	// send user id
+	TpUserId    = uint32(6)
 )

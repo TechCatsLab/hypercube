@@ -38,23 +38,23 @@ var OnLineUser *OnLineManager
 
 type OnLineManager struct {
 	locker 		sync.RWMutex
-	onLineMap	map[string]*websocket.Conn // Todo: string ---> uint64
+	onLineMap	map[uint64]*websocket.Conn
 }
 
 func init() {
 	OnLineUser = &OnLineManager{
-		onLineMap: map[string]*websocket.Conn{},
+		onLineMap: map[uint64]*websocket.Conn{},
 	}
 }
 
-func (this *OnLineManager) OnConnect(userID string, conn *websocket.Conn) {
+func (this *OnLineManager) OnConnect(userID uint64, conn *websocket.Conn) {
 	this.locker.Lock()
 	defer this.locker.Unlock()
 
 	this.onLineMap[userID] = conn
 }
 
-func (this *OnLineManager) OnDisconnect(userID string) {
+func (this *OnLineManager) OnDisconnect(userID uint64) {
 	this.locker.Lock()
 	defer this.locker.Unlock()
 
@@ -63,8 +63,8 @@ func (this *OnLineManager) OnDisconnect(userID string) {
 	}
 }
 
-func (this *OnLineManager) IsUserOnline(userID string) (*websocket.Conn, bool) {
-	this.locker.Lock() // Todo: 使用读锁
+func (this *OnLineManager) IsUserOnline(userID uint64) (*websocket.Conn, bool) {
+	this.locker.RLock()
 	defer this.locker.Unlock()
 
 	user, ok := this.onLineMap[userID]

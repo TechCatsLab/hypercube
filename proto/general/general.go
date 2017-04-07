@@ -38,3 +38,7 @@ type Message struct {
 type Keepalive struct {
 	Uid         uint64      `json:"uid"`
 }
+
+type User struct {
+	UserID 		uint64
+}
