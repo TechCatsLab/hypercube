@@ -44,11 +44,12 @@ var (
 type NatsStreaming struct {
     subject     *string
     durable		*string
-    conn 		*stan.Conn
+    conn 		*stan.Conn  // Todo: 去指针
     timeout     uint32
     readMessage chan interface{}
 }
 
+// Todo: 删掉
 type Proto struct {
     Ver     uint32
     Body    []byte
@@ -63,7 +64,7 @@ func ConnectToServer(urls, clusterID, clientID, subject, durable  *string, timeo
     return &NatsStreaming{
         subject: subject,
         durable: durable,
-        conn: &sc,
+        conn: &sc,  // Todo: 不用再取地址
         readMessage: make(chan interface{}, 1),
         timeout: timeout,
     }, nil
@@ -71,7 +72,7 @@ func ConnectToServer(urls, clusterID, clientID, subject, durable  *string, timeo
 
 func (ns *NatsStreaming)WriteMessage(msg interface{}) error  {
 
-    m, err := json.Marshal(msg)
+    m, err := json.Marshal(msg)   // Todo: 是否能直接传入 JSON
     if err != nil {
         return err
     }
@@ -92,7 +93,7 @@ func (ns *NatsStreaming)ReadMessage(startPosition uint64, count uint32) (msg int
     }
 
     var (
-        sub stan.Subscription
+        sub stan.Subscription // Todo: 放入结构体，避免每次都创建
         msgs []*stan.Msg
     )
 
@@ -105,7 +106,7 @@ func (ns *NatsStreaming)ReadMessage(startPosition uint64, count uint32) (msg int
 
     sub, err = (*ns.conn).Subscribe(*ns.subject, messageHandle, startOpt, stan.DurableName(*ns.durable))
     if err != nil {
-        (*ns.conn).Close()
+        (*ns.conn).Close()  // Todo: 不能直接关
         return nil, err
     }
 
@@ -116,7 +117,8 @@ func (ns *NatsStreaming)ReadMessage(startPosition uint64, count uint32) (msg int
             return msgs, nil
         }
         return nil, ErrMessageEmpty
-    case msg = <-ns.readMessage:
+    case msg = <-ns.readMessage: // TODO： readMessage 改名字
+        // Todo: 关 Timer
         sub.Unsubscribe()
         return msg, nil
     }

@@ -38,6 +38,8 @@ func userToUserRequestHandler(p interface{}, req interface{}) interface{} {
 
 	user = req.(*general.Message)
 
+	// Todo: 完善逻辑
+	// Todo: 参数传递类型统一
 	natsStreaming.WriteMessage(user)
 
 	return nil

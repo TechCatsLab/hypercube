@@ -108,7 +108,7 @@ func serveWebSocket(w http.ResponseWriter, req *http.Request) {
 	}
 	defer connection.Close()
 
-	webSocketUserHandler(connection)
+	webSocketUserHandler(connection) // Todo: 与下面函数合并
 	webSocketConnectionHandler(connection)
 }
 
@@ -139,10 +139,10 @@ func webSocketConnectionHandler(conn *websocket.Conn) {
 		case general.TpUTUMsg:
 			v = mes
 			handler = userToUserRequestHandler
-		case general.TpRoomMsg:
+		case general.TpRoomMsg: // Todo: Room 相关代码清理掉
 			v = pushmany
 			handler = pushManyRequestHandler
-		case general.TpPushMsg:
+		case general.TpPushMsg: // Todo: Push 消息处理不在这里
 			v = pushone
 			handler = pushOneRequestHandler
 		}
@@ -150,6 +150,7 @@ func webSocketConnectionHandler(conn *websocket.Conn) {
 		if v != nil {
 			err = json.Unmarshal(p.Body, v)
 			if err != nil {
+				// Todo: 记录错误
 				continue
 			} else {
 				handler(p,v)

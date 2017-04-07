@@ -37,13 +37,12 @@ import (
 var OnLineUser *OnLineManager
 
 type OnLineManager struct {
-	locker 		*sync.RWMutex
-	onLineMap	map[string]*websocket.Conn
+	locker 		sync.RWMutex
+	onLineMap	map[string]*websocket.Conn // Todo: string ---> uint64
 }
 
 func init() {
 	OnLineUser = &OnLineManager{
-		locker: &sync.RWMutex{},
 		onLineMap: map[string]*websocket.Conn{},
 	}
 }
@@ -65,7 +64,7 @@ func (this *OnLineManager) OnDisconnect(userID string) {
 }
 
 func (this *OnLineManager) IsUserOnline(userID string) (*websocket.Conn, bool) {
-	this.locker.Lock()
+	this.locker.Lock() // Todo: 使用读锁
 	defer this.locker.Unlock()
 
 	user, ok := this.onLineMap[userID]

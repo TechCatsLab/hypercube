@@ -29,6 +29,11 @@
 
 package api
 
+type Ucb struct {
+	UserID       uint64
+	ServerIP     string
+}
+
 type UserLogin struct {
 	UserID        uint64
 	ServerIP      string

@@ -26,7 +26,7 @@
  * Revision History:
  *     Initial: 2017/04/05        Yang Chenglong
  */
-
+// Todo: 重新设计 Push 机制
 package main
 
 func pushOneRequestHandler(p interface{},req interface{}) interface{} {

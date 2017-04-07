@@ -67,6 +67,7 @@ exit:
 	os.Exit(1)
 }
 
+// Todo: 接入层不应该直连消息队列
 func initMsg() {
 	var (
 		err        error

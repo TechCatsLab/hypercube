@@ -1,8 +1,43 @@
+/*
+ * MIT License
+ *
+ * Copyright (c) 2017 SmartestEE Inc.
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in all
+ * copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+ * SOFTWARE.
+ */
+
+/*
+ * Revision History:
+ *     Initial: 2017/04/04        Liu Jiachang
+ */
+
 package main
 
 import (
 	"hypercube/proto/api"
 	"errors"
+)
+
+const (
+	AddType = uint8(0)
+	RmType  = uint8(1)
+	QrType  = uint8(2)
 )
 
 var (
@@ -15,21 +50,23 @@ var (
 func init() {
 	OnLineUserMag = &OnLineUserMagServer{
 		users:      make(map[uint64]string),
-		addchan:    make(chan api.UserLogin),
-		rmchan:     make(chan uint64),
-		qrchan:     make(chan uint64),
+		reqchan:    make(chan usrbasic),
 		replychan:  make(chan chanreply),
 	}
 
-	go OnLineUserMag.loop()
+	OnLineUserMag.loop()
 }
 
 type OnLineUserMagServer struct {
-	users       map[uint64]string
-	addchan     chan api.UserLogin
-	rmchan      chan uint64
-	qrchan      chan uint64
+	users       map[uint64]api.Ucb  // Todo : 不能使用 Ucb
+	reqchan     chan usrbasic
 	replychan   chan chanreply
+}
+
+type usrbasic struct {
+	UserID       uint64
+	ServerIP     string
+	Type         uint8
 }
 
 type chanreply struct {
@@ -37,9 +74,11 @@ type chanreply struct {
 	Err          error
 }
 
-func (this *OnLineUserMagServer) Add(user api.UserLogin) error {
+func (this *OnLineUserMagServer) Add(user api.Ucb) error {
 	if user.ServerIP != "" && user.UserID != 0 {
-		this.addchan <- user
+		usrb := usrbasic{user.UserID, user.ServerIP, AddType}
+
+		this.reqchan <- usrb
 		repl := <-this.replychan
 
 		return repl.Err
@@ -50,7 +89,9 @@ func (this *OnLineUserMagServer) Add(user api.UserLogin) error {
 
 func (this *OnLineUserMagServer) Remove(uid uint64) error {
 	if uid != 0 {
-		this.rmchan <- uid
+		user := usrbasic{uid, "", RmType}
+
+		this.reqchan <- user
 		repl := <-this.replychan
 
 		return repl.Err
@@ -61,7 +102,9 @@ func (this *OnLineUserMagServer) Remove(uid uint64) error {
 
 func (this *OnLineUserMagServer) Query(uid uint64) (string, error) {
 	if uid != 0 {
-		this.qrchan <- uid
+		user := usrbasic{uid, "", QrType}
+
+		this.reqchan <- user
 		repl := <-this.replychan
 
 		return repl.ServerIP, repl.Err
@@ -71,36 +114,38 @@ func (this *OnLineUserMagServer) Query(uid uint64) (string, error) {
 }
 
 func (this *OnLineUserMagServer)loop() {
-	for {
-		repl := chanreply{
-			ServerIP:    "",
-			Err:         nil,
-		}
-
-		select {
-		case user := <-this.addchan:
-			this.users[user.UserID] = user.ServerIP
-
-			this.replychan <- repl
-		case uid := <-this.rmchan:
-			if _, ok := this.users[uid]; ok {
-				delete(this.users, uid)
-
-				this.replychan <- repl
-			} else {
-				repl.Err = ParamErr
-				this.replychan <- repl
+	go func() {
+		for {
+			repl := chanreply{
+				ServerIP:    "",
+				Err:         nil,
 			}
-		case uid := <-this.qrchan:
-			if serverip, ok := this.users[uid]; ok {
-				repl.ServerIP = serverip
+			user := <-this.reqchan
+			switch {
+			case user.Type == AddType:
+				ucb := api.Ucb{user.UserID, user.ServerIP}
+				this.users[user.UserID] = ucb
 
 				this.replychan <- repl
-			} else {
-				repl.Err = ParamErr
-				this.replychan <- repl
+			case user.Type == RmType:
+				if _, ok := this.users[user.UserID]; ok {
+					delete(this.users, user.UserID)
+
+					this.replychan <- repl
+				} else {
+					repl.Err = ParamErr
+					this.replychan <- repl
+				}
+			case user.Type == QrType:
+				if serverip, ok := this.users[user.UserID]; ok {
+					repl.ServerIP = serverip
+
+					this.replychan <- repl
+				} else {
+					repl.Err = ParamErr
+					this.replychan <- repl
+				}
 			}
 		}
-
-	}
+	}()
 }
