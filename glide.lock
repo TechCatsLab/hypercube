@@ -1,5 +1,5 @@
-hash: 48a8dda9cbdaef76e906f70d719496edca229f8c017a87c41641c81ad0a4bfdc
-updated: 2017-04-08T10:09:12.77168336+08:00
+hash: dbc3a572966e16e2794ebb15f66f073abac24ac76c4e0730a4cc9fbba1d504f3
+updated: 2017-04-08T10:35:34.547731713+08:00
 imports:
 - name: github.com/beorn7/perks
   version: 4c0e84591b9aa9e6dcfdf3e020114cd81f89d5f9
@@ -7,6 +7,11 @@ imports:
   - quantile
 - name: github.com/fsnotify/fsnotify
   version: 4da3e2cfbabc9f751898f250b49f2439785783a1
+- name: github.com/garyburd/redigo
+  version: 8873b2f1995f59d4bcdd2b0dc9858e2cb9bf0c13
+  subpackages:
+  - internal
+  - redis
 - name: github.com/gogo/protobuf
   version: 6fe4aed35b712b681d5d372e06da5344c22ed61f
   subpackages:
