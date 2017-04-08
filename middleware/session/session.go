@@ -30,7 +30,6 @@
 package session
 
 import (
-	"log"
 	"net/http"
 
 	"github.com/gorilla/sessions"
@@ -155,7 +154,7 @@ func (s *session) Session() *sessions.Session {
 
 		s.session, err = s.store.Get(s.request, s.name)
 		if err != nil {
-			log.Printf(errorFormat, err)
+			return nil
 		}
 	}
 
