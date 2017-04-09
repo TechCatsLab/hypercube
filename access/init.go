@@ -35,7 +35,6 @@ func init()  {
     readConfiguration()
 
     initRPC()
-    initMsg()
 
     HttpPprof()
     initWebsocket()

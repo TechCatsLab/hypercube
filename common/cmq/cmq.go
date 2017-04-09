@@ -24,44 +24,13 @@
 
 /*
  * Revision History:
- *     Initial: 2017/04/04        Feng Yifei
+ *     Initial: 2017/04/09        HeCJ
  */
 
-package main
+package cmq
 
-import (
-	"os"
-	"hypercube/common/mq"
-)
-
-var (
-	natsMQ        *mq.NatsJsonMQ
-	requester     *mq.NatsRequester
-)
-
-func initRPC() {
-	var (
-		err        error
-	)
-
-	natsMQ, err = mq.NewNatsMQ(&configuration.NatsUrl)
-	if err != nil {
-		logger.Error("Initialize RPC with error:", err)
-		goto exit
-	}
-
-	requester, err = natsMQ.CreateRequester(&configuration.ApiChannel)
-	if err != nil {
-		logger.Error("Initialize RPC channel with error:", err)
-		goto exit
-	}
-
-	logger.Debug("RPC messaging channel connected...")
-	return
-
-exit:
-	if natsMQ != nil {
-		natsMQ.Close()
-	}
-	os.Exit(1)
+type ChatMessageQueue interface {
+    NewPublisher(v interface{}) interface{}
+    NewSubscriber(v interface{}) interface{}
+    NewHistory(v interface{}) interface{}
 }

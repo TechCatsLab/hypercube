@@ -24,44 +24,44 @@
 
 /*
  * Revision History:
- *     Initial: 2017/04/04        Feng Yifei
+ *     Initial: 2017/04/09        He CJ
  */
 
 package main
 
 import (
-	"os"
-	"hypercube/common/mq"
+    "hypercube/common/cmq"
 )
 
 var (
-	natsMQ        *mq.NatsJsonMQ
-	requester     *mq.NatsRequester
+    natssCMQ *cmq.NatssCMQ
+    publisher *cmq.NatssPublisher
+    subscriber *cmq.NatssSubcriber
+    history *cmq.NatssHistory
 )
 
-func initRPC() {
-	var (
-		err        error
-	)
+func initCMQ() error {
+    var (
+        err error
+    )
+    natssCMQ, err = cmq.NewNatssCMQ(
+        &configuration.NatssUrl,
+        &configuration.NatssClusterID,
+        &configuration.NatssClientID )
 
-	natsMQ, err = mq.NewNatsMQ(&configuration.NatsUrl)
-	if err != nil {
-		logger.Error("Initialize RPC with error:", err)
-		goto exit
-	}
+    if err != nil {
+        logger.Error("Logic request processor error:", err)
+        return err
+    }
 
-	requester, err = natsMQ.CreateRequester(&configuration.ApiChannel)
-	if err != nil {
-		logger.Error("Initialize RPC channel with error:", err)
-		goto exit
-	}
+    publisher = natssCMQ.NewPublisher(&configuration.NatssSubject)
 
-	logger.Debug("RPC messaging channel connected...")
-	return
+    subscriber = natssCMQ.NewSubscriber(
+        &configuration.NatssSubject,
+        &configuration.NatssQGroup,
+        &configuration.NatssDurable )
 
-exit:
-	if natsMQ != nil {
-		natsMQ.Close()
-	}
-	os.Exit(1)
+    history = natssCMQ.NewHistory(&configuration.NatssSubject)
+
+    return nil
 }
