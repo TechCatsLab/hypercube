@@ -29,7 +29,7 @@
 
 package api
 
-type Ucb struct {
+type UsrLogic struct {
 	UserID       uint64
 	ServerIP     string
 }
