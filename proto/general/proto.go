@@ -56,12 +56,12 @@ func (p *Proto) String() string {
 
 func (p *Proto) VerCheck() (*Proto, uint32) {
 	if p.Ver > curVer {
-		p.Type = TpVerConf
+		p.Type = TypeVerConf
 		return  p, ErrVerConf
 	}
 
 	if p.Ver < curVer {
-		p.Type = TpSpiteAtt
+		p.Type = TypeSpiteAtt
 		return  p, ErrVerConf
 	}
 

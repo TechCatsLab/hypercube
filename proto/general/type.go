@@ -34,7 +34,7 @@ const (
 	TypeVerConf         = uint32(0x0001)            // proto version conflict
 	TypeSpiteAtt        = uint32(0x0002)            // spite attack
 	TypeLoginAccess     = uint32(0x0003)            // login access type
-	TypeLogoutAccess    = uint32(0x0003)            // logout access type
+	TypeLogoutAccess    = uint32(0x0004)            // logout access type
 
 	TypePushMsg         = uint32(0x0005)            // logic server push message to all people
 	TypeUTUMsg          = uint32(0x0006)            // user to user message

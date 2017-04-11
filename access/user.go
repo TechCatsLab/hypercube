@@ -32,6 +32,8 @@ package main
 import (
 	"sync"
 	"github.com/gorilla/websocket"
+	. "hypercube/proto/api"
+	"time"
 )
 
 var OnLineUser *OnLineManager
@@ -69,4 +71,20 @@ func (this *OnLineManager) IsUserOnline(userID uint64) (*websocket.Conn, bool) {
 
 	user, ok := this.onLineMap[userID]
 	return user, ok
+}
+
+func (this *OnLineManager) SendToLogic(userID uint64) error {
+	var (
+		userlog UserLogin
+		r		bool
+		err		error
+	)
+
+	userlog = UserLogin{
+		UserID: 	userID,
+		ServerIP:   configuration.Addrs[0],
+	}
+	err = requester.Request(userlog, r, time.Duration(5)*time.Second)
+
+	return err
 }
