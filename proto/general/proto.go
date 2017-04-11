@@ -36,7 +36,7 @@ import (
 )
 
 var (
-	curVer     = uint16(0x0001)       // 从左向右 第一位 主版本号 0, 第二位 副版本号 0, 第三四位 次版本号
+	CurVer     = uint16(0x0001) // 从左向右 第一位 主版本号 0, 第二位 副版本号 0, 第三四位 次版本号
 	emptyProto = Proto{}
 )
 
@@ -55,12 +55,12 @@ func (p *Proto) String() string {
 }
 
 func (p *Proto) VerCheck() (*Proto, uint32) {
-	if p.Ver > curVer {
+	if p.Ver > CurVer {
 		p.Type = TypeVerConf
 		return  p, ErrVerConf
 	}
 
-	if p.Ver < curVer {
+	if p.Ver < CurVer {
 		p.Type = TypeSpiteAtt
 		return  p, ErrVerConf
 	}

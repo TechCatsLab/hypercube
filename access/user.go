@@ -34,6 +34,8 @@ import (
 	"github.com/gorilla/websocket"
 	. "hypercube/proto/api"
 	"time"
+	"hypercube/proto/general"
+	"encoding/json"
 )
 
 var OnLineUser *OnLineManager
@@ -73,9 +75,11 @@ func (this *OnLineManager) IsUserOnline(userID uint64) (*websocket.Conn, bool) {
 	return user, ok
 }
 
-func (this *OnLineManager) SendToLogic(userID uint64) error {
+func (this *OnLineManager) UserLoginHandler(userID uint64) error {
 	var (
 		userlog UserLogin
+		proto 	general.Proto
+		conv 	[]byte
 		r		bool
 		err		error
 	)
@@ -84,7 +88,51 @@ func (this *OnLineManager) SendToLogic(userID uint64) error {
 		UserID: 	userID,
 		ServerIP:   configuration.Addrs[0],
 	}
-	err = requester.Request(userlog, r, time.Duration(5)*time.Second)
+
+	conv, err = json.Marshal(userlog)
+	if err != nil {
+		logger.Error(err)
+	}
+
+	proto = general.Proto{
+		Ver:    general.CurVer,
+		Type:   general.TypeLoginAccess,
+		Body:	json.RawMessage(conv),
+	}
+	for r != true{
+		err = requester.Request(proto, r, time.Duration(5)*time.Second)
+	}
+
+	return err
+}
+
+func (this *OnLineManager) UserLogoutHandler(userID uint64) error {
+	var (
+		userlog UserLogout
+		proto 	general.Proto
+		conv    []byte
+		r		bool
+		err		error
+	)
+
+	userlog = UserLogout{
+		UserID: 	userID,
+	}
+
+	conv, err = json.Marshal(UserLogout{})
+	if err != nil {
+		logger.Error(err)
+	}
+
+	proto = general.Proto{
+		Ver:    general.CurVer,
+		Type:   general.TypeLogoutAccess,
+		Body:	json.RawMessage(conv),
+	}
+
+	for r != true{
+		err = requester.Request(userlog, r, time.Duration(5)*time.Second)
+	}
 
 	return err
 }

@@ -153,13 +153,17 @@ func webSocketConnectionHandler(conn *websocket.Conn) {
 				case general.TypeLoginAccess:
 					user = v.(*general.UserAccess)
 					OnLineUser.OnConnect(user.UserID, conn)
-					err = OnLineUser.SendToLogic(user.UserID)
+					err = OnLineUser.UserLoginHandler(user.UserID)
 					if err != nil {
 						logger.Error(err)
 					}
 				case general.TypeLogoutAccess:
 					user = v.(*general.UserAccess)
 					OnLineUser.OnDisconnect(user.UserID)
+					err = OnLineUser.UserLogoutHandler(user.UserID)
+					if err != nil {
+						logger.Error(err)
+					}
 				default:
 					handler(p,v)
 				}
