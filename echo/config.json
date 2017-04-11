@@ -1,0 +1,10 @@
+{
+  "server": {
+    "address": ":20004"
+  },
+  "middleware": {
+    "cors": {
+      "hosts": ["https://labstack.com", "https://labstack.net"]
+    }
+  }
+}
