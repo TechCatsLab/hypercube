@@ -37,3 +37,5 @@ import:
   version: ^1.0.0
 - package: github.com/mattn/go-colorable
   version: ^0.0.7
+- package: github.com/dgrijalva/jwt-go
+  version: ^3.0.0
