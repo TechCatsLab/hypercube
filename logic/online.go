@@ -49,7 +49,7 @@ var (
 
 func init() {
 	OnLineUserMag = &OnLineUserMagServer{
-		users:      make(map[uint64]api.UsrLogic),
+		users:      make(map[uint64]api.UsrInfo),
 		reqchan:    make(chan usrbasic),
 		replychan:  make(chan chanreply),
 	}
@@ -58,7 +58,7 @@ func init() {
 }
 
 type OnLineUserMagServer struct {
-	users       map[uint64]api.UsrLogic
+	users       map[uint64]api.UsrInfo
 	reqchan     chan usrbasic
 	replychan   chan chanreply
 }
@@ -74,7 +74,7 @@ type chanreply struct {
 	Err          error
 }
 
-func (this *OnLineUserMagServer) Add(user api.UsrLogic) error {
+func (this *OnLineUserMagServer) Add(user api.UsrInfo) error {
 	if user.ServerIP != "" && user.UserID != 0 {
 		usrb := usrbasic{user.UserID, user.ServerIP, AddType}
 
@@ -123,7 +123,7 @@ func (this *OnLineUserMagServer)loop() {
 			user := <-this.reqchan
 			switch {
 			case user.Type == AddType:
-				usrlogic := api.UsrLogic{user.UserID, user.ServerIP}
+				usrlogic := api.UsrInfo{user.UserID, user.ServerIP}
 				this.users[user.UserID] = usrlogic
 
 				this.replychan <- repl

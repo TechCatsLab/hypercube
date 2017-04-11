@@ -134,10 +134,10 @@ func webSocketConnectionHandler(conn *websocket.Conn) {
 		case general.TypeHeartbeat:
 			v = ver
 			handler = keepAliveRequestHandler
-		case general.TpUTUMsg:
+		case general.TypeUTUMsg:
 			v = mes
 			handler = userToUserRequestHandler
-		case general.TpLoginAccess:
+		case general.TypeLoginAccess:
 			v = user
 		}
 
@@ -148,7 +148,7 @@ func webSocketConnectionHandler(conn *websocket.Conn) {
 				continue
 			} else {
 				switch p.Type {
-				case general.TpLoginAccess:
+				case general.TypeLoginAccess:
 					user = v.(*general.UserAccess)
 					OnLineUser.OnConnect(user.UserID, conn)
 				default:

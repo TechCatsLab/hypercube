@@ -24,12 +24,12 @@
 
 /*
  * Revision History:
- *     Initial: 2017/04/04        Liu Jiachang
+ *     Initial: 2017/04/11        Liu Jiachang
  */
 
-package push
+package api
 
-// 推送消息
-type PushMsg struct {
-	Content     string
+type AccessInfo struct {
+	Subject         string
+	OnlineUserNum   uint64
 }

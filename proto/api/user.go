@@ -29,7 +29,7 @@
 
 package api
 
-type UsrLogic struct {
+type UsrInfo struct {
 	UserID       uint64
 	ServerIP     string
 }
