@@ -43,7 +43,6 @@ const (
 
 type Store interface {
 	sessions.Store
-	Options(Options)
 }
 
 type Options struct {

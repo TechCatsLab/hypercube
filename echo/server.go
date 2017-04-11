@@ -32,18 +32,35 @@ package main
 import (
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
-	_ "hypercube/middleware/session"
+	"hypercube/middleware/session"
+)
+
+const (
+	maxRedisIdleConnectionSize = 32
 )
 
 var (
 	server *echo.Echo
+	store  session.Store
 )
 
+func initSessionStore() {
+	var err    error
+
+	store, err = session.NewRediStore(maxRedisIdleConnectionSize, "tcp", configuration.RedisAddress, "", []byte(configuration.SessionSecret))
+	if err != nil {
+		panic(err)
+	}
+}
+
 func initEchoServer() {
+	initSessionStore()
+
 	server = echo.New()
 
 	server.Use(middleware.Logger())
 	server.Use(middleware.Recover())
+	server.Use(session.New(configuration.SessionName, store))
 	server.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowOrigins:    configuration.CorsHosts,
 		AllowMethods:    []string{echo.GET, echo.POST},

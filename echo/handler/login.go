@@ -27,40 +27,46 @@
  *     Initial: 2017/04/11        Feng Yifei
  */
 
-package main
+package handler
 
 import (
-	"github.com/spf13/viper"
+	"net/http"
+	"github.com/labstack/echo"
+	"hypercube/middleware/session"
 )
 
-// 配置文件结构
-type EchoConfig struct {
-	Address                 string
-	RedisAddress            string
-	SessionSecret           string
-	SessionName             string
-	CorsHosts               []string
+func Login(c echo.Context) error {
+	session := session.GetSession(c)
+
+	if session == nil {
+		logger.Error("Server session error")
+		return c.JSON(http.StatusOK, map[string]interface{}{"status": 0})
+	}
+
+	userID := session.Get("id")
+
+	if userID == nil {
+		logger.Debug("Not login, try login")
+	}
+
+	session.Set("id", 100)
+	session.Save()
+
+	return c.JSON(http.StatusOK, map[string]interface{}{"status": 0})
 }
 
-var (
-	configuration    *EchoConfig
-)
+func Logout(c echo.Context) error {
+	session := session.GetSession(c)
 
-// 初始化配置
-func readConfiguration() {
-	viper.AddConfigPath("./")
-	viper.SetConfigName("config")
+	userID := session.Get("id")
 
-	if err := viper.ReadInConfig(); err != nil {
-		logger.Error("Read configuration file with error:", err)
-		panic(err)
+	if userID == nil {
+		logger.Debug("Not login, exit")
+		return c.JSON(http.StatusOK, map[string]interface{}{"status": 1})
 	}
 
-	configuration = &EchoConfig{
-		Address:          viper.GetString("server.address"),
-		RedisAddress:     viper.GetString("middleware.session.address"),
-		SessionSecret:    viper.GetString("middleware.session.secret"),
-		SessionName:      viper.GetString("middleware.session.name"),
-		CorsHosts:        viper.GetStringSlice("middleware.cors.hosts"),
-	}
+	session.Clear()
+	session.Save()
+
+	return c.JSON(http.StatusOK, map[string]interface{}{"status": 0})
 }

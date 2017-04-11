@@ -3,6 +3,11 @@
     "address": ":20004"
   },
   "middleware": {
+    "session": {
+      "address": "127.0.0.1:6379",
+      "secret": "Random Key",
+      "name": "Echo"
+    },
     "cors": {
       "hosts": ["https://labstack.com", "https://labstack.net"]
     }
