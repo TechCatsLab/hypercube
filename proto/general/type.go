@@ -30,18 +30,12 @@
 package general
 
 const (
-	// heartbeat
-	TpHeartbeat = uint32(0)
-	// user to user message
-	TpUTUMsg    = uint32(1)
-	// proto ver conflict
-	TpVerConf   = uint32(2)
-	// spite attack
-	TpSpiteAtt  = uint32(3)
-	// server push message
-	TpPushMsg   = uint32(4)
-	// send to room
-	TpRoomMsg   = uint32(5)
-	// send user id
-	TpUserId    = uint32(6)
+	TypeHeartbeat       = uint32(0x0000)            // heartbeat
+	TypeVerConf         = uint32(0x0001)            // proto version conflict
+	TypeSpiteAtt        = uint32(0x0002)            // spite attack
+	TypeLoginAccess     = uint32(0x0003)            // login access type
+	TypeLogoutAccess    = uint32(0x0003)            // logout access type
+
+	TypePushMsg         = uint32(0x0005)            // logic server push message to all people
+	TypeUTUMsg          = uint32(0x0006)            // user to user message
 )

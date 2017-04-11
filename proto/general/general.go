@@ -39,6 +39,6 @@ type Keepalive struct {
 	Uid         uint64      `json:"uid"`
 }
 
-type User struct {
+type UserAccess struct {
 	UserID 		uint64
 }

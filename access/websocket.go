@@ -119,9 +119,7 @@ func webSocketConnectionHandler(conn *websocket.Conn) {
 		p          *general.Proto = &general.Proto{}
 		ver        *general.Keepalive = &general.Keepalive{}
 		mes        *general.Message = &general.Message{}
-		pushmany   *push.MPushMsg = &push.MPushMsg{}
-		pushone    *push.PushMsg = &push.PushMsg{}
-		user       *general.User = &general.User{}
+		user       *general.UserAccess = &general.UserAccess{}
 		v          interface{}
 		handler    handlerFunc
 	)
@@ -133,19 +131,13 @@ func webSocketConnectionHandler(conn *websocket.Conn) {
 		}
 
 		switch p.Type {
-		case general.TpHeartbeat:
+		case general.TypeHeartbeat:
 			v = ver
 			handler = keepAliveRequestHandler
 		case general.TpUTUMsg:
 			v = mes
 			handler = userToUserRequestHandler
-		case general.TpRoomMsg: // Todo: Room 相关代码清理掉
-			v = pushmany
-			handler = pushManyRequestHandler
-		case general.TpPushMsg: // Todo: Push 消息处理不在这里
-			v = pushone
-			handler = pushOneRequestHandler
-		case general.TpUserId:
+		case general.TpLoginAccess:
 			v = user
 		}
 
@@ -156,8 +148,8 @@ func webSocketConnectionHandler(conn *websocket.Conn) {
 				continue
 			} else {
 				switch p.Type {
-				case general.TpUserId:
-					user = v.(*general.User)
+				case general.TpLoginAccess:
+					user = v.(*general.UserAccess)
 					OnLineUser.OnConnect(user.UserID, conn)
 				default:
 					handler(p,v)
