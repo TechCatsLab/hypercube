@@ -80,12 +80,6 @@ func createAccessRPC(sub *string) mq.Requester{
 		logicRequester   *mq.NatsRequester
 	)
 
-	natsMQ, err = mq.NewNatsMQ(&configuration.NatsUrl)
-	if err != nil {
-		logger.Error("Initialize RPC with error:", err)
-		goto exit
-	}
-
 	logicRequester, err = natsMQ.CreateRequester(sub)
 	if err != nil {
 		logger.Error("Initialize RPC channel with error:", err)
@@ -95,7 +89,7 @@ func createAccessRPC(sub *string) mq.Requester{
 	logger.Debug("RPC messaging channel connected...")
 	return logicRequester
 
-	exit:
+exit:
 	if natsMQ != nil {
 		natsMQ.Close()
 	}
