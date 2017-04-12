@@ -69,7 +69,7 @@ func (this *OnLineManager) OnDisconnect(userID uint64) {
 
 func (this *OnLineManager) IsUserOnline(userID uint64) (*websocket.Conn, bool) {
 	this.locker.RLock()
-	defer this.locker.Unlock()
+	defer this.locker.RUnlock()
 
 	user, ok := this.onLineMap[userID]
 	return user, ok
@@ -77,7 +77,7 @@ func (this *OnLineManager) IsUserOnline(userID uint64) (*websocket.Conn, bool) {
 
 func (this *OnLineManager) OnUnusualDisConnect(conn *websocket.Conn) (uint64, bool) {
 	this.locker.RLock()
-	defer this.locker.Unlock()
+	defer this.locker.RUnlock()
 
 	for k, v := range this.onLineMap {
 		if v == conn {
