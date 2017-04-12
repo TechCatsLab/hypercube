@@ -32,14 +32,27 @@ var(
     msgbuf map[uint64][]interface{}
 )
 
+const (
+    maxBufferSize = 100
+)
+
 func init()  {
     msgbuf = make(map[uint64][]interface{})
 }
 
 func addHistMessage(userID uint64, msg interface{})  {
-    msgbuf[userID] = append(msgbuf[userID], msg)
+    if msgbuf[userID] == nil {
+        msgbuf[userID] = make([]interface{}, maxBufferSize)
+    }
+    if len(msgbuf[userID]) < maxBufferSize {
+        msgbuf[userID] = append(msgbuf[userID], msg)
+    }
 }
 
 func getHistMessages(userID uint64) []interface{} {
     return msgbuf[userID]
+}
+
+func clearHistMessages(userID uint64) {
+    msgbuf[userID] = []interface{}{}
 }
