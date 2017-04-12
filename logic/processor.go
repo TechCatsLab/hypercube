@@ -66,7 +66,7 @@ func requestProcessor(req []byte) interface{} {
 		handler = userLogoutRequestHandler
 	case general.TypeUTUMsg:
 		v = &msg
-		handler = userToUserMsgHandler
+		handler = MessageHandler
 	}
 
 	if v != nil {

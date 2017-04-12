@@ -74,7 +74,7 @@ func userLogoutRequestHandler(req interface{}) interface{} {
 	return reply
 }
 
-func userToUserMsgHandler(req interface{}) interface{} {
+func MessageHandler(req interface{}) interface{} {
 	var (
 		msg          *general.Message
 	)
