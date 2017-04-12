@@ -145,7 +145,7 @@ func (this *OnLineManager) UserLogoutHandler(userID uint64) error {
 
 	conv, err = json.Marshal(&userlog)
 	if err != nil {
-		logger.Error(err)
+		logger.Error("UserLogoutHandler format request error:", err)
 	}
 
 	proto = &api.Request{
@@ -155,7 +155,7 @@ func (this *OnLineManager) UserLogoutHandler(userID uint64) error {
 
 	err = logicRequester.Request(proto, &r, time.Duration(100) * time.Millisecond)
 	if err != nil {
-		logger.Error(err)
+		logger.Error("UserLogoutHandler send request error:", err)
 	}
 
 	return err
