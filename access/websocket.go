@@ -38,6 +38,7 @@ import (
 	"encoding/json"
 	"hypercube/proto/api"
 	"time"
+	"strings"
 )
 
 var (
@@ -102,7 +103,8 @@ func sendAccessInfo()  {
 	webSocketServers = make([]*ws.WebSocketServer, len(configuration.Addrs))
 
 	for _, address := range configuration.Addrs {
-		serverinfo.ServerIp = &address
+		addr := strings.Split(address, ":")[0]
+		serverinfo.ServerIp = &addr
 		serverinfo.Subject = &configuration.Subject
 		serverinfo.Type = api.ApiTypeAccess
 

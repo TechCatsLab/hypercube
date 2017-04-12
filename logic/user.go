@@ -48,7 +48,6 @@ func userLoginRequestHandler(req interface{}) interface{} {
 	if err != nil {
 
 	}
-
 	return nil
 }
 
