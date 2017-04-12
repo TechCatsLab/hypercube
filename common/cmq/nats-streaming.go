@@ -30,150 +30,146 @@
 package cmq
 
 import (
-    "github.com/nats-io/go-nats-streaming"
-    "github.com/nats-io/go-nats-streaming/pb"
-    "time"
+	"github.com/nats-io/go-nats-streaming"
+	"github.com/nats-io/go-nats-streaming/pb"
+	"time"
 )
 
 type NatssCMQ struct {
-    conn 		stan.Conn
+	conn stan.Conn
 }
 
 type NatssPublisher struct {
-    cmq       *NatssCMQ
-    subject   *string
+	cmq     *NatssCMQ
+	subject *string
 }
 
 type NatssSubcriber struct {
-    subject *string
-    durable *string
-    qgroup  *string
-    cmq     *NatssCMQ
-    sub     stan.Subscription
-    handle  SubHandle
+	subject *string
+	durable *string
+	qgroup  *string
+	cmq     *NatssCMQ
+	sub     stan.Subscription
+	handle  SubHandle
 }
 
 type NatssHistory struct {
-    subject *string
-    cmq     *NatssCMQ
-    sub     stan.Subscription
-    handle  SubHandle
+	subject *string
+	cmq     *NatssCMQ
+	sub     stan.Subscription
+	handle  SubHandle
 }
 
 func NewNatssCMQ(urls, clusterID, clientID *string) (*NatssCMQ, error) {
-    sc, err := stan.Connect(*clusterID, *clientID, stan.NatsURL(*urls))
+	sc, err := stan.Connect(*clusterID, *clientID, stan.NatsURL(*urls))
 
-    if err != nil {
-        return nil, err
-    }
-    return &NatssCMQ{
-        conn:   sc,
-    }, nil
+	if err != nil {
+		return nil, err
+	}
+	return &NatssCMQ{
+		conn: sc,
+	}, nil
 }
 
-func (ncmq *NatssCMQ)NewPublisher(sub interface{}) *NatssPublisher {
-    subject, _ := sub.(*string)
+func (ncmq *NatssCMQ) NewPublisher(sub interface{}) *NatssPublisher {
+	subject, _ := sub.(*string)
 
-    return &NatssPublisher{
-        cmq: ncmq,
-        subject: subject,
-    }
+	return &NatssPublisher{
+		cmq:     ncmq,
+		subject: subject,
+	}
 }
 
+func (ncmq *NatssCMQ) NewSubscriber(sub, qg, dur interface{}) *NatssSubcriber {
+	subject, _ := sub.(*string)
+	qgroup, _ := qg.(*string)
+	durable, _ := dur.(*string)
 
-func (ncmq *NatssCMQ)NewSubscriber(sub, qg, dur interface{}) *NatssSubcriber {
-    subject, _ := sub.(*string)
-    qgroup, _ := qg.(*string)
-    durable, _ := dur.(*string)
-
-    return &NatssSubcriber{
-        subject: subject,
-        durable: durable,
-        qgroup: qgroup,
-        cmq: ncmq,
-    }
+	return &NatssSubcriber{
+		subject: subject,
+		durable: durable,
+		qgroup:  qgroup,
+		cmq:     ncmq,
+	}
 }
 
+func (ncmq *NatssCMQ) NewHistory(sub interface{}) *NatssHistory {
+	subject, _ := sub.(*string)
 
-func (ncmq *NatssCMQ)NewHistory(sub interface{}) *NatssHistory {
-    subject, _ := sub.(*string)
-
-    return &NatssHistory{
-        subject: subject,
-        cmq: ncmq,
-    }
+	return &NatssHistory{
+		subject: subject,
+		cmq:     ncmq,
+	}
 }
 
-func (nsp *NatssPublisher)Publish(msg interface{}) error {
-    m, _ := msg.([]byte)
-    err := nsp.cmq.conn.Publish(*nsp.subject, m)
+func (nsp *NatssPublisher) Publish(msg interface{}) error {
+	m, _ := msg.([]byte)
+	err := nsp.cmq.conn.Publish(*nsp.subject, m)
 
-    if err != nil {
-        return err
-    }
-    return nil
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
-func (nss *NatssSubcriber)SetSubHandle(h SubHandle) {
+func (nss *NatssSubcriber) SetSubHandle(h SubHandle) {
 
-    nss.handle = h
+	nss.handle = h
 }
 
-func (nss *NatssSubcriber)Start() error {
-    var (
-        err  error
-    )
+func (nss *NatssSubcriber) Start() error {
+	var (
+		err error
+	)
 
-    startOpt := stan.StartAt(pb.StartPosition_NewOnly)
+	startOpt := stan.StartAt(pb.StartPosition_NewOnly)
 
-    messageHandle := func(msg *stan.Msg){
-        nss.handle(msg)
-    }
+	messageHandle := func(msg *stan.Msg) {
+		nss.handle(msg)
+	}
 
-    nss.sub, err = nss.cmq.conn.QueueSubscribe(*nss.subject, *nss.qgroup, messageHandle, startOpt, stan.DurableName(*nss.durable))
+	nss.sub, err = nss.cmq.conn.QueueSubscribe(*nss.subject, *nss.qgroup, messageHandle, startOpt, stan.DurableName(*nss.durable))
 
-    if err != nil {
-        return err
-    }
-    return nil
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
-
-func (nss *NatssSubcriber)Stop() error {
-    if nss.sub != nil {
-        nss.sub.Unsubscribe()
-    }
-    return nss.cmq.conn.Close()
+func (nss *NatssSubcriber) Stop() error {
+	if nss.sub != nil {
+		nss.sub.Unsubscribe()
+	}
+	return nss.cmq.conn.Close()
 }
 
-func (nsh *NatssHistory)SetSubHandle(h SubHandle) {
-    nsh.handle = h
+func (nsh *NatssHistory) SetSubHandle(h SubHandle) {
+	nsh.handle = h
 }
 
-func (nsh *NatssHistory)Start(startDelta interface{}) error {
-    var (
-        err  error
-    )
+func (nsh *NatssHistory) Start(startDelta interface{}) error {
+	var (
+		err error
+	)
 
-    delta := startDelta.(time.Duration)
-    startOpt := stan.StartAtTimeDelta(delta)
+	delta := startDelta.(time.Duration)
+	startOpt := stan.StartAtTimeDelta(delta)
 
-    messageHandle := func(msg *stan.Msg){
-        nsh.handle(msg)
-    }
+	messageHandle := func(msg *stan.Msg) {
+		nsh.handle(msg)
+	}
 
-    nsh.sub, err = nsh.cmq.conn.Subscribe(*nsh.subject, messageHandle, startOpt)
+	nsh.sub, err = nsh.cmq.conn.Subscribe(*nsh.subject, messageHandle, startOpt)
 
-    if err != nil {
-        return err
-    }
-    return nil
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
-
-func (nsh *NatssHistory)Stop() error {
-    if nsh.sub != nil {
-        nsh.sub.Unsubscribe()
-    }
-    return nsh.cmq.conn.Close()
+func (nsh *NatssHistory) Stop() error {
+	if nsh.sub != nil {
+		nsh.sub.Unsubscribe()
+	}
+	return nsh.cmq.conn.Close()
 }
