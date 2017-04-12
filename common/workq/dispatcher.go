@@ -35,7 +35,7 @@ type Dispatcher struct {
 }
 
 func NewDispatcher(maxWorkers int) *Dispatcher {
-	if (maxWorkers <= 0) || (maxWorkers > maxWorker) {
+	if maxWorkers <= 0 {
 		maxWorkers = maxWorker
 	}
 

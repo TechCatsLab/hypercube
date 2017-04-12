@@ -30,16 +30,58 @@
 package main
 
 import (
+	"errors"
+
+	"hypercube/common/workq"
 	"hypercube/proto/general"
 )
 
+const (
+	workersCount = 128
+)
+
+var (
+	pushWorkQueue *workq.Dispatcher
+)
+
 func userMessageHandler(p interface{}, req interface{}) interface{} {
-	/*
 	var (
-		user *general.Message
+		message *pushMessageJob
 	)
-	*/
-	_ = req.(*general.Message)
+
+	message = &pushMessageJob{
+		message: p.(*general.Message),
+	}
+
+	return appendPushMessage(message)
+}
+
+type pushMessageJob struct {
+	message *general.Message
+}
+
+func (this *pushMessageJob) Do() error {
+	conn, ok := OnLineUser.IsUserOnline(this.message.To)
+
+	if !ok {
+		return errors.New("user is offline")
+	}
+
+	logger.Debug("Sending:", this.message.From, "->", this.message.To)
+
+	return conn.WriteJSON(this.message)
+}
+
+func initPushMessageQueue() {
+	pushWorkQueue = workq.NewDispatcher(workersCount)
+	pushWorkQueue.Run()
+	logger.Debug("message queue is running")
+}
+
+func appendPushMessage(msg *pushMessageJob) error {
+	logger.Debug("push to job queue...", msg.message.From, "->", msg.message.To)
+
+	pushWorkQueue.PushToJobQ(msg)
 
 	return nil
 }
