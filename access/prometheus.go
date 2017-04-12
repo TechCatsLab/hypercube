@@ -38,29 +38,26 @@ import (
 )
 
 var (
-	onlineUserDurations = prometheus.NewSummaryVec(
-		prometheus.SummaryOpts{
+	onlineUserDurations = prometheus.NewCounterVec(
+		prometheus.CounterOpts{
 			Name:       "onlineUser_durations_seconds",
 			Help:       "OnlineUser latency distributions.",
-			Objectives: map[float64]float64{0.5: 0.05, 0.9: 0.01, 0.99: 0.001},
 		},
 		[]string{"service"},
 	)
 
-	sendMessageDurations = prometheus.NewSummaryVec(
-		prometheus.SummaryOpts{
+	sendMessageDurations = prometheus.NewCounterVec(
+		prometheus.CounterOpts{
 			Name:       "sendMessage_durations_seconds",
 			Help:       "SendMessage latency distributions.",
-			Objectives: map[float64]float64{0.5: 0.05, 0.9: 0.01, 0.99: 0.001},
 		},
 		[]string{"service"},
 	)
 
-	resiveMessageDurations = prometheus.NewSummaryVec(
-		prometheus.SummaryOpts{
+	resiveMessageDurations = prometheus.NewCounterVec(
+		prometheus.CounterOpts{
 			Name:       "resiveMessage_durations_seconds",
 			Help:       "ResiveMessage latency distributions.",
-			Objectives: map[float64]float64{0.5: 0.05, 0.9: 0.01, 0.99: 0.001},
 		},
 		[]string{"service"},
 	)
