@@ -42,3 +42,8 @@ type Reply struct {
 	Code        uint32
 	Content     json.RawMessage
 }
+
+type Access struct {
+	ServerIp   *string
+	Subject    *string
+}
