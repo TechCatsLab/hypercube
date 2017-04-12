@@ -30,5 +30,11 @@
 package api
 
 const (
-	ErrSucceed            = uint32(0x0)
+	ErrSucceed            = uint32(0x0000)
+	ErrLogin              = uint32(0x0001)
+	ErrLogout             = uint32(0x0002)
+	ErrUserQuery          = uint32(0x0003)
+	ErrSendToAccess       = uint32(0x0004)
+	ErrFindAccess         = uint32(0x0005)
+	ErrAddAccess          = uint32(0x0006)
 )

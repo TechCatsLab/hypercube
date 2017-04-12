@@ -31,6 +31,7 @@ package main
 
 import (
 	"hypercube/proto/api"
+	"hypercube/common/mq"
 	"errors"
 )
 
@@ -51,8 +52,9 @@ var (
 
 func init() {
 	OnLineUserMag = &OnlineUserManager{
-		users:      make(map[uint64]api.UsrInfo),
-		reqchan:    make(chan usrbasic),
+		users:      make(map[uint64]*api.UsrInfo),
+		access:     make(map[string]mq.Requester),
+		reqchan:    make(chan interface{}),
 		replychan:  make(chan chanreply),
 	}
 
@@ -60,8 +62,9 @@ func init() {
 }
 
 type OnlineUserManager struct {
-	users       map[uint64]api.UsrInfo
-	reqchan     chan usrbasic
+	users       map[uint64]*api.UsrInfo
+	access      map[string]mq.Requester
+	reqchan     chan interface{}
 	replychan   chan chanreply
 }
 
@@ -80,7 +83,7 @@ func (this *OnlineUserManager) Add(user *api.UserLogin) error {
 	if user.ServerIP != "" && user.UserID == invalideUserID {
 		usrb := usrbasic{user.UserID, user.ServerIP, AddType}
 
-		this.reqchan <- usrb
+		this.reqchan <- &usrb
 		repl := <-this.replychan
 
 		return repl.Err
@@ -93,7 +96,7 @@ func (this *OnlineUserManager) Remove(uid uint64) error {
 	if uid != 0 {
 		user := usrbasic{uid, "", RmType}
 
-		this.reqchan <- user
+		this.reqchan <- &user
 		repl := <-this.replychan
 
 		return repl.Err
@@ -106,13 +109,24 @@ func (this *OnlineUserManager) Query(uid uint64) (string, error) {
 	if uid != 0 {
 		user := usrbasic{uid, "", QrType}
 
-		this.reqchan <- user
+		this.reqchan <- &user
 		repl := <-this.replychan
 
 		return repl.ServerIP, repl.Err
 	}
 
 	return "", ParamErr
+}
+
+func (this *OnlineUserManager) AddAccess(access *api.Access) error {
+	if *access.ServerIp != "" && *access.Subject != "" {
+		this.reqchan <- access
+		repl := <- this.replychan
+
+		return repl.Err
+	}
+
+	return ParamErr
 }
 
 func (this *OnlineUserManager)loop() {
@@ -122,31 +136,42 @@ func (this *OnlineUserManager)loop() {
 				ServerIP:    "",
 				Err:         nil,
 			}
-			user := <-this.reqchan
-			switch {
-			case user.Type == AddType:
-				usrlogic := api.UsrInfo{UserID: user.UserID, ServerIP: user.ServerIP}
-				this.users[user.UserID] = usrlogic
+			myinterface := <-this.reqchan
+
+			if user, ok := myinterface.(*usrbasic); ok {
+				switch {
+				case user.Type == AddType:
+					usrlogic := api.UsrInfo{UserID: user.UserID, ServerIP: user.ServerIP}
+					this.users[user.UserID] = &usrlogic
+
+					this.replychan <- repl
+				case user.Type == RmType:
+					if _, ok := this.users[user.UserID]; ok {
+						delete(this.users, user.UserID)
+
+						this.replychan <- repl
+					} else {
+						repl.Err = ParamErr
+						this.replychan <- repl
+					}
+				case user.Type == QrType:
+					if userb, ok := this.users[user.UserID]; ok {
+						repl.ServerIP = userb.ServerIP
+
+						this.replychan <- repl
+					} else {
+						repl.Err = ParamErr
+						this.replychan <- repl
+					}
+				}
+			}
+
+			if access, ok := myinterface.(*api.Access); ok {
+				req := createAccessRPC(access.Subject)
+
+				this.access[*access.ServerIp] = req
 
 				this.replychan <- repl
-			case user.Type == RmType:
-				if _, ok := this.users[user.UserID]; ok {
-					delete(this.users, user.UserID)
-
-					this.replychan <- repl
-				} else {
-					repl.Err = ParamErr
-					this.replychan <- repl
-				}
-			case user.Type == QrType:
-				if userb, ok := this.users[user.UserID]; ok {
-					repl.ServerIP = userb.ServerIP
-
-					this.replychan <- repl
-				} else {
-					repl.Err = ParamErr
-					this.replychan <- repl
-				}
 			}
 		}
 	}()

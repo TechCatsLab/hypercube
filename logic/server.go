@@ -72,3 +72,33 @@ exit:
 	}
 	os.Exit(1)
 }
+
+// 创建到 Access 模块儿 RPC 调用
+func createAccessRPC(sub *string) mq.Requester{
+	var (
+		err              error
+		logicRequester   *mq.NatsRequester
+	)
+
+	natsMQ, err = mq.NewNatsMQ(&configuration.NatsUrl)
+	if err != nil {
+		logger.Error("Initialize RPC with error:", err)
+		goto exit
+	}
+
+	logicRequester, err = natsMQ.CreateRequester(sub)
+	if err != nil {
+		logger.Error("Initialize RPC channel with error:", err)
+		goto exit
+	}
+
+	logger.Debug("RPC messaging channel connected...")
+	return logicRequester
+
+	exit:
+	if natsMQ != nil {
+		natsMQ.Close()
+	}
+
+	return nil
+}

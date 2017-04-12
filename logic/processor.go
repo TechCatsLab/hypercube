@@ -44,6 +44,7 @@ func requestProcessor(req []byte) interface{} {
 		login        api.UserLogin
 		logout       api.UserLogout
 		msg          general.Message
+		access       api.Access
 		v            interface{}
 		handler      handlerFunc
 	)
@@ -69,6 +70,9 @@ func requestProcessor(req []byte) interface{} {
 	case general.TypeUTUMsg:
 		v = &msg
 		handler = MessageHandler
+	case api.ApiTypeAccess:
+		v = &access
+		handler = AccessConnectHandler
 	}
 
 	if v != nil {
