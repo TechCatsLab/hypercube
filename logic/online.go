@@ -180,3 +180,7 @@ func (this *OnlineUserManager)loop() {
 		}
 	}()
 }
+
+func (this *OnlineUserManager) PrintDebugInfo()  {
+	logger.Debug("Online user manager:", this.users, this.access)
+}

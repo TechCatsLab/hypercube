@@ -53,5 +53,11 @@ func finalHandler(sig os.Signal) {
 	case syscall.SIGHUP:
 		logger.Info("Signal hup captured")
 		return
+
+	case syscall.SIGALRM:
+		logger.Info("Signal alrm captured")
+
+		OnLineUserMag.PrintDebugInfo()
+		return
 	}
 }
