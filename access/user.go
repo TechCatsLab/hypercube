@@ -75,7 +75,7 @@ func (this *OnLineManager) IsUserOnline(userID uint64) (*websocket.Conn, bool) {
 	return user, ok
 }
 
-func (this *OnLineManager) IsUnusualDisConnect(conn *websocket.Conn) (uint64, bool) {
+func (this *OnLineManager) OnUnusualDisConnect(conn *websocket.Conn) (uint64, bool) {
 	this.locker.RLock()
 	defer this.locker.Unlock()
 
