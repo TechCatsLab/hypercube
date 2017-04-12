@@ -36,7 +36,7 @@ import (
 	"syscall"
 )
 
-var terminationSignals = []os.Signal{syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT}
+var terminationSignals = []os.Signal{syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT, syscall.SIGALRM}
 
 // Handler guarantees execution of notifications after a critical section (the function passed
 // to a Run method), even in the presence of process termination. It guarantees exactly once
