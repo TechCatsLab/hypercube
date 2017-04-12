@@ -81,7 +81,7 @@ type chanreply struct {
 }
 
 func (this *OnlineUserManager) Add(user *api.UserLogin) error {
-	if user.ServerIP != "" && user.UserID == invalideUserID {
+	if user.ServerIP != "" && user.UserID != invalideUserID {
 		usrb := usrbasic{user.UserID, user.ServerIP, AddType}
 
 		this.reqchan <- &usrb
@@ -94,7 +94,7 @@ func (this *OnlineUserManager) Add(user *api.UserLogin) error {
 }
 
 func (this *OnlineUserManager) Remove(uid uint64) error {
-	if uid != 0 {
+	if uid != invalideUserID {
 		user := usrbasic{uid, "", RmType}
 
 		this.reqchan <- &user
@@ -107,7 +107,7 @@ func (this *OnlineUserManager) Remove(uid uint64) error {
 }
 
 func (this *OnlineUserManager) Query(uid uint64) (string, error) {
-	if uid != 0 {
+	if uid != invalideUserID {
 		user := usrbasic{uid, "", QrType}
 
 		this.reqchan <- &user
