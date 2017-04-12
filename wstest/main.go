@@ -47,12 +47,14 @@ const(
     userCount = 10
 )
 
+var userIDs []uint64 = []uint64{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
+
 func main() {
     interrupt := make(chan os.Signal, 1)
     signal.Notify(interrupt, os.Interrupt)
 
     for i := 0; i < userCount; i ++ {
-        newRoutine(uint64(i+1))
+        newRoutine(userIDs[i])
     }
     select {
     case <-interrupt:
@@ -64,13 +66,8 @@ func newRoutine(from uint64) {
      go testRoutine(addr, from)
 }
 
-func closeWsConn(c *websocket.Conn, from uint64)  {
-    c.Close()
-    newRoutine(from)
-}
-
 func randUserID() uint64  {
-    return uint64(rand.Uint32() % userCount + 1)
+    return userIDs[rand.Uint32() % userCount]
 }
 
 func dial(addr string) (*websocket.Conn, error)  {
@@ -116,34 +113,9 @@ func testPackage(from, to uint64, t time.Time) []byte  {
     return byteMsg
 }
 
-func testRoutine(addr string, from uint64)  {
-    log.Println("new routine, userID = ", from)
-
-    // 拨号
-    c, err := dial(addr)
-    if err != nil {
-        log.Println("dial:", err)
-        return
-    }
-    defer closeWsConn(c, from)
-
-    // 发送登录数据包
-    message := loginPackage(from)
-    err = c.WriteMessage(websocket.TextMessage, message)
-    if err != nil {
-        log.Println("write:", err)
-        return
-    }
-
-    // 读
-    for {
-        _, message, err := c.ReadMessage()
-        if err != nil {
-            log.Println("read:", err)
-            return
-        }
-        log.Printf("recv: %s", message)
-    }
+func writeRoutine(c *websocket.Conn, from uint64) {
+    var msgCount int32 = 0
+    defer log.Printf("send %d messages, from %d \n", msgCount, from)
 
     // 写入计时
     ticker := time.NewTicker(time.Millisecond * time.Duration( 10 ))
@@ -164,6 +136,7 @@ func testRoutine(addr string, from uint64)  {
                 log.Println("write:", err)
                 return
             }
+            msgCount ++
         case <-exitTimer.C:
             log.Println("go routine exit")
             err := c.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseNormalClosure, ""))
@@ -173,5 +146,40 @@ func testRoutine(addr string, from uint64)  {
             }
             return
         }
+    }
+}
+
+func testRoutine(addr string, from uint64)  {
+    log.Println("new routine, userID = ", from)
+
+    // 拨号
+    c, err := dial(addr)
+    if err != nil {
+        log.Println("dial:", err)
+        return
+    }
+    defer c.Close()
+
+    // 发送登录数据包
+    message := loginPackage(from)
+    err = c.WriteMessage(websocket.TextMessage, message)
+    if err != nil {
+        log.Println("write:", err)
+        return
+    }
+
+    // 写
+    go writeRoutine(c, from)
+
+    // 读
+    var msgCount int32 = 0
+    defer log.Printf("recv %d messages, to = %d", msgCount, from)
+    for {
+        _, message, err := c.ReadMessage()
+        if err != nil {
+            log.Println("read:", err)
+            return
+        }
+        log.Printf("recv: %s", message)
     }
 }
