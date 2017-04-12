@@ -73,7 +73,7 @@ func receiveLogicRPC() {
 		err 	error
 	)
 
-	processor, err = natsMQ.CreateProcessor(&configuration.RecChanal)
+	processor, err = natsMQ.CreateProcessor(&configuration.RecChanel)
 	if err != nil {
 		logger.Error("Start Recieve RPC chanal with error:", err)
 		goto exit
