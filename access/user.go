@@ -114,6 +114,9 @@ func (this *OnLineManager) UserLoginHandler(userID uint64) error {
 	}
 	for r != true{
 		err = logicRequester.Request(proto, r, time.Duration(100)*time.Millisecond)
+		if err != nil {
+			logger.Error(err)
+		}
 	}
 
 	return err
@@ -145,6 +148,9 @@ func (this *OnLineManager) UserLogoutHandler(userID uint64) error {
 
 	for r != true{
 		err = logicRequester.Request(proto, r, time.Duration(100)*time.Millisecond)
+		if err != nil {
+			logger.Error(err)
+		}
 	}
 
 	return err
