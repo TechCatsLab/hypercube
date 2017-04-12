@@ -45,9 +45,10 @@ import (
 const (
 	userCount = 10
 	debugMsg  = false
+	Duration = 600
 )
 
-var addrs []string = []string{"10.0.0.106:10086"}
+var addrs []string = []string{"10.0.0.106:10086", "10.0.0.103:10086"}
 var userIDs []uint64 = []uint64{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
 
 func main() {
@@ -63,8 +64,11 @@ func main() {
 	}
 }
 
+var i int = 0
+
 func getAddr() string {
-	return addrs[rand.Uint32()%uint32(len(addrs))]
+    i ++
+	return addrs[i % len(addrs)]
 }
 
 func newRoutine(from uint64) {
@@ -126,7 +130,7 @@ func testPackage(from, to uint64, t time.Time) []byte {
 	return byteMsg
 }
 
-func writeRoutine(c *websocket.Conn, from uint64) {
+func writeRoutine(c *websocket.Conn, addr string, from uint64) {
 	var msgCount int32 = 0
 
 	// 写入计时
@@ -135,7 +139,7 @@ func writeRoutine(c *websocket.Conn, from uint64) {
 
 	// 退出计时
 	//exitTimer := time.NewTimer(time.Second * time.Duration(rand.Uint32()%60+1))
-    exitTimer := time.NewTimer(time.Second * time.Duration(60))
+    exitTimer := time.NewTimer(time.Second * time.Duration(Duration))
 	defer exitTimer.Stop()
 
 	for {
@@ -156,11 +160,11 @@ func writeRoutine(c *websocket.Conn, from uint64) {
 		}
 	}
 exit:
-	log.Printf("send %d messages, from %d \n", msgCount, from)
+	log.Printf("send %d messages, addr %s, from %d \n", msgCount, addr, from)
 }
 
 func testRoutine(addr string, from uint64) {
-	log.Println("new routine, userID = ", from)
+	log.Println("new routine, addr = ",addr ,"userID = ", from)
 
 	// 拨号
 	c, err := dial(addr)
@@ -179,11 +183,20 @@ func testRoutine(addr string, from uint64) {
 	}
 
 	// 写
-	go writeRoutine(c, from)
+	go writeRoutine(c, addr, from)
 
 	// 读
+	exitTimer := time.NewTimer(time.Second * time.Duration(Duration + 10))
+	defer exitTimer.Stop()
+
 	var msgCount int32 = 0
 	for {
+		select {
+		case <- exitTimer.C :
+			goto exit
+		default:
+
+		}
 		_, _, err := c.ReadMessage()
 		if err != nil {
 			log.Println("read:", err)
@@ -195,5 +208,5 @@ func testRoutine(addr string, from uint64) {
         }
 	}
 exit:
-    log.Printf("recv %d messages, to = %d", msgCount, from)
+    log.Printf("recv %d messages, addr = %s, to = %d", msgCount, addr, from)
 }
