@@ -24,44 +24,22 @@
 
 /*
  * Revision History:
- *     Initial: 2017/04/04        Feng Yifei
+ *     Initial: 2017/04/12        Feng Yifei
  */
 
 package main
 
 import (
-	"os"
-	"hypercube/common/mq"
+	"hypercube/proto/general"
 )
 
-var (
-	natsMQ        *mq.NatsJsonMQ
-	requester     *mq.NatsRequester
-)
-
-func initRPC() {
+func userMessageHandler(p interface{}, req interface{}) interface{} {
+	/*
 	var (
-		err        error
+		user *general.Message
 	)
+	*/
+	_ = req.(*general.Message)
 
-	natsMQ, err = mq.NewNatsMQ(&configuration.NatsUrl)
-	if err != nil {
-		logger.Error("Initialize RPC with error:", err)
-		goto exit
-	}
-
-	requester, err = natsMQ.CreateRequester(&configuration.ApiChannel)
-	if err != nil {
-		logger.Error("Initialize RPC channel with error:", err)
-		goto exit
-	}
-
-	logger.Debug("RPC messaging channel connected...")
-	return
-
-exit:
-	if natsMQ != nil {
-		natsMQ.Close()
-	}
-	os.Exit(1)
+	return nil
 }

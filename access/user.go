@@ -100,7 +100,7 @@ func (this *OnLineManager) UserLoginHandler(userID uint64) error {
 		Body:	json.RawMessage(conv),
 	}
 	for r != true{
-		err = requester.Request(proto, r, time.Duration(5)*time.Second)
+		err = logicRequester.Request(proto, r, time.Duration(5)*time.Second)
 	}
 
 	return err
@@ -131,7 +131,7 @@ func (this *OnLineManager) UserLogoutHandler(userID uint64) error {
 	}
 
 	for r != true{
-		err = requester.Request(proto, r, time.Duration(5)*time.Second)
+		err = logicRequester.Request(proto, r, time.Duration(5)*time.Second)
 	}
 
 	return err

@@ -29,7 +29,9 @@
 
 package main
 
-import "hypercube/proto/general"
+import (
+	"hypercube/proto/general"
+)
 
 func keepAliveRequestHandler(p interface{},req interface{}) interface{} {
 	var (

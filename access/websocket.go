@@ -134,7 +134,7 @@ func webSocketConnectionHandler(conn *websocket.Conn) {
 			handler = keepAliveRequestHandler
 		case general.TypeUTUMsg:
 			v = mes
-			handler = userToUserRequestHandler
+			handler = userMessageHandler
 		case general.TypeLoginAccess:
 			v = user
 		case general.TypeLogoutAccess:
