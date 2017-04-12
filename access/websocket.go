@@ -147,10 +147,20 @@ func webSocketConnectionHandler(conn *websocket.Conn) {
 		user       *general.UserAccess = &general.UserAccess{}
 		v          interface{}
 		handler    handlerFunc
+		id 		   uint64
+		ok 		   bool
 	)
 
 	for {
 		if err = p.ReadWebSocket(conn); err != nil {
+			id, ok = OnLineUser.IsUnusualDisConnect(conn)
+			if ok {
+				OnLineUser.OnDisconnect(id)
+				err = OnLineUser.UserLogoutHandler(id)
+				if err != nil {
+					logger.Error("User Logout failed:", err)
+				}
+			}
 			logger.Error("conn read error:", err)
 			break
 		}

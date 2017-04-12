@@ -75,6 +75,19 @@ func (this *OnLineManager) IsUserOnline(userID uint64) (*websocket.Conn, bool) {
 	return user, ok
 }
 
+func (this *OnLineManager) IsUnusualDisConnect(conn *websocket.Conn) (uint64, bool) {
+	this.locker.RLock()
+	defer this.locker.Unlock()
+
+	for k, v := range this.onLineMap {
+		if v == conn {
+			return k, true
+		}
+	}
+
+	return 0, false
+}
+
 func (this *OnLineManager) UserLoginHandler(userID uint64) error {
 	var (
 		userlog api.UserLogin
