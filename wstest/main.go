@@ -29,157 +29,171 @@
 package main
 
 import (
-    "log"
-    "net/url"
-    "os"
-    "time"
-    "math/rand"
-    "encoding/json"
-    "os/signal"
+	"encoding/json"
+	"log"
+	"math/rand"
+	"net/url"
+	"os"
+	"os/signal"
+	"time"
 
-    "github.com/gorilla/websocket"
+	"github.com/gorilla/websocket"
 
-    "hypercube/proto/general"
+	"hypercube/proto/general"
 )
 
-const(
-    addr = "10.0.0.253:8000"
-    userCount = 10
+const (
+	userCount = 10
+	debugMsg  = false
 )
 
+var addrs []string = []string{"10.0.0.106:10086"}
 var userIDs []uint64 = []uint64{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
 
 func main() {
-    interrupt := make(chan os.Signal, 1)
-    signal.Notify(interrupt, os.Interrupt)
+	interrupt := make(chan os.Signal, 1)
+	signal.Notify(interrupt, os.Interrupt)
 
-    for i := 0; i < userCount; i ++ {
-        newRoutine(userIDs[i])
-    }
-    select {
-    case <-interrupt:
-        return
-    }
+	for i := 0; i < userCount; i++ {
+		newRoutine(userIDs[i])
+	}
+	select {
+	case <-interrupt:
+		return
+	}
+}
+
+func getAddr() string {
+	return addrs[rand.Uint32()%uint32(len(addrs))]
 }
 
 func newRoutine(from uint64) {
-     go testRoutine(addr, from)
+	go testRoutine(getAddr(), from)
 }
 
-func randUserID() uint64  {
-    return userIDs[rand.Uint32() % userCount]
+func randUserID() uint64 {
+	return userIDs[rand.Uint32()%userCount]
 }
 
-func dial(addr string) (*websocket.Conn, error)  {
+func dial(addr string) (*websocket.Conn, error) {
 
-    u := url.URL{Scheme: "ws", Host: addr, Path: "/ws"}
-    log.Printf("connecting to %s", u.String())
+	u := url.URL{Scheme: "ws", Host: addr, Path: "/join"}
+	log.Printf("connecting to %s", u.String())
 
-    c, _, err := websocket.DefaultDialer.Dial(u.String(), nil)
+	c, _, err := websocket.DefaultDialer.Dial(u.String(), nil)
 
-    return c, err
+	return c, err
 }
 
-func loginPackage(from uint64) []byte  {
-    message := general.UserAccess{
-        UserID: from,
-    }
-    byteMessage, _ := json.Marshal(message)
+func loginPackage(from uint64) []byte {
+	message := general.UserAccess{
+		UserID: from,
+	}
+	byteMessage, _ := json.Marshal(message)
 
-    msg := &general.Proto{
-        Ver: general.CurVer,
-        Type: general.TypeLoginAccess,
-        Body: byteMessage,
-    }
-    byteMsg, _ := json.Marshal(msg)
+	msg := &general.Proto{
+		Ver:  general.CurVer,
+		Type: general.TypeLoginAccess,
+		Body: byteMessage,
+	}
+	byteMsg, _ := json.Marshal(msg)
 
-    return byteMsg
+	if debugMsg {
+		log.Println("login: ", string(byteMsg))
+	}
+
+	return byteMsg
 }
 
-func testPackage(from, to uint64, t time.Time) []byte  {
-    message := &general.Message{
-        From: from,
-        To: to,
-        Content: t.String(),
-    }
-    byteMessage, _ := json.Marshal(message)
-    msg := &general.Proto{
-        Ver: general.CurVer,
-        Type: general.TypeUTUMsg,
-        Body: byteMessage,
-    }
-    byteMsg, _ := json.Marshal(msg)
+func testPackage(from, to uint64, t time.Time) []byte {
+	message := &general.Message{
+		From:    from,
+		To:      to,
+		Content: t.String(),
+	}
+	byteMessage, _ := json.Marshal(message)
+	msg := &general.Proto{
+		Ver:  general.CurVer,
+		Type: general.TypeUTUMsg,
+		Body: byteMessage,
+	}
+	byteMsg, _ := json.Marshal(msg)
 
-    return byteMsg
+	if debugMsg {
+		log.Println("utu: ", string(byteMsg))
+	}
+
+	return byteMsg
 }
 
 func writeRoutine(c *websocket.Conn, from uint64) {
-    var msgCount int32 = 0
-    defer log.Printf("send %d messages, from %d \n", msgCount, from)
+	var msgCount int32 = 0
 
-    // 写入计时
-    ticker := time.NewTicker(time.Millisecond * time.Duration( 10 ))
-    defer ticker.Stop()
+	// 写入计时
+	ticker := time.NewTicker(time.Microsecond * time.Duration(1))
+	defer ticker.Stop()
 
-    // 退出计时
-    exitTimer := time.NewTimer(time.Second * time.Duration( rand.Uint32() % 60 + 1))
-    defer exitTimer.Stop()
+	// 退出计时
+	//exitTimer := time.NewTimer(time.Second * time.Duration(rand.Uint32()%60+1))
+    exitTimer := time.NewTimer(time.Second * time.Duration(60))
+	defer exitTimer.Stop()
 
-    for {
-        select {
-        case t := <-ticker.C:
-            // 发送
-            to := randUserID()
-            message := testPackage(from, to, t)
-            err := c.WriteMessage(websocket.TextMessage, message)
-            if err != nil {
-                log.Println("write:", err)
-                return
-            }
-            msgCount ++
-        case <-exitTimer.C:
-            log.Println("go routine exit")
-            err := c.WriteMessage(websocket.CloseMessage, websocket.FormatCloseMessage(websocket.CloseNormalClosure, ""))
-            if err != nil {
-                log.Println("write close:", err)
-                return
-            }
-            return
-        }
-    }
+	for {
+		select {
+		case t := <-ticker.C:
+			// 发送
+			to := randUserID()
+			message := testPackage(from, to, t)
+			err := c.WriteMessage(websocket.TextMessage, message)
+			if err != nil {
+				log.Println("write:", err)
+				goto exit
+			}
+			msgCount++
+		case <-exitTimer.C:
+			log.Println("exitTimer : go routine exit, from = ", from)
+			goto exit
+		}
+	}
+exit:
+	log.Printf("send %d messages, from %d \n", msgCount, from)
 }
 
-func testRoutine(addr string, from uint64)  {
-    log.Println("new routine, userID = ", from)
+func testRoutine(addr string, from uint64) {
+	log.Println("new routine, userID = ", from)
 
-    // 拨号
-    c, err := dial(addr)
-    if err != nil {
-        log.Println("dial:", err)
-        return
-    }
-    defer c.Close()
+	// 拨号
+	c, err := dial(addr)
+	if err != nil {
+		log.Println("dial:", err)
+		return
+	}
+	defer c.Close()
 
-    // 发送登录数据包
-    message := loginPackage(from)
-    err = c.WriteMessage(websocket.TextMessage, message)
-    if err != nil {
-        log.Println("write:", err)
-        return
-    }
+	// 发送登录数据包
+	message := loginPackage(from)
+	err = c.WriteMessage(websocket.TextMessage, message)
+	if err != nil {
+		log.Println("write:", err)
+		return
+	}
 
-    // 写
-    go writeRoutine(c, from)
+	// 写
+	go writeRoutine(c, from)
 
-    // 读
-    var msgCount int32 = 0
-    defer log.Printf("recv %d messages, to = %d", msgCount, from)
-    for {
-        _, message, err := c.ReadMessage()
-        if err != nil {
-            log.Println("read:", err)
-            return
+	// 读
+	var msgCount int32 = 0
+	for {
+		_, _, err := c.ReadMessage()
+		if err != nil {
+			log.Println("read:", err)
+			goto exit
+		}
+		msgCount++
+        if debugMsg {
+            log.Printf("to: %d, count: %d, recv: %s \n", from, msgCount, message)
         }
-        log.Printf("recv: %s", message)
-    }
+	}
+exit:
+    log.Printf("recv %d messages, to = %d", msgCount, from)
 }
