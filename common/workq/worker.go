@@ -45,7 +45,7 @@ type Worker struct {
 func NewWorker(workerPool chan chan Job) Worker {
 	return Worker{
 		workerPool: workerPool,
-		jobChannel: make(chan Job, 1),
+		jobChannel: make(chan Job),
 	}
 }
 

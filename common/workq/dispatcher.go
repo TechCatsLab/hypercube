@@ -41,7 +41,7 @@ func NewDispatcher(maxWorkers int) *Dispatcher {
 
 	return &Dispatcher{
 		workerPool: make(chan chan Job, maxWorkers),
-		jobQueue:   make(chan Job, 1),
+		jobQueue:   make(chan Job),
 	}
 }
 
