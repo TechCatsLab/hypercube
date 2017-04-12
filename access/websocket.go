@@ -71,8 +71,6 @@ func initWebSocketServer() error {
 	var (
 		server      *ws.WebSocketServer
 		err         error
-		r		bool
-		serverinfo  api.Access
 	)
 
 	webSocketServers = make([]*ws.WebSocketServer, len(configuration.Addrs))
@@ -90,16 +88,34 @@ func initWebSocketServer() error {
 
 		webSocketServers[index] = server
 		server.Run()
+	}
 
+	return err
+}
+
+func sendAccessInfo()  {
+	var (
+		r		bool
+		serverinfo  api.Access
+	)
+
+	webSocketServers = make([]*ws.WebSocketServer, len(configuration.Addrs))
+
+	for _, address := range configuration.Addrs {
 		serverinfo.ServerIp = &address
 		serverinfo.Subject = &configuration.Subject
 		serverinfo.Type = api.ApiTypeAccess
 
-		err = logicRequester.Request(serverinfo, r, time.Duration(5)*time.Second)
+		err := logicRequester.Request(serverinfo, r, time.Duration(5) * time.Second)
+
+		if err != nil {
+			logger.Error("send access info error:", err, " , address:", address)
+
+			break
+		}
+
 		logger.Debug("send access info to logic:", serverinfo)
 	}
-
-	return err
 }
 
 func serveWebSocket(w http.ResponseWriter, req *http.Request) {

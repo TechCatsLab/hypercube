@@ -30,5 +30,6 @@
 package main
 
 func main() {
+	sendAccessInfo()
 	sigHandler.Wait()
 }
