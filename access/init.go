@@ -36,6 +36,7 @@ func init()  {
 
     initLogicRPC()
     initPushMessageQueue()
+    receiveLogicRPC()
 
     HttpPprof()
     initWebsocket()

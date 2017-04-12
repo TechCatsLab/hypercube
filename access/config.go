@@ -53,6 +53,7 @@ type AccessLayerConfig struct {
 	NatsUrl             string
 	ApiChannel          string
 	Subject             string
+	RecChanal 			string
 	PprofAddrs          string
 	PrometheusPort      string
 }
@@ -74,6 +75,7 @@ func readConfiguration() {
 		NatsUrl:               viper.GetString("nats.urls"),
 		ApiChannel:            viper.GetString("nats.apiChannel"),
 		Subject:               viper.GetString("nats.subject"),
+		RecChanal: 			   viper.GetString("nats.recchanal"),
 		PprofAddrs:            viper.GetString("monitor.pprofAddrs"),
 		PrometheusPort:        viper.GetString("monitor.prometheusPort"),
 	}

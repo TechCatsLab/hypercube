@@ -24,68 +24,50 @@
 
 /*
  * Revision History:
- *     Initial: 2017/04/04        Feng Yifei
+ *     Initial: 2017/04/13        Yusan Kurban
  */
 
 package main
 
 import (
-	"os"
-	"hypercube/common/mq"
+	"hypercube/proto/general"
+	"hypercube/proto/api"
+	"encoding/json"
 )
 
-var (
-	natsMQ             *mq.NatsJsonMQ
-	logicRequester     *mq.NatsRequester
-	processor			*mq.NatsProcessor
-)
+type ReceiveHandler func(p interface{}, req interface{}) interface{}
 
-// 创建到 Logic 模块儿 RPC 调用
-func initLogicRPC() {
+func receiveRequestProcessor(req []byte) interface{} {
 	var (
-		err        error
+		err     error
+		request api.Request
+		msg     general.Message
+		handler ReceiveHandler
+		p       interface{}
+		r 		interface{}
 	)
 
-	natsMQ, err = mq.NewNatsMQ(&configuration.NatsUrl)
+	err = json.Unmarshal(req, request)
 	if err != nil {
-		logger.Error("Initialize RPC with error:", err)
-		goto exit
+		logger.Error(err)
 	}
 
-	logicRequester, err = natsMQ.CreateRequester(&configuration.ApiChannel)
-	if err != nil {
-		logger.Error("Initialize RPC channel with error:", err)
-		goto exit
+	switch request.Type{
+	case general.TypeUTUMsg:
+		p = msg
+		handler = userMessageHandler
 	}
 
-	logger.Debug("RPC messaging channel connected...")
-	return
+	if p != nil {
+		err = json.Unmarshal(request.Content, p)
+		if err != nil {
+			logger.Error("Receive Request Logic Processor connect error:", err)
+			return nil
+		}
 
-exit:
-	if natsMQ != nil {
-		natsMQ.Close()
-	}
-	os.Exit(1)
-}
-
-func receiveLogicRPC() {
-	var (
-		err 	error
-	)
-
-	processor, err = natsMQ.CreateProcessor(&configuration.RecChanal)
-	if err != nil {
-		logger.Error("Start Recieve RPC chanal with error:", err)
-		goto exit
+		return handler(p, r)
 	}
 
-	processor.SetRequestHandler(receiveRequestProcessor)
-	logger.Info("receive request finish.")
-	goto exit
+	return nil
 
-exit:
-	if natsMQ != nil{
-		natsMQ.Close()
-	}
-	os.Exit(1)
 }
