@@ -168,10 +168,14 @@ func (this *OnlineUserManager)loop() {
 
 			if access, ok := myinterface.(*api.Access); ok {
 				req := createAccessRPC(access.Subject)
+				if req != nil {
+					this.access[*access.ServerIp] = req
 
-				this.access[*access.ServerIp] = req
-
-				this.replychan <- repl
+					this.replychan <- repl
+				} else {
+					repl.Err = ParamErr
+					this.replychan <- repl
+				}
 			}
 		}
 	}()
