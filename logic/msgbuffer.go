@@ -22,72 +22,24 @@
  * SOFTWARE.
  */
 
-/*
- * Revision History:
- *     Initial: 2017/04/04        Feng Yifei
+/**
+ * Created by HeChengJun on 13/04/2017.
  */
 
 package main
 
-import (
-	"hypercube/proto/api"
-	"hypercube/proto/general"
+var(
+    msgbuf map[uint64][]interface{}
 )
 
-func userLoginRequestHandler(req interface{}) interface{} {
-	var (
-		login    *api.UserLogin
-
-	)
-
-	login = req.(*api.UserLogin)
-	logger.Debug("userLoginRequestHandler userID:", login.UserID)
-
-	err := OnLineUserMag.Add(login)
-
-	if err != nil {
-
-	}
-
-	return nil
+func init()  {
+    msgbuf = make(map[uint64][]interface{})
 }
 
-func userLogoutRequestHandler(req interface{}) interface{} {
-	var (
-		reply        *api.Reply
-		logout       *api.UserLogout
-	)
-
-	logout = req.(*api.UserLogout)
-	logger.Debug("userLogoutRequestHandler userID:", logout.UserID)
-
-	err := OnLineUserMag.Remove(logout.UserID)
-
-	if err != nil {
-		return err
-	}
-
-	reply = &api.Reply{
-		Code: api.ErrSucceed,
-	}
-
-	return reply
+func addHistMessage(userID uint64, msg interface{})  {
+    msgbuf[userID] = append(msgbuf[userID], msg)
 }
 
-func MessageHandler(req interface{}) interface{} {
-	var (
-		msg          *general.Message
-	)
-
-	msg = req.(*general.Message)
-	logger.Debug("userToUserMsgHandler:", msg)
-
-	_, err := OnLineUserMag.Query(msg.To)
-
-	if err != nil {
-		addHistMessage(msg.To, msg)
-		return err
-	}
-
-	return err
+func getHistMessages(userID uint64) []interface{} {
+    return msgbuf[userID]
 }
