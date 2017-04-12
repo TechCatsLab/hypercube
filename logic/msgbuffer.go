@@ -53,7 +53,7 @@ func addHistMessage(userID uint64, msg interface{})  {
     mesg := msg.(*general.Message)
 
     if len(msgbuf[userID]) < maxBufferSize {
-        msgbuf[userID] = append(msgbuf[userID], mesg)
+        msgbuf[userID] = append(msgbuf[userID], *mesg)
     }
 }
 
@@ -80,9 +80,9 @@ func userSendMessageHandler(userID uint64) error {
 
     messages := getHistMessages(userID)
 
-    for mes := range messages {
+    for _, mes := range messages {
         message = &pushMessageJob{
-            message: mes,
+            message: &mes,
         }
 
         if err := appendPushMessage(message); err != nil {
