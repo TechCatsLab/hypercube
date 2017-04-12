@@ -40,14 +40,19 @@ import (
 
 var OnLineUser *OnLineManager
 
+type OnlineEntry struct {
+	Mutex    sync.Mutex
+	Conn     *websocket.Conn
+}
+
 type OnLineManager struct {
 	locker 		sync.RWMutex
-	onLineMap	map[uint64]*websocket.Conn
+	onLineMap	map[uint64]*OnlineEntry
 }
 
 func init() {
 	OnLineUser = &OnLineManager{
-		onLineMap: map[uint64]*websocket.Conn{},
+		onLineMap: map[uint64]*OnlineEntry{},
 	}
 }
 
@@ -55,7 +60,7 @@ func (this *OnLineManager) OnConnect(userID uint64, conn *websocket.Conn) {
 	this.locker.Lock()
 	defer this.locker.Unlock()
 
-	this.onLineMap[userID] = conn
+	this.onLineMap[userID] = &OnlineEntry{Conn: conn}
 }
 
 func (this *OnLineManager) OnDisconnect(userID uint64) {
@@ -67,7 +72,7 @@ func (this *OnLineManager) OnDisconnect(userID uint64) {
 	}
 }
 
-func (this *OnLineManager) IsUserOnline(userID uint64) (*websocket.Conn, bool) {
+func (this *OnLineManager) IsUserOnline(userID uint64) (*OnlineEntry, bool) {
 	this.locker.RLock()
 	defer this.locker.RUnlock()
 
@@ -80,7 +85,7 @@ func (this *OnLineManager) OnUnusualDisConnect(conn *websocket.Conn) (uint64, bo
 	defer this.locker.RUnlock()
 
 	for k, v := range this.onLineMap {
-		if v == conn {
+		if v.Conn == conn {
 			return k, true
 		}
 	}

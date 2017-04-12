@@ -88,7 +88,10 @@ func (this *pushMessageJob) Do() error {
 
 	logger.Debug("Sending:", this.message.From, "->", this.message.To)
 
-	return conn.WriteJSON(this.message)
+	conn.Mutex.Lock()
+	defer conn.Mutex.Unlock()
+
+	return conn.Conn.WriteJSON(this.message)
 }
 
 func initPushMessageQueue() {
