@@ -34,4 +34,6 @@ const (
 	ApiTypeUserLogout              = 0x101
 	ApiTypeUserConnect             = 0x102
 	ApiTypeUserDisConnect          = 0x103
+
+	ApiTypeAccess                  = 0X104
 )

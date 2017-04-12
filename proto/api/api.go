@@ -46,4 +46,5 @@ type Reply struct {
 type Access struct {
 	ServerIp   *string
 	Subject    *string
+	Type       *uint32
 }

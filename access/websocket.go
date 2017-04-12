@@ -36,6 +36,8 @@ import (
 	ws "hypercube/common/server/websocket"
 	"hypercube/proto/general"
 	"encoding/json"
+	"hypercube/proto/api"
+	"time"
 )
 
 var (
@@ -67,8 +69,10 @@ func initWebsocket()  {
 
 func initWebSocketServer() error {
 	var (
-		server    *ws.WebSocketServer
-		err       error
+		server      *ws.WebSocketServer
+		err         error
+		r		bool
+		serverinfo  api.Access
 	)
 
 	webSocketServers = make([]*ws.WebSocketServer, len(configuration.Addrs))
@@ -86,6 +90,12 @@ func initWebSocketServer() error {
 
 		webSocketServers[index] = server
 		server.Run()
+
+		serverinfo.ServerIp = address
+		serverinfo.Subject = configuration.Subject
+		serverinfo.Type = api.ApiTypeAccess
+
+		err = logicRequester.Request(serverinfo, r, time.Duration(5)*time.Second)
 	}
 
 	return err

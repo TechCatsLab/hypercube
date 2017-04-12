@@ -52,6 +52,7 @@ type AccessLayerConfig struct {
 	WSWriteBufferSize   int
 	NatsUrl             string
 	ApiChannel          string
+	Subject             string
 	PprofAddrs          string
 	PrometheusPort      string
 }
@@ -72,6 +73,7 @@ func readConfiguration() {
 		WSWriteBufferSize:     viper.GetInt("websocket.writeBufferSize"),
 		NatsUrl:               viper.GetString("nats.urls"),
 		ApiChannel:            viper.GetString("nats.apiChannel"),
+		Subject:               viper.GetString("nats.subject"),
 		PprofAddrs:            viper.GetString("monitor.pprofAddrs"),
 		PrometheusPort:        viper.GetString("monitor.prometheusPort"),
 	}
