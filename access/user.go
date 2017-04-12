@@ -32,7 +32,7 @@ package main
 import (
 	"sync"
 	"github.com/gorilla/websocket"
-	. "hypercube/proto/api"
+	"hypercube/proto/api"
 	"time"
 	"hypercube/proto/general"
 	"encoding/json"
@@ -77,14 +77,14 @@ func (this *OnLineManager) IsUserOnline(userID uint64) (*websocket.Conn, bool) {
 
 func (this *OnLineManager) UserLoginHandler(userID uint64) error {
 	var (
-		userlog UserLogin
+		userlog api.UserLogin
 		proto 	general.Proto
 		conv 	[]byte
 		r		bool
 		err		error
 	)
 
-	userlog = UserLogin{
+	userlog = api.UserLogin{
 		UserID: 	userID,
 		ServerIP:   configuration.Addrs[0],
 	}
@@ -108,14 +108,14 @@ func (this *OnLineManager) UserLoginHandler(userID uint64) error {
 
 func (this *OnLineManager) UserLogoutHandler(userID uint64) error {
 	var (
-		userlog UserLogout
+		userlog api.UserLogout
 		proto 	general.Proto
 		conv    []byte
 		r		bool
 		err		error
 	)
 
-	userlog = UserLogout{
+	userlog = api.UserLogout{
 		UserID: 	userID,
 	}
 
