@@ -42,7 +42,7 @@ func keepAliveRequestHandler(p interface{},req interface{}) interface{} {
 	pro = p.(*general.Proto)
 
 	if _, err := pro.VerCheck(); err != general.ErrSucceed {
-		logger.Error(err)
+		logger.Error("keepAliveRequestHandler vercheck:", err)
 		return err
 	}
 

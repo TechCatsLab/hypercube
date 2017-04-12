@@ -109,7 +109,7 @@ func (this *OnLineManager) UserLoginHandler(userID uint64) error {
 
 	conv, err = json.Marshal(&userlog)
 	if err != nil {
-		logger.Error(err)
+		logger.Error("UserLoginHandler marshall error:", err)
 	}
 
 	proto = &api.Request{

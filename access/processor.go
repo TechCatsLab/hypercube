@@ -49,7 +49,7 @@ func receiveRequestProcessor(req []byte) interface{} {
 
 	err = json.Unmarshal(req, request)
 	if err != nil {
-		logger.Error(err)
+		logger.Error("receiveRequestProcessor unmarshall error:", err)
 	}
 
 	msg.Pushed = true
