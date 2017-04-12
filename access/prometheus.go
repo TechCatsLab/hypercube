@@ -32,43 +32,44 @@ package main
 import (
 	"net/http"
 	"log"
-	"flag"
 
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/prometheus/client_golang/prometheus"
 )
 
-var(
-	normDomain        = flag.Float64("normal.domain", 200, "The domain for the normal distribution.")
-	normMean          = flag.Float64("normal.mean", 10, "The mean for the normal distribution.")
-	)
-
 var (
-	// Create a summary to track fictional interservice RPC latencies for three
-	// distinct services with different latency distributions. These services are
-	// differentiated via a "service" label.
-	rpcDurations = prometheus.NewSummaryVec(
+	onlineUserDurations = prometheus.NewSummaryVec(
 		prometheus.SummaryOpts{
-			Name:       "rpc_durations_seconds",
-			Help:       "RPC latency distributions.",
+			Name:       "onlineUser_durations_seconds",
+			Help:       "OnlineUser latency distributions.",
 			Objectives: map[float64]float64{0.5: 0.05, 0.9: 0.01, 0.99: 0.001},
 		},
 		[]string{"service"},
 	)
-	// The same as above, but now as a histogram, and only for the normal
-	// distribution. The buckets are targeted to the parameters of the
-	// normal distribution, with 20 buckets centered on the mean, each
-	// half-sigma wide.
-	rpcDurationsHistogram = prometheus.NewHistogram(prometheus.HistogramOpts{
-		Name:    "rpc_durations_histogram_seconds",
-		Help:    "RPC latency distributions.",
-		Buckets: prometheus.LinearBuckets(*normMean-5**normDomain, .5**normDomain, 20),
-	})
+
+	sendMessageDurations = prometheus.NewSummaryVec(
+		prometheus.SummaryOpts{
+			Name:       "sendMessage_durations_seconds",
+			Help:       "SendMessage latency distributions.",
+			Objectives: map[float64]float64{0.5: 0.05, 0.9: 0.01, 0.99: 0.001},
+		},
+		[]string{"service"},
+	)
+
+	resiveMessageDurations = prometheus.NewSummaryVec(
+		prometheus.SummaryOpts{
+			Name:       "resiveMessage_durations_seconds",
+			Help:       "ResiveMessage latency distributions.",
+			Objectives: map[float64]float64{0.5: 0.05, 0.9: 0.01, 0.99: 0.001},
+		},
+		[]string{"service"},
+	)
 )
 
 func initPrometheus() {
-	prometheus.MustRegister(rpcDurations)
-	prometheus.MustRegister(rpcDurationsHistogram)
+	prometheus.MustRegister(onlineUserDurations)
+	prometheus.MustRegister(sendMessageDurations)
+	prometheus.MustRegister(resiveMessageDurations)
 
 	go func() {
 		http.Handle("/metrics", promhttp.Handler())
