@@ -32,6 +32,7 @@ package general
 type Message struct {
 	From        uint64      `json:"fr"`
 	To          uint64      `json:"to"`
+	Pushed      bool
 	Content     string      `json:"co"`
 }
 

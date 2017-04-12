@@ -52,9 +52,11 @@ func receiveRequestProcessor(req []byte) interface{} {
 		logger.Error(err)
 	}
 
+	msg.Pushed = true
+	
 	switch request.Type{
 	case general.TypeUTUMsg:
-		p = msg
+		p = &msg
 		handler = userMessageHandler
 	}
 

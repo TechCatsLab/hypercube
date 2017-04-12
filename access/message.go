@@ -34,6 +34,8 @@ import (
 
 	"hypercube/common/workq"
 	"hypercube/proto/general"
+	"hypercube/proto/api"
+	"encoding/json"
 )
 
 const (
@@ -60,10 +62,27 @@ type pushMessageJob struct {
 	message *general.Message
 }
 
+func (this *pushMessageJob) sendToLogic() error {
+	msg, err := json.Marshal(this.message)
+
+	if err != nil {
+		return err
+	}
+
+	return logicRequester.SendMessage(&api.Request{
+		Type:    general.TypeUTUMsg,
+		Content: msg,
+	})
+}
+
 func (this *pushMessageJob) Do() error {
 	conn, ok := OnLineUser.IsUserOnline(this.message.To)
 
 	if !ok {
+		if !this.message.Pushed {
+			logger.Debug("User not on this server, sending to logic:", this.message.From, "->", this.message.To)
+			return this.sendToLogic()
+		}
 		return errors.New("user is offline")
 	}
 
