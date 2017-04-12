@@ -30,11 +30,11 @@
 package main
 
 import (
+	"strings"
 	"sync"
 	"github.com/gorilla/websocket"
 	"hypercube/proto/api"
 	"time"
-	"hypercube/proto/general"
 	"encoding/json"
 )
 
@@ -91,7 +91,7 @@ func (this *OnLineManager) OnUnusualDisConnect(conn *websocket.Conn) (uint64, bo
 func (this *OnLineManager) UserLoginHandler(userID uint64) error {
 	var (
 		userlog api.UserLogin
-		proto 	general.Proto
+		proto 	*api.Request
 		conv 	[]byte
 		r		api.Reply
 		err		error
@@ -99,7 +99,7 @@ func (this *OnLineManager) UserLoginHandler(userID uint64) error {
 
 	userlog = api.UserLogin{
 		UserID: 	userID,
-		ServerIP:   configuration.Addrs[0],
+		ServerIP:   strings.Split(configuration.Addrs[0], ":")[0],
 	}
 
 	conv, err = json.Marshal(&userlog)
@@ -107,20 +107,20 @@ func (this *OnLineManager) UserLoginHandler(userID uint64) error {
 		logger.Error(err)
 	}
 
-	proto = general.Proto{
-		Ver:    general.CurVer,
-		Type:   general.TypeLoginAccess,
-		Body:	json.RawMessage(conv),
+	proto = &api.Request{
+		Type:    api.ApiTypeUserLogin,
+		Content: conv,
 	}
 
-	err = logicRequester.Request(proto, r, time.Duration(100)*time.Millisecond)
+	err = logicRequester.Request(proto, &r, time.Duration(100) * time.Millisecond)
+
 	if err != nil {
 		logger.Error(err)
 	}
-	if r.Code != uint32(0x0000) {
+
+	if r.Code != api.ErrSucceed {
 		logger.Error("request error code:", r.Code)
 	}
-
 
 	return err
 }
@@ -128,9 +128,9 @@ func (this *OnLineManager) UserLoginHandler(userID uint64) error {
 func (this *OnLineManager) UserLogoutHandler(userID uint64) error {
 	var (
 		userlog api.UserLogout
-		proto 	general.Proto
+		proto 	*api.Request
 		conv    []byte
-		r		bool
+		r		api.Reply
 		err		error
 	)
 
@@ -143,17 +143,14 @@ func (this *OnLineManager) UserLogoutHandler(userID uint64) error {
 		logger.Error(err)
 	}
 
-	proto = general.Proto{
-		Ver:    general.CurVer,
-		Type:   general.TypeLogoutAccess,
-		Body:	json.RawMessage(conv),
+	proto = &api.Request{
+		Type:    api.ApiTypeUserLogin,
+		Content: conv,
 	}
 
-	for r != true{
-		err = logicRequester.Request(proto, r, time.Duration(100)*time.Millisecond)
-		if err != nil {
-			logger.Error(err)
-		}
+	err = logicRequester.Request(proto, &r, time.Duration(100) * time.Millisecond)
+	if err != nil {
+		logger.Error(err)
 	}
 
 	return err

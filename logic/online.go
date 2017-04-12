@@ -33,6 +33,7 @@ import (
 	"hypercube/proto/api"
 	"hypercube/common/mq"
 	"errors"
+	"fmt"
 )
 
 const (
@@ -182,5 +183,5 @@ func (this *OnlineUserManager)loop() {
 }
 
 func (this *OnlineUserManager) PrintDebugInfo()  {
-	logger.Debug("Online user manager:", this.users, this.access)
+	logger.Debug(fmt.Sprintf("Online user manager:(%+v, %+v)", this.users, this.access))
 }
