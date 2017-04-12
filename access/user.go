@@ -158,3 +158,10 @@ func (this *OnLineManager) UserLogoutHandler(userID uint64) error {
 
 	return err
 }
+
+func (this *OnLineManager) PrintDebugInfo() {
+	this.locker.RLock()
+	defer this.locker.RUnlock()
+
+	logger.Debug("Online user manager:", this.onLineMap)
+}

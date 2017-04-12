@@ -167,6 +167,8 @@ func webSocketConnectionHandler(conn *websocket.Conn) {
 			break
 		}
 
+		logger.Debug("Websocket received message type:", p.Type)
+
 		switch p.Type {
 		case general.TypeHeartbeat:
 			v = ver
