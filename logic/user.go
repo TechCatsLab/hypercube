@@ -36,8 +36,8 @@ import (
 
 func userLoginRequestHandler(req interface{}) interface{} {
 	var (
-		login    *api.UserLogin
-
+		login       *api.UserLogin
+		reply       *api.Reply
 	)
 
 	login = req.(*api.UserLogin)
@@ -46,7 +46,15 @@ func userLoginRequestHandler(req interface{}) interface{} {
 	err := OnLineUserMag.Add(login)
 
 	if err != nil {
+		logger.Error(err)
 
+		reply = &api.Reply{
+			Code: api.ErrLogin,
+		}
+	} else {
+		reply = &api.Reply{
+			Code: api.ErrSucceed,
+		}
 	}
 
 	return nil
@@ -67,7 +75,7 @@ func userLogoutRequestHandler(req interface{}) interface{} {
 		logger.Error(err)
 
 		reply = &api.Reply{
-			Code: api.ErrLogin,
+			Code: api.ErrLogout,
 		}
 	} else {
 		reply = &api.Reply{
@@ -107,7 +115,7 @@ func MessageHandler(req interface{}) interface{} {
 			logger.Error(err)
 
 			reply = &api.Reply{
-				Code: api.ErrUserQuery,
+				Code: api.ErrSendToAccess,
 			}
 		}
 	} else {
