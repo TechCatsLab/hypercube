@@ -28,6 +28,10 @@
 
 package main
 
+import (
+    "hypercube/common/workq"
+    "hypercube/proto/general"
+)
 var(
     msgbuf map[uint64][]interface{}
 )
@@ -38,6 +42,7 @@ const (
 
 func init()  {
     msgbuf = make(map[uint64][]interface{})
+    initSendMessageQueue()
 }
 
 func addHistMessage(userID uint64, msg interface{})  {
@@ -55,4 +60,67 @@ func getHistMessages(userID uint64) []interface{} {
 
 func clearHistMessages(userID uint64) {
     msgbuf[userID] = []interface{}{}
+}
+
+const (
+    workersCount = 128
+)
+
+var (
+    sendWorkQueue *workq.Dispatcher
+)
+
+func userSendMessageHandler(userID uint64) error {
+    var (
+        message *pushMessageJob
+    )
+
+    messages := getHistMessages(userID)
+
+    for mes := range messages {
+        message = &pushMessageJob{
+            message: mes.(*general.Message),
+        }
+
+        if err := appendPushMessage(message); err != nil {
+            return err
+        }
+
+        mes = nil
+    }
+
+    return nil
+}
+
+type pushMessageJob struct {
+    message *general.Message
+}
+
+func (this *pushMessageJob) Do() error {
+    serverip,err := OnLineUserMag.Query(this.message.To)
+    if err != nil {
+        return err
+    }
+
+    if req, ok := OnLineUserMag.access[serverip]; ok {
+        req.SendMessage(this.message)
+    }
+
+    logger.Debug("Sending:", this.message.From, "->", this.message.To)
+
+    return nil
+}
+
+func initSendMessageQueue() {
+    sendWorkQueue = workq.NewDispatcher(workersCount)
+    sendWorkQueue.Run()
+    logger.Debug("message queue is running")
+}
+
+func appendPushMessage(msg *pushMessageJob) error {
+    logger.Debug("push to job queue...", msg.message.From, "->", msg.message.To)
+
+    sendWorkQueue.PushToJobQ(msg)
+
+    return nil
 }

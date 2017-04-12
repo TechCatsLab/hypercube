@@ -57,7 +57,12 @@ func userLoginRequestHandler(req interface{}) interface{} {
 		}
 	}
 
-	return nil
+	err = userSendMessageHandler(login.UserID)
+	if err != nil {
+		logger.Error(err)
+	}
+
+	return reply
 }
 
 func userLogoutRequestHandler(req interface{}) interface{} {
@@ -116,6 +121,10 @@ func MessageHandler(req interface{}) interface{} {
 
 			reply = &api.Reply{
 				Code: api.ErrSendToAccess,
+			}
+		} else {
+			reply = &api.Reply{
+				Code: api.ErrSucceed,
 			}
 		}
 	} else {
