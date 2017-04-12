@@ -91,11 +91,12 @@ func initWebSocketServer() error {
 		webSocketServers[index] = server
 		server.Run()
 
-		serverinfo.ServerIp = address
-		serverinfo.Subject = configuration.Subject
+		serverinfo.ServerIp = &address
+		serverinfo.Subject = &configuration.Subject
 		serverinfo.Type = api.ApiTypeAccess
 
 		err = logicRequester.Request(serverinfo, r, time.Duration(5)*time.Second)
+		logger.Debug("send access info to logic:", serverinfo)
 	}
 
 	return err
