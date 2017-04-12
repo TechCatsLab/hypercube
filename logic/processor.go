@@ -55,6 +55,8 @@ func requestProcessor(req []byte) interface{} {
 		return nil
 	}
 
+	logger.Debug("Logic RPC received message type:", request.Type)
+
 	switch request.Type {
 	case api.ApiTypeUserConnect:
 	case api.ApiTypeUserDisConnect:

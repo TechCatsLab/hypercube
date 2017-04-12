@@ -35,7 +35,7 @@ import (
 )
 
 var (
-	natsMQ        *mq.NatsJsonMQ
+	natsMQ             *mq.NatsJsonMQ
 	logicRequester     *mq.NatsRequester
 )
 
