@@ -52,7 +52,7 @@ func userMessageHandler(p interface{}, req interface{}) interface{} {
 	)
 
 	message = &pushMessageJob{
-		message: p.(*general.Message),
+		message: req.(*general.Message),
 	}
 
 	return appendPushMessage(message)
