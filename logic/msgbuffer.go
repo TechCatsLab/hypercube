@@ -33,7 +33,7 @@ import (
     "hypercube/proto/general"
 )
 var(
-    msgbuf map[uint64][]interface{}
+    msgbuf map[uint64][]general.Message
 )
 
 const (
@@ -41,25 +41,28 @@ const (
 )
 
 func init()  {
-    msgbuf = make(map[uint64][]interface{})
+    msgbuf = make(map[uint64][]general.Message)
     initSendMessageQueue()
 }
 
 func addHistMessage(userID uint64, msg interface{})  {
     if msgbuf[userID] == nil {
-        msgbuf[userID] = make([]interface{}, maxBufferSize)
+        msgbuf[userID] = make([]general.Message, maxBufferSize)
     }
+
+    mesg := msg.(*general.Message)
+
     if len(msgbuf[userID]) < maxBufferSize {
-        msgbuf[userID] = append(msgbuf[userID], msg)
+        msgbuf[userID] = append(msgbuf[userID], mesg)
     }
 }
 
-func getHistMessages(userID uint64) []interface{} {
+func getHistMessages(userID uint64) []general.Message {
     return msgbuf[userID]
 }
 
 func clearHistMessages(userID uint64) {
-    msgbuf[userID] = []interface{}{}
+    msgbuf[userID] = []general.Message{}
 }
 
 const (
@@ -79,14 +82,12 @@ func userSendMessageHandler(userID uint64) error {
 
     for mes := range messages {
         message = &pushMessageJob{
-            message: mes.(*general.Message),
+            message: mes,
         }
 
         if err := appendPushMessage(message); err != nil {
             return err
         }
-
-        mes = nil
     }
 
     return nil
