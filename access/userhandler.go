@@ -32,15 +32,12 @@ package main
 import "hypercube/proto/general"
 
 func userToUserRequestHandler(p interface{}, req interface{}) interface{} {
+	/*
 	var (
 		user *general.Message
 	)
-
-	user = req.(*general.Message)
-
-	// Todo: 完善逻辑
-	// Todo: 参数传递类型统一
-	natsStreaming.WriteMessage(user)
+	*/
+	_ = req.(*general.Message)
 
 	return nil
 }

@@ -36,7 +36,6 @@ import (
 	ws "hypercube/common/server/websocket"
 	"hypercube/proto/general"
 	"encoding/json"
-	"hypercube/proto/push"
 )
 
 var (
@@ -96,7 +95,6 @@ func serveWebSocket(w http.ResponseWriter, req *http.Request) {
 	logger.Debug("New connection")
 
 	if req.Method != "GET" {
-		// TODO: 考虑加入黑名单逻辑
 		http.Error(w, "Method Not Allowed", 405)
 		return
 	}
@@ -145,8 +143,9 @@ func webSocketConnectionHandler(conn *websocket.Conn) {
 
 		if v != nil {
 			err = json.Unmarshal(p.Body, v)
+
 			if err != nil {
-				// Todo: 记录错误
+				logger.Error("Receive unknown message:", err)
 				continue
 			} else {
 				switch p.Type {
@@ -155,14 +154,14 @@ func webSocketConnectionHandler(conn *websocket.Conn) {
 					OnLineUser.OnConnect(user.UserID, conn)
 					err = OnLineUser.UserLoginHandler(user.UserID)
 					if err != nil {
-						logger.Error(err)
+						logger.Error("User Login failed:", err)
 					}
 				case general.TypeLogoutAccess:
 					user = v.(*general.UserAccess)
 					OnLineUser.OnDisconnect(user.UserID)
 					err = OnLineUser.UserLogoutHandler(user.UserID)
 					if err != nil {
-						logger.Error(err)
+						logger.Error("User Logout failed:", err)
 					}
 				default:
 					handler(p,v)
