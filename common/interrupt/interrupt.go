@@ -119,15 +119,19 @@ func (h *Handler) Wait() {
 	ch := make(chan os.Signal, 1)
 	signal.Notify(ch, terminationSignals...)
 
-	sig, ok := <-ch
-	if !ok {
-		return
+	for {
+		sig, ok := <-ch
+		if !ok {
+			return
+		}
+
+		if h.final != nil {
+			h.final(sig)
+		}
+
+		if sig != syscall.SIGALRM {
+			signal.Stop(ch)
+			close(ch)
+		}
 	}
-
-	defer func() {
-		signal.Stop(ch)
-		close(ch)
-	}()
-
-	h.Signal(sig)
 }
