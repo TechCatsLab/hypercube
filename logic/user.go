@@ -31,16 +31,23 @@ package main
 
 import (
 	"hypercube/proto/api"
+	"hypercube/proto/general"
 )
 
 func userLoginRequestHandler(req interface{}) interface{} {
 	var (
 		login    *api.UserLogin
+
 	)
 
 	login = req.(*api.UserLogin)
-
 	logger.Debug("userLoginRequestHandler userID:", login.UserID)
+
+	err := OnLineUserMag.Add(login)
+
+	if err != nil {
+
+	}
 
 	return nil
 }
@@ -54,9 +61,32 @@ func userLogoutRequestHandler(req interface{}) interface{} {
 	logout = req.(*api.UserLogout)
 	logger.Debug("userLogoutRequestHandler userID:", logout.UserID)
 
+	err := OnLineUserMag.Remove(logout.UserID)
+
+	if err != nil {
+		return err
+	}
+
 	reply = &api.Reply{
 		Code: api.ErrSucceed,
 	}
 
 	return reply
+}
+
+func userToUserMsgHandler(req interface{}) interface{} {
+	var (
+		msg          *general.Message
+	)
+
+	msg = req.(*general.Message)
+	logger.Debug("userToUserMsgHandler:", msg)
+
+	_, err := OnLineUserMag.Query(msg.To)
+
+	if err != nil {
+		return err
+	}
+
+	return err
 }

@@ -35,20 +35,22 @@ import (
 )
 
 const (
+	invalideUserID = 0
+
 	AddType = uint8(0)
 	RmType  = uint8(1)
 	QrType  = uint8(2)
 )
 
 var (
-	OnLineUserMag *OnLineUserMagServer
+	OnLineUserMag *OnlineUserManager
 
 	ParamErr     = errors.New("Your input parametric error!")
 	UserNotExist = errors.New("User not exist!")
 )
 
 func init() {
-	OnLineUserMag = &OnLineUserMagServer{
+	OnLineUserMag = &OnlineUserManager{
 		users:      make(map[uint64]api.UsrInfo),
 		reqchan:    make(chan usrbasic),
 		replychan:  make(chan chanreply),
@@ -57,7 +59,7 @@ func init() {
 	OnLineUserMag.loop()
 }
 
-type OnLineUserMagServer struct {
+type OnlineUserManager struct {
 	users       map[uint64]api.UsrInfo
 	reqchan     chan usrbasic
 	replychan   chan chanreply
@@ -74,8 +76,8 @@ type chanreply struct {
 	Err          error
 }
 
-func (this *OnLineUserMagServer) Add(user api.UsrInfo) error {
-	if user.ServerIP != "" && user.UserID != 0 {
+func (this *OnlineUserManager) Add(user *api.UserLogin) error {
+	if user.ServerIP != "" && user.UserID == invalideUserID {
 		usrb := usrbasic{user.UserID, user.ServerIP, AddType}
 
 		this.reqchan <- usrb
@@ -87,7 +89,7 @@ func (this *OnLineUserMagServer) Add(user api.UsrInfo) error {
 	return ParamErr
 }
 
-func (this *OnLineUserMagServer) Remove(uid uint64) error {
+func (this *OnlineUserManager) Remove(uid uint64) error {
 	if uid != 0 {
 		user := usrbasic{uid, "", RmType}
 
@@ -100,7 +102,7 @@ func (this *OnLineUserMagServer) Remove(uid uint64) error {
 	return ParamErr
 }
 
-func (this *OnLineUserMagServer) Query(uid uint64) (string, error) {
+func (this *OnlineUserManager) Query(uid uint64) (string, error) {
 	if uid != 0 {
 		user := usrbasic{uid, "", QrType}
 
@@ -113,7 +115,7 @@ func (this *OnLineUserMagServer) Query(uid uint64) (string, error) {
 	return "", ParamErr
 }
 
-func (this *OnLineUserMagServer)loop() {
+func (this *OnlineUserManager)loop() {
 	go func() {
 		for {
 			repl := chanreply{
@@ -123,7 +125,7 @@ func (this *OnLineUserMagServer)loop() {
 			user := <-this.reqchan
 			switch {
 			case user.Type == AddType:
-				usrlogic := api.UsrInfo{user.UserID, user.ServerIP}
+				usrlogic := api.UsrInfo{UserID: user.UserID, ServerIP: user.ServerIP}
 				this.users[user.UserID] = usrlogic
 
 				this.replychan <- repl
@@ -137,8 +139,8 @@ func (this *OnLineUserMagServer)loop() {
 					this.replychan <- repl
 				}
 			case user.Type == QrType:
-				if serverip, ok := this.users[user.UserID]; ok {
-					repl.ServerIP = serverip
+				if userb, ok := this.users[user.UserID]; ok {
+					repl.ServerIP = userb.ServerIP
 
 					this.replychan <- repl
 				} else {

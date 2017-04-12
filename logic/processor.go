@@ -31,6 +31,7 @@ package main
 
 import (
 	"hypercube/proto/api"
+	"hypercube/proto/general"
 	"encoding/json"
 )
 
@@ -42,6 +43,7 @@ func requestProcessor(req []byte) interface{} {
 		request      api.Request
 		login        api.UserLogin
 		logout       api.UserLogout
+		msg          general.Message
 		v            interface{}
 		handler      handlerFunc
 	)
@@ -54,13 +56,17 @@ func requestProcessor(req []byte) interface{} {
 	}
 
 	switch request.Type {
+	case api.ApiTypeUserConnect:
+	case api.ApiTypeUserDisConnect:
 	case api.ApiTypeUserLogin:
 		v = &login
 		handler = userLoginRequestHandler
-
 	case api.ApiTypeUserLogout:
 		v = &logout
 		handler = userLogoutRequestHandler
+	case general.TypeUTUMsg:
+		v = &msg
+		handler = userToUserMsgHandler
 	}
 
 	if v != nil {
