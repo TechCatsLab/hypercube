@@ -81,7 +81,7 @@ func receiveLogicRPC() {
 
 	processor.SetRequestHandler(receiveRequestProcessor)
 	logger.Info("receive request finish.")
-	goto exit
+	return
 
 exit:
 	if natsMQ != nil{
