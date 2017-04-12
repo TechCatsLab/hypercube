@@ -93,7 +93,7 @@ func (this *OnLineManager) UserLoginHandler(userID uint64) error {
 		userlog api.UserLogin
 		proto 	general.Proto
 		conv 	[]byte
-		r		bool
+		r		api.Reply
 		err		error
 	)
 
@@ -112,12 +112,15 @@ func (this *OnLineManager) UserLoginHandler(userID uint64) error {
 		Type:   general.TypeLoginAccess,
 		Body:	json.RawMessage(conv),
 	}
-	for r != true{
-		err = logicRequester.Request(proto, r, time.Duration(100)*time.Millisecond)
-		if err != nil {
-			logger.Error(err)
-		}
+
+	err = logicRequester.Request(proto, r, time.Duration(100)*time.Millisecond)
+	if err != nil {
+		logger.Error(err)
 	}
+	if r.Code != uint32(0x0000) {
+		logger.Error("request error code:", r.Code)
+	}
+
 
 	return err
 }
