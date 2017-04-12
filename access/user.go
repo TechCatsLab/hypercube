@@ -120,7 +120,7 @@ func (this *OnLineManager) UserLoginHandler(userID uint64) error {
 	err = logicRequester.Request(proto, &r, time.Duration(100) * time.Millisecond)
 
 	if err != nil {
-		logger.Error(err)
+		logger.Error("UserLoginHandler request receive error:", err)
 	}
 
 	if r.Code != api.ErrSucceed {
