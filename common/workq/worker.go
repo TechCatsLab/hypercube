@@ -38,14 +38,14 @@ var (
 )
 
 type Worker struct {
-	workerPool chan chan *Job
-	jobChannel chan *Job
+	workerPool chan chan Job
+	jobChannel chan Job
 }
 
-func NewWorker(workerPool chan chan *Job) Worker {
+func NewWorker(workerPool chan chan Job) Worker {
 	return Worker{
 		workerPool: workerPool,
-		jobChannel: make(chan *Job, 1),
+		jobChannel: make(chan Job, 1),
 	}
 }
 
@@ -56,7 +56,7 @@ func (this *Worker) Start() {
 
 			select {
 			case job := <-this.jobChannel:
-				(*job).Do()
+				job.Do()
 			}
 		}
 	}()

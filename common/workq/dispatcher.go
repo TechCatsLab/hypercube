@@ -30,8 +30,8 @@
 package workq
 
 type Dispatcher struct {
-	workerPool chan chan *Job
-	jobQueue   chan *Job
+	workerPool chan chan Job
+	jobQueue   chan Job
 }
 
 func NewDispatcher(maxWorkers int) *Dispatcher {
@@ -40,8 +40,8 @@ func NewDispatcher(maxWorkers int) *Dispatcher {
 	}
 
 	return &Dispatcher{
-		workerPool: make(chan chan *Job, maxWorkers),
-		jobQueue:   make(chan *Job, 1),
+		workerPool: make(chan chan Job, maxWorkers),
+		jobQueue:   make(chan Job, 1),
 	}
 }
 
@@ -65,6 +65,6 @@ func (this *Dispatcher) dispatch() {
 	}
 }
 
-func (this *Dispatcher) PushToJobQ(job *Job) {
+func (this *Dispatcher) PushToJobQ(job Job) {
 	this.jobQueue <- job
 }
