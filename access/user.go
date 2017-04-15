@@ -58,6 +58,7 @@ func init() {
 	}
 }
 
+// 用户登录时，保存用户id 和 connection到在线用户表，并把用户id 传到逻辑层
 func (this *OnLineTable) OnConnect(userID uint64, conn *websocket.Conn) error {
 	var err	error
 
@@ -75,6 +76,7 @@ func (this *OnLineTable) OnConnect(userID uint64, conn *websocket.Conn) error {
 	return err
 }
 
+// 用户登出时，把用户 id 和 connection 从在线用户表中删除，并通知逻辑层
 func (this *OnLineTable) OnDisconnect(userID uint64) error {
 	var err error
 
@@ -86,7 +88,7 @@ func (this *OnLineTable) OnDisconnect(userID uint64) error {
 
 	this.locker.Unlock()
 	
-	err = OnLineManagement.loginReport(userID)
+	err = OnLineManagement.logoutReport(userID)
 	if err != nil {
 		logger.Error(err)
 	}
@@ -94,6 +96,7 @@ func (this *OnLineTable) OnDisconnect(userID uint64) error {
 	return err
 }
 
+// 通过用户 id 获取对应的 connection
 func (this *OnLineTable) GetEntryByID(userID uint64) (*onlineEntry, bool) {
 	this.locker.RLock()
 	defer this.locker.RUnlock()
@@ -102,6 +105,7 @@ func (this *OnLineTable) GetEntryByID(userID uint64) (*onlineEntry, bool) {
 	return user, ok
 }
 
+// 通过 connection 获取对应的用户id
 func (this *OnLineTable) GetIDByConnection(conn *websocket.Conn) (uint64, bool) {
 	this.locker.RLock()
 	defer this.locker.RUnlock()
@@ -115,6 +119,7 @@ func (this *OnLineTable) GetIDByConnection(conn *websocket.Conn) (uint64, bool) 
 	return 0, false
 }
 
+// 用户登录时，通知逻辑层并把用户 id 传到逻辑层，并作出错误处理
 func (this *OnLineTable) loginReport(userID uint64) error {
 	var (
 		userlog api.UserLogin
@@ -152,6 +157,7 @@ func (this *OnLineTable) loginReport(userID uint64) error {
 	return err
 }
 
+// 用户登出时，通知逻辑层并把用户id 传过去，并作出错误处理
 func (this *OnLineTable) logoutReport(userID uint64) error {
 	var (
 		userlog api.UserLogout
@@ -183,6 +189,7 @@ func (this *OnLineTable) logoutReport(userID uint64) error {
 	return err
 }
 
+// 打印出在线用户表
 func (this *OnLineTable) PrintDebugInfo() {
 	this.locker.RLock()
 	defer this.locker.RUnlock()
