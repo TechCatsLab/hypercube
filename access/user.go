@@ -62,9 +62,10 @@ func (this *OnLineTable) OnConnect(userID uint64, conn *websocket.Conn) error {
 	var err	error
 
 	this.locker.Lock()
-	defer this.locker.Unlock()
 
 	this.onLineMap[userID] = &onlineEntry{conn: conn}
+
+	this.locker.Unlock()
 
 	err = OnLineManagement.loginReport(userID)
 	if err != nil {
@@ -78,12 +79,13 @@ func (this *OnLineTable) OnDisconnect(userID uint64) error {
 	var err error
 
 	this.locker.Lock()
-	defer this.locker.Unlock()
 
 	if _, ok := this.onLineMap[userID]; ok {
 		delete(this.onLineMap, userID)
 	}
 
+	this.locker.Unlock()
+	
 	err = OnLineManagement.loginReport(userID)
 	if err != nil {
 		logger.Error(err)
