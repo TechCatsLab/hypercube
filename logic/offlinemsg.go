@@ -47,7 +47,7 @@ func init()  {
 }
 
 func addHistMessage(userID uint64, msg interface{})  {
-    if msgbuf[userID].Empty() == true {
+    if msgbuf[userID] == nil {
         msgbuf[userID] = container.NewRing(maxMsgSize)
     }
 
