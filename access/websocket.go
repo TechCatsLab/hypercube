@@ -154,7 +154,7 @@ func webSocketConnectionHandler(conn *websocket.Conn) {
 
 	for {
 		if err = p.ReadWebSocket(conn); err != nil {
-			id, ok = OnLineManagement.OnUnusualDisConnect(conn)
+			id, ok = OnLineManagement.GetIDByConnection(conn)
 			if ok {
 				err = OnLineManagement.OnDisconnect(id)
 				if err != nil {

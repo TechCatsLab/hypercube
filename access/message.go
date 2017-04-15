@@ -76,7 +76,7 @@ func (this *pushMessageJob) sendToLogic() error {
 }
 
 func (this *pushMessageJob) Do() error {
-	conn, ok := OnLineManagement.IsUserOnline(this.message.To)
+	conn, ok := OnLineManagement.GetEntryByID(this.message.To)
 
 	if !ok {
 		if !this.message.Pushed {

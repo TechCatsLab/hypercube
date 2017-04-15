@@ -94,7 +94,7 @@ func (this *OnLineTable) OnDisconnect(userID uint64) error {
 	return err
 }
 
-func (this *OnLineTable) IsUserOnline(userID uint64) (*onlineEntry, bool) {
+func (this *OnLineTable) GetEntryByID(userID uint64) (*onlineEntry, bool) {
 	this.locker.RLock()
 	defer this.locker.RUnlock()
 
@@ -102,7 +102,7 @@ func (this *OnLineTable) IsUserOnline(userID uint64) (*onlineEntry, bool) {
 	return user, ok
 }
 
-func (this *OnLineTable) OnUnusualDisConnect(conn *websocket.Conn) (uint64, bool) {
+func (this *OnLineTable) GetIDByConnection(conn *websocket.Conn) (uint64, bool) {
 	this.locker.RLock()
 	defer this.locker.RUnlock()
 
