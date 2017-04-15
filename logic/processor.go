@@ -59,15 +59,15 @@ func requestProcessor(req []byte) interface{} {
 	logger.Debug("Logic RPC received message type:", request.Type)
 
 	switch request.Type {
-	case api.ApiTypeUserConnect:
-	case api.ApiTypeUserDisConnect:
+	case api.ApiTypeUserOnConnect:
+	case api.ApiTypeUserOnDisConnect:
 	case api.ApiTypeUserLogin:
 		v = &login
 		handler = userLoginRequestHandler
 	case api.ApiTypeUserLogout:
 		v = &logout
 		handler = userLogoutRequestHandler
-	case general.AccTypeUTUMsg:
+	case general.GeneralTypeTextMsg:
 		v = &msg
 		handler = MessageHandler
 	case api.ApiTypeAccessInfo:

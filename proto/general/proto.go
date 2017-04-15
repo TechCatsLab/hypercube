@@ -56,12 +56,7 @@ func (p *Proto) String() string {
 
 func (p *Proto) VerCheck() (*Proto, uint32) {
 	if p.Ver > CurVer {
-		p.Type = AccTypeVerConf
-		return  p, ErrVerConf
-	}
-
-	if p.Ver < CurVer {
-		p.Type = AccTypeSpiteAtt
+		p.Type = GeneralTypeVersionConflict
 		return  p, ErrVerConf
 	}
 

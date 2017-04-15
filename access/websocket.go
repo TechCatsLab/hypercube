@@ -168,15 +168,15 @@ func webSocketConnectionHandler(conn *websocket.Conn) {
 		logger.Debug("Websocket received message type:", p.Type)
 
 		switch p.Type {
-		case general.AccTypeHeartbeat:
+		case general.GeneralTypeKeepAlive:
 			v = ver
 			handler = keepAliveRequestHandler
-		case general.AccTypeUTUMsg:
+		case general.GeneralTypeTextMsg:
 			v = mes
 			handler = userMessageHandler
-		case general.AccTypeLogin:
+		case general.GeneralTypeLogin:
 			v = user
-		case general.AccTypeLogout:
+		case general.GeneralTypeLogout:
 			v = user
 		}
 
@@ -188,13 +188,13 @@ func webSocketConnectionHandler(conn *websocket.Conn) {
 				continue
 			} else {
 				switch p.Type {
-				case general.AccTypeLogin:
+				case general.GeneralTypeLogin:
 					user = v.(*general.UserAccess)
 					err = OnLineManagement.OnConnect(user.UserID, conn)
 					if err != nil {
 						logger.Error("User Login failed:", err)
 					}
-				case general.AccTypeLogout:
+				case general.GeneralTypeLogout:
 					user = v.(*general.UserAccess)
 					err = OnLineManagement.OnDisconnect(user.UserID)
 					if err != nil {

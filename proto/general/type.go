@@ -30,12 +30,14 @@
 package general
 
 const (
-	AccTypeHeartbeat    = uint32(0x1000)            // heartbeat
-	AccTypeVerConf      = uint32(0x1001)            // proto version conflict
-	AccTypeSpiteAtt     = uint32(0x1002)            // spite attack
-	AccTypeLogin        = uint32(0x1003)            // login access type
-	AccTypeLogout       = uint32(0x1004)            // logout access type
+	GeneralTypeKeepAlive       = uint32(0x1000)            // heartbeat
+	GeneralTypeVersionConflict = uint32(0x1001)            // proto version conflict
+	GeneralTypeLogin           = uint32(0x1002)            // login access type
+	GeneralTypeLogout          = uint32(0x1003)            // logout access type
 
-	AccTypePushMsg      = uint32(0x1005)            // logic server push message to all people
-	AccTypeUTUMsg       = uint32(0x1006)            // user to user message
+	GeneralTypeTextMsg         = uint32(0x1004)            // user to user message
+
+
+	PushTypePushMsg            = uint32(0x200)            // logic server push message to all people
+
 )

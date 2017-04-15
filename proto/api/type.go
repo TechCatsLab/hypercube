@@ -32,8 +32,8 @@ package api
 const (
 	ApiTypeUserLogin               = 0x100
 	ApiTypeUserLogout              = 0x101
-	ApiTypeUserConnect             = 0x102
-	ApiTypeUserDisConnect          = 0x103
+	ApiTypeUserOnConnect           = 0x102
+	ApiTypeUserOnDisConnect        = 0x103
 
 	ApiTypeAccessInfo              = 0x104
 )

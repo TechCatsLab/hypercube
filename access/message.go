@@ -70,7 +70,7 @@ func (this *pushMessageJob) sendToLogic() error {
 	}
 
 	return logicRequester.SendMessage(&api.Request{
-		Type:    general.AccTypeUTUMsg,
+		Type:    general.GeneralTypeTextMsg,
 		Content: msg,
 	})
 }

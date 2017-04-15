@@ -55,7 +55,7 @@ func receiveRequestProcessor(req []byte) interface{} {
 	msg.Pushed = true
 	
 	switch request.Type{
-	case general.AccTypeUTUMsg:
+	case general.GeneralTypeTextMsg:
 		p = &msg
 		handler = userMessageHandler
 	}
