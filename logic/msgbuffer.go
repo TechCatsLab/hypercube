@@ -31,38 +31,39 @@ package main
 import (
     "hypercube/common/workq"
     "hypercube/proto/general"
+    "hypercube/common/container"
 )
 var(
-    msgbuf map[uint64][]general.Message
+    msgbuf map[uint64]*container.Ring
 )
 
 const (
-    maxBufferSize = 100
+    maxMsgSize = 100
 )
 
 func init()  {
-    msgbuf = make(map[uint64][]general.Message)
+    msgbuf = make(map[uint64]*container.Ring)
     initSendMessageQueue()
 }
 
 func addHistMessage(userID uint64, msg interface{})  {
-    if msgbuf[userID] == nil {
-        msgbuf[userID] = make([]general.Message, maxBufferSize)
+    if msgbuf[userID].Empty() == true {
+        msgbuf[userID] = container.NewRing(maxMsgSize)
     }
 
     mesg := msg.(*general.Message)
 
-    if len(msgbuf[userID]) < maxBufferSize {
-        msgbuf[userID] = append(msgbuf[userID], *mesg)
+    if msgbuf[userID].Full() == false {
+        msgbuf[userID].Push(mesg)
     }
 }
 
-func getHistMessages(userID uint64) []general.Message {
+func getHistMessages(userID uint64) *container.Ring {
     return msgbuf[userID]
 }
 
 func clearHistMessages(userID uint64) {
-    msgbuf[userID] = []general.Message{}
+    msgbuf[userID].MPop(msgbuf[userID].Len())
 }
 
 const (
@@ -78,17 +79,19 @@ func userSendMessageHandler(userID uint64) error {
         message *pushMessageJob
     )
 
-    messages := getHistMessages(userID)
+    messages := getHistMessages(userID).GetAll()
 
     for _, mes := range messages {
         message = &pushMessageJob{
-            message: &mes,
+            message: mes.(*general.Message),
         }
 
         if err := appendPushMessage(message); err != nil {
             return err
         }
     }
+
+    clearHistMessages(userID)
 
     return nil
 }
