@@ -154,10 +154,9 @@ func webSocketConnectionHandler(conn *websocket.Conn) {
 
 	for {
 		if err = p.ReadWebSocket(conn); err != nil {
-			id, ok = OnLineUser.OnUnusualDisConnect(conn)
+			id, ok = OnLineManagement.OnUnusualDisConnect(conn)
 			if ok {
-				OnLineUser.OnDisconnect(id)
-				err = OnLineUser.UserLogoutHandler(id)
+				err = OnLineManagement.OnDisconnect(id)
 				if err != nil {
 					logger.Error("User Logout failed:", err)
 				}
@@ -191,15 +190,13 @@ func webSocketConnectionHandler(conn *websocket.Conn) {
 				switch p.Type {
 				case general.AccTypeLogin:
 					user = v.(*general.UserAccess)
-					OnLineUser.OnConnect(user.UserID, conn)
-					err = OnLineUser.UserLoginHandler(user.UserID)
+					err = OnLineManagement.OnConnect(user.UserID, conn)
 					if err != nil {
 						logger.Error("User Login failed:", err)
 					}
 				case general.AccTypeLogout:
 					user = v.(*general.UserAccess)
-					OnLineUser.OnDisconnect(user.UserID)
-					err = OnLineUser.UserLogoutHandler(user.UserID)
+					err = OnLineManagement.OnDisconnect(user.UserID)
 					if err != nil {
 						logger.Error("User Logout failed:", err)
 					}

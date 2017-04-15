@@ -32,47 +32,67 @@ package main
 import (
 	"strings"
 	"sync"
-	"github.com/gorilla/websocket"
-	"hypercube/proto/api"
 	"time"
 	"encoding/json"
+
+	"github.com/gorilla/websocket"
+
+	"hypercube/proto/api"
 )
 
-var OnLineUser *OnLineManager
+var OnLineManagement *OnLineTable
 
-type OnlineEntry struct {
-	Mutex    sync.Mutex
-	Conn     *websocket.Conn
+type onlineEntry struct {
+	mutex sync.Mutex
+	conn  *websocket.Conn
 }
 
-type OnLineManager struct {
+type OnLineTable struct {
 	locker 		sync.RWMutex
-	onLineMap	map[uint64]*OnlineEntry
+	onLineMap	map[uint64]*onlineEntry
 }
 
 func init() {
-	OnLineUser = &OnLineManager{
-		onLineMap: map[uint64]*OnlineEntry{},
+	OnLineManagement = &OnLineTable{
+		onLineMap: map[uint64]*onlineEntry{},
 	}
 }
 
-func (this *OnLineManager) OnConnect(userID uint64, conn *websocket.Conn) {
+func (this *OnLineTable) OnConnect(userID uint64, conn *websocket.Conn) error {
+	var err	error
+
 	this.locker.Lock()
 	defer this.locker.Unlock()
 
-	this.onLineMap[userID] = &OnlineEntry{Conn: conn}
+	this.onLineMap[userID] = &onlineEntry{conn: conn}
+
+	err = OnLineManagement.loginReport(userID)
+	if err != nil {
+		logger.Error(err)
+	}
+
+	return err
 }
 
-func (this *OnLineManager) OnDisconnect(userID uint64) {
+func (this *OnLineTable) OnDisconnect(userID uint64) error {
+	var err error
+
 	this.locker.Lock()
 	defer this.locker.Unlock()
 
 	if _, ok := this.onLineMap[userID]; ok {
 		delete(this.onLineMap, userID)
 	}
+
+	err = OnLineManagement.loginReport(userID)
+	if err != nil {
+		logger.Error(err)
+	}
+
+	return err
 }
 
-func (this *OnLineManager) IsUserOnline(userID uint64) (*OnlineEntry, bool) {
+func (this *OnLineTable) IsUserOnline(userID uint64) (*onlineEntry, bool) {
 	this.locker.RLock()
 	defer this.locker.RUnlock()
 
@@ -80,12 +100,12 @@ func (this *OnLineManager) IsUserOnline(userID uint64) (*OnlineEntry, bool) {
 	return user, ok
 }
 
-func (this *OnLineManager) OnUnusualDisConnect(conn *websocket.Conn) (uint64, bool) {
+func (this *OnLineTable) OnUnusualDisConnect(conn *websocket.Conn) (uint64, bool) {
 	this.locker.RLock()
 	defer this.locker.RUnlock()
 
 	for k, v := range this.onLineMap {
-		if v.Conn == conn {
+		if v.conn == conn {
 			return k, true
 		}
 	}
@@ -93,7 +113,7 @@ func (this *OnLineManager) OnUnusualDisConnect(conn *websocket.Conn) (uint64, bo
 	return 0, false
 }
 
-func (this *OnLineManager) UserLoginHandler(userID uint64) error {
+func (this *OnLineTable) loginReport(userID uint64) error {
 	var (
 		userlog api.UserLogin
 		proto 	*api.Request
@@ -130,7 +150,7 @@ func (this *OnLineManager) UserLoginHandler(userID uint64) error {
 	return err
 }
 
-func (this *OnLineManager) UserLogoutHandler(userID uint64) error {
+func (this *OnLineTable) logoutReport(userID uint64) error {
 	var (
 		userlog api.UserLogout
 		proto 	*api.Request
@@ -161,7 +181,7 @@ func (this *OnLineManager) UserLogoutHandler(userID uint64) error {
 	return err
 }
 
-func (this *OnLineManager) PrintDebugInfo() {
+func (this *OnLineTable) PrintDebugInfo() {
 	this.locker.RLock()
 	defer this.locker.RUnlock()
 

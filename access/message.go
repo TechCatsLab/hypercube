@@ -76,7 +76,7 @@ func (this *pushMessageJob) sendToLogic() error {
 }
 
 func (this *pushMessageJob) Do() error {
-	conn, ok := OnLineUser.IsUserOnline(this.message.To)
+	conn, ok := OnLineManagement.IsUserOnline(this.message.To)
 
 	if !ok {
 		if !this.message.Pushed {
@@ -88,10 +88,10 @@ func (this *pushMessageJob) Do() error {
 
 	logger.Debug("Sending:", this.message.From, "->", this.message.To)
 
-	conn.Mutex.Lock()
-	defer conn.Mutex.Unlock()
+	conn.mutex.Lock()
+	defer conn.mutex.Unlock()
 
-	return conn.Conn.WriteJSON(this.message)
+	return conn.conn.WriteJSON(this.message)
 }
 
 func initPushMessageQueue() {
