@@ -97,7 +97,7 @@ func loginPackage(from uint64) []byte {
 
 	msg := &general.Proto{
 		Ver:  general.CurVer,
-		Type: general.TypeLoginAccess,
+		Type: general.AccTypeLogin,
 		Body: byteMessage,
 	}
 	byteMsg, _ := json.Marshal(msg)
@@ -118,7 +118,7 @@ func testPackage(from, to uint64, t time.Time) []byte {
 	byteMessage, _ := json.Marshal(message)
 	msg := &general.Proto{
 		Ver:  general.CurVer,
-		Type: general.TypeUTUMsg,
+		Type: general.AccTypeUTUMsg,
 		Body: byteMessage,
 	}
 	byteMsg, _ := json.Marshal(msg)

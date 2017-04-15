@@ -107,7 +107,7 @@ func sendAccessInfo()  {
 
 		info, _ := json.Marshal(serverinfo)
 
-		err := logicRequester.Request(&api.Request{Type: api.ApiTypeAccess, Content: info}, &r, time.Duration(100) * time.Millisecond)
+		err := logicRequester.Request(&api.Request{Type: api.ApiTypeAccessInfo, Content: info}, &r, time.Duration(100) * time.Millisecond)
 
 		if err != nil {
 			logger.Error("send access info error:", err, " , address:", address)
@@ -169,15 +169,15 @@ func webSocketConnectionHandler(conn *websocket.Conn) {
 		logger.Debug("Websocket received message type:", p.Type)
 
 		switch p.Type {
-		case general.TypeHeartbeat:
+		case general.AccTypeHeartbeat:
 			v = ver
 			handler = keepAliveRequestHandler
-		case general.TypeUTUMsg:
+		case general.AccTypeUTUMsg:
 			v = mes
 			handler = userMessageHandler
-		case general.TypeLoginAccess:
+		case general.AccTypeLogin:
 			v = user
-		case general.TypeLogoutAccess:
+		case general.AccTypeLogout:
 			v = user
 		}
 
@@ -189,14 +189,14 @@ func webSocketConnectionHandler(conn *websocket.Conn) {
 				continue
 			} else {
 				switch p.Type {
-				case general.TypeLoginAccess:
+				case general.AccTypeLogin:
 					user = v.(*general.UserAccess)
 					OnLineUser.OnConnect(user.UserID, conn)
 					err = OnLineUser.UserLoginHandler(user.UserID)
 					if err != nil {
 						logger.Error("User Login failed:", err)
 					}
-				case general.TypeLogoutAccess:
+				case general.AccTypeLogout:
 					user = v.(*general.UserAccess)
 					OnLineUser.OnDisconnect(user.UserID)
 					err = OnLineUser.UserLogoutHandler(user.UserID)

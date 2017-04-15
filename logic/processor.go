@@ -67,10 +67,10 @@ func requestProcessor(req []byte) interface{} {
 	case api.ApiTypeUserLogout:
 		v = &logout
 		handler = userLogoutRequestHandler
-	case general.TypeUTUMsg:
+	case general.AccTypeUTUMsg:
 		v = &msg
 		handler = MessageHandler
-	case api.ApiTypeAccess:
+	case api.ApiTypeAccessInfo:
 		v = &access
 		handler = AccessConnectHandler
 	}
