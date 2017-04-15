@@ -22,8 +22,11 @@
  * SOFTWARE.
  */
 
-/**
- * Created by Yang Chenglong on 15/04/2017.
+/*
+ * Revision History:
+ *     Initial: 2017/04/13        He ChengJun
+ *         ModifyType: 2017/04/15        Yang ChengLong
+ *	       ModifyFileName: 2017/04/15    Yang Chenglong
  */
 
 package main
