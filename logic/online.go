@@ -25,6 +25,10 @@
 /*
  * Revision History:
  *     Initial: 2017/04/04        Liu Jiachang
+ *	    Modify: 2017/04/15 		  Yusan Kurban
+ *			#66 修改常量名和结构名，以及删除没有用到的语句，
+ * 			UserNotExist = errors.New("User not exist!")
+ *
  */
 
 package main
@@ -39,53 +43,52 @@ import (
 const (
 	invalideUserID = 0
 
-	AddType = uint8(0)
-	RmType  = uint8(1)
-	QrType  = uint8(2)
+	addUser    = uint8(0)
+	removeUser = uint8(1)
+	queryUser  = uint8(2)
 )
 
 var (
 	OnLineUserMag *OnlineUserManager
 
 	ParamErr     = errors.New("Your input parametric error!")
-	UserNotExist = errors.New("User not exist!")
 )
 
 func init() {
 	OnLineUserMag = &OnlineUserManager{
-		users:      make(map[uint64]*api.UsrInfo),
-		access:     make(map[string]mq.Requester),
-		reqchan:    make(chan interface{}),
-		replychan:  make(chan chanreply),
+		users:  make(map[uint64]*api.UsrInfo),
+		access: make(map[string]mq.Requester),
+		req:    make(chan interface{}),
+		rep:    make(chan reply),
 	}
 
 	OnLineUserMag.loop()
 }
 
 type OnlineUserManager struct {
-	users       map[uint64]*api.UsrInfo
-	access      map[string]mq.Requester
-	reqchan     chan interface{}
-	replychan   chan chanreply
+	users  map[uint64]*api.UsrInfo
+	access map[string]mq.Requester
+	req    chan interface{}
+	rep    chan reply
 }
 
-type usrbasic struct {
+type manageUser struct {
 	UserID       uint64
 	ServerIP     string
 	Type         uint8
 }
 
-type chanreply struct {
+type reply struct {
 	ServerIP     string
 	Err          error
 }
 
 func (this *OnlineUserManager) Add(user *api.UserLogin) error {
 	if user.ServerIP != "" && user.UserID != invalideUserID {
-		usrb := usrbasic{user.UserID, user.ServerIP, AddType}
+		usrb := manageUser{user.UserID, user.ServerIP, addUser}
 
-		this.reqchan <- &usrb
-		repl := <-this.replychan
+		this.req <- &usrb
+		repl := <-this.rep
 
 		return repl.Err
 	}
@@ -95,10 +98,10 @@ func (this *OnlineUserManager) Add(user *api.UserLogin) error {
 
 func (this *OnlineUserManager) Remove(uid uint64) error {
 	if uid != invalideUserID {
-		user := usrbasic{uid, "", RmType}
+		user := manageUser{uid, "", removeUser}
 
-		this.reqchan <- &user
-		repl := <-this.replychan
+		this.req <- &user
+		repl := <-this.rep
 
 		return repl.Err
 	}
@@ -108,10 +111,10 @@ func (this *OnlineUserManager) Remove(uid uint64) error {
 
 func (this *OnlineUserManager) Query(uid uint64) (string, error) {
 	if uid != invalideUserID {
-		user := usrbasic{uid, "", QrType}
+		user := manageUser{uid, "", queryUser}
 
-		this.reqchan <- &user
-		repl := <-this.replychan
+		this.req <- &user
+		repl := <-this.rep
 
 		return repl.ServerIP, repl.Err
 	}
@@ -121,8 +124,8 @@ func (this *OnlineUserManager) Query(uid uint64) (string, error) {
 
 func (this *OnlineUserManager) AddAccess(access *api.Access) error {
 	if *access.ServerIp != "" && *access.Subject != "" {
-		this.reqchan <- access
-		repl := <- this.replychan
+		this.req <- access
+		repl := <- this.rep
 
 		return repl.Err
 	}
@@ -133,36 +136,36 @@ func (this *OnlineUserManager) AddAccess(access *api.Access) error {
 func (this *OnlineUserManager)loop() {
 	go func() {
 		for {
-			repl := chanreply{
+			repl := reply{
 				ServerIP:    "",
 				Err:         nil,
 			}
-			myinterface := <-this.reqchan
+			myinterface := <-this.req
 
-			if user, ok := myinterface.(*usrbasic); ok {
+			if user, ok := myinterface.(*manageUser); ok {
 				switch {
-				case user.Type == AddType:
+				case user.Type == addUser:
 					usrlogic := api.UsrInfo{UserID: user.UserID, ServerIP: user.ServerIP}
 					this.users[user.UserID] = &usrlogic
 
-					this.replychan <- repl
-				case user.Type == RmType:
+					this.rep <- repl
+				case user.Type == removeUser:
 					if _, ok := this.users[user.UserID]; ok {
 						delete(this.users, user.UserID)
 
-						this.replychan <- repl
+						this.rep <- repl
 					} else {
 						repl.Err = ParamErr
-						this.replychan <- repl
+						this.rep <- repl
 					}
-				case user.Type == QrType:
+				case user.Type == queryUser:
 					if userb, ok := this.users[user.UserID]; ok {
 						repl.ServerIP = userb.ServerIP
 
-						this.replychan <- repl
+						this.rep <- repl
 					} else {
 						repl.Err = ParamErr
-						this.replychan <- repl
+						this.rep <- repl
 					}
 				}
 			}
@@ -172,10 +175,10 @@ func (this *OnlineUserManager)loop() {
 				if req != nil {
 					this.access[*access.ServerIp] = req
 
-					this.replychan <- repl
+					this.rep <- repl
 				} else {
 					repl.Err = ParamErr
-					this.replychan <- repl
+					this.rep <- repl
 				}
 			}
 		}
