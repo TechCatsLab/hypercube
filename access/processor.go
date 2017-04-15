@@ -67,7 +67,7 @@ func receiveRequestProcessor(req []byte) interface{} {
 			return nil
 		}
 
-		return handler(p, r)
+		return handler(r, p)
 	}
 
 	return nil
