@@ -40,7 +40,7 @@ import (
 )
 
 const (
-	invalideUserID = 0
+	invalidUserID = 0
 
 	addUser    = uint8(0)
 	removeUser = uint8(1)
@@ -83,39 +83,39 @@ type reply struct {
 }
 
 func (this *OnlineUserManager) Add(user *api.UserLogin) error {
-	if user.ServerIP != "" && user.UserID != invalideUserID {
+	if user.ServerIP != "" && user.UserID != invalidUserID {
 		usrb := userEntry{user.UserID, user.ServerIP, addUser}
 
 		this.req <- &usrb
-		repl := <-this.rep
+		replier := <-this.rep
 
-		return repl.Err
+		return replier.Err
 	}
 
 	return ParamErr
 }
 
 func (this *OnlineUserManager) Remove(uid uint64) error {
-	if uid != invalideUserID {
+	if uid != invalidUserID {
 		user := userEntry{uid, "", removeUser}
 
 		this.req <- &user
-		repl := <-this.rep
+		replier := <-this.rep
 
-		return repl.Err
+		return replier.Err
 	}
 
 	return ParamErr
 }
 
 func (this *OnlineUserManager) Query(uid uint64) (string, error) {
-	if uid != invalideUserID {
+	if uid != invalidUserID {
 		user := userEntry{uid, "", queryUser}
 
 		this.req <- &user
-		repl := <-this.rep
+		replier := <-this.rep
 
-		return repl.ServerIP, repl.Err
+		return replier.ServerIP, replier.Err
 	}
 
 	return "", ParamErr
@@ -124,9 +124,9 @@ func (this *OnlineUserManager) Query(uid uint64) (string, error) {
 func (this *OnlineUserManager) AddAccess(access *api.Access) error {
 	if *access.ServerIp != "" && *access.Subject != "" {
 		this.req <- access
-		repl := <- this.rep
+		replier := <- this.rep
 
-		return repl.Err
+		return replier.Err
 	}
 
 	return ParamErr
@@ -135,49 +135,49 @@ func (this *OnlineUserManager) AddAccess(access *api.Access) error {
 func (this *OnlineUserManager)loop() {
 	go func() {
 		for {
-			repl := reply{
+			replier := reply{
 				ServerIP:    "",
 				Err:         nil,
 			}
-			myinterface := <-this.req
+			request := <-this.req
 
-			if user, ok := myinterface.(*userEntry); ok {
+			if user, ok := request.(*userEntry); ok {
 				switch {
 				case user.Type == addUser:
-					usrlogic := api.UsrInfo{UserID: user.UserID, ServerIP: user.ServerIP}
-					this.users[user.UserID] = &usrlogic
+					userLogic := api.UsrInfo{UserID: user.UserID, ServerIP: user.ServerIP}
+					this.users[user.UserID] = &userLogic
 
-					this.rep <- repl
+					this.rep <- replier
 				case user.Type == removeUser:
 					if _, ok := this.users[user.UserID]; ok {
 						delete(this.users, user.UserID)
 
-						this.rep <- repl
+						this.rep <- replier
 					} else {
-						repl.Err = ParamErr
-						this.rep <- repl
+						replier.Err = ParamErr
+						this.rep <- replier
 					}
 				case user.Type == queryUser:
-					if userb, ok := this.users[user.UserID]; ok {
-						repl.ServerIP = userb.ServerIP
+					if usrInfo, ok := this.users[user.UserID]; ok {
+						replier.ServerIP = usrInfo.ServerIP
 
-						this.rep <- repl
+						this.rep <- replier
 					} else {
-						repl.Err = ParamErr
-						this.rep <- repl
+						replier.Err = ParamErr
+						this.rep <- replier
 					}
 				}
 			}
 
-			if access, ok := myinterface.(*api.Access); ok {
+			if access, ok := request.(*api.Access); ok {
 				req := createAccessRPC(access.Subject)
 				if req != nil {
 					this.access[*access.ServerIp] = req
 
-					this.rep <- repl
+					this.rep <- replier
 				} else {
-					repl.Err = ParamErr
-					this.rep <- repl
+					replier.Err = ParamErr
+					this.rep <- replier
 				}
 			}
 		}
