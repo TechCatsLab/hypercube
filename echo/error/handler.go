@@ -24,17 +24,42 @@
 
 /*
  * Revision History:
- *     Initial: 2017/04/11        Feng Yifei
+ *     Initial: 2017/04/16        Feng Yifei
  */
 
-package handler
+package error
 
 import (
 	"net/http"
 	"github.com/labstack/echo"
-	e "hypercube/echo/error"
 )
 
-func Dummy(c echo.Context) error {
-	return e.NewHTTPError(http.StatusUnauthorized, "Dummy", "Error handler test")
+var (
+	code = http.StatusInternalServerError
+	key  = "ServerError"
+	msg  string
+)
+
+func HTTPErrorHandler(err error, c echo.Context) {
+	if he, ok := err.(*httpError); ok {
+		code = he.Code
+		key = *he.Key
+		msg = *he.Message
+	} else {
+		msg = http.StatusText(code)
+	}
+
+	if !c.Response().Committed {
+		if c.Request().Method == echo.HEAD {
+			err := c.NoContent(code)
+			if err != nil {
+				c.Logger().Error(err)
+			}
+		} else {
+			err := c.JSON(code, NewHTTPError(code, key, msg))
+			if err != nil {
+				c.Logger().Error(err)
+			}
+		}
+	}
 }
