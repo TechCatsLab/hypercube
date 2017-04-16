@@ -26,8 +26,7 @@
  * Revision History:
  *     Initial: 2017/04/04        Liu Jiachang
  *	    Modify: 2017/04/15 		  Yusan Kurban
- *			#66 修改常量名和结构名，以及删除没有用到的语句，
- * 			UserNotExist = errors.New("User not exist!")
+ *			#66 修改常量名和结构名
  *
  */
 
@@ -72,7 +71,7 @@ type OnlineUserManager struct {
 	rep    chan reply
 }
 
-type manageUser struct {
+type userEntry struct {
 	UserID       uint64
 	ServerIP     string
 	Type         uint8
@@ -85,7 +84,7 @@ type reply struct {
 
 func (this *OnlineUserManager) Add(user *api.UserLogin) error {
 	if user.ServerIP != "" && user.UserID != invalideUserID {
-		usrb := manageUser{user.UserID, user.ServerIP, addUser}
+		usrb := userEntry{user.UserID, user.ServerIP, addUser}
 
 		this.req <- &usrb
 		repl := <-this.rep
@@ -98,7 +97,7 @@ func (this *OnlineUserManager) Add(user *api.UserLogin) error {
 
 func (this *OnlineUserManager) Remove(uid uint64) error {
 	if uid != invalideUserID {
-		user := manageUser{uid, "", removeUser}
+		user := userEntry{uid, "", removeUser}
 
 		this.req <- &user
 		repl := <-this.rep
@@ -111,7 +110,7 @@ func (this *OnlineUserManager) Remove(uid uint64) error {
 
 func (this *OnlineUserManager) Query(uid uint64) (string, error) {
 	if uid != invalideUserID {
-		user := manageUser{uid, "", queryUser}
+		user := userEntry{uid, "", queryUser}
 
 		this.req <- &user
 		repl := <-this.rep
@@ -142,7 +141,7 @@ func (this *OnlineUserManager)loop() {
 			}
 			myinterface := <-this.req
 
-			if user, ok := myinterface.(*manageUser); ok {
+			if user, ok := myinterface.(*userEntry); ok {
 				switch {
 				case user.Type == addUser:
 					usrlogic := api.UsrInfo{UserID: user.UserID, ServerIP: user.ServerIP}
