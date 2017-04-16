@@ -25,8 +25,9 @@
 /*
  * Revision History:
  *     Initial: 2017/04/13        He ChengJun
- *         ModifyType: 2017/04/15        Yang ChengLong
- *	       ModifyFileName: 2017/04/15    Yang Chenglong
+ *      Modify: 2017/04/15        Yang ChengLong
+ *          Content: 修改文件名称，更改消息存储方式，使用环形队列存储消息，更改消息发送方式
+ *           issues: 用户上线后，发送离线消息 #60
  */
 
 package main
@@ -61,8 +62,8 @@ func addHistMessage(userID uint64, msg interface{})  {
     }
 }
 
-func getHistMessages(userID uint64) *container.Ring {
-    return msgbuf[userID]
+func getHistMessages(userID uint64) (interface{}, error) {
+    return msgbuf[userID].Pop()
 }
 
 func clearHistMessages(userID uint64) {
@@ -79,28 +80,34 @@ var (
 
 func userSendMessageHandler(userID uint64) error {
     var (
-        message *pushMessageJob
+	    message *pushMessageJob
     )
+	num := msgbuf[userID].Len()
 
-    messages := getHistMessages(userID).GetAll()
+    for i := 0; i < num; i++ {
+	    mes,err := getHistMessages(userID)
 
-    for _, mes := range messages {
-        message = &pushMessageJob{
-            message: mes.(*general.Message),
-        }
+	    if err != nil {
+		    logger.Error("User get history err:", err)
 
-        if err := appendPushMessage(message); err != nil {
-            return err
-        }
+		    return err
+	    }
+
+	    message = &pushMessageJob{
+		    message: mes.(*general.Message),
+	    }
+	    message.Send(sendWorkQueue)
+	    num = msgbuf[userID].Len()
     }
-
-    clearHistMessages(userID)
-
     return nil
 }
 
 type pushMessageJob struct {
     message *general.Message
+}
+
+func (this *pushMessageJob) Send(sendWorkQueue *workq.Dispatcher) {
+	sendWorkQueue.PushToJobQ(this)
 }
 
 func (this *pushMessageJob) Do() error {
@@ -122,12 +129,4 @@ func initSendMessageQueue() {
     sendWorkQueue = workq.NewDispatcher(workersCount)
     sendWorkQueue.Run()
     logger.Debug("message queue is running")
-}
-
-func appendPushMessage(msg *pushMessageJob) error {
-    logger.Debug("push to job queue...", msg.message.From, "->", msg.message.To)
-
-    sendWorkQueue.PushToJobQ(msg)
-
-    return nil
 }
