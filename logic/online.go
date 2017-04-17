@@ -83,7 +83,6 @@ type reply struct {
 
 func (this *OnlineUserManager) Add(user *api.UserLogin) error {
 	if user.ServerIP != "" && user.UserID.MDUserID != "" && user.UserID.MySQLUserID != 0 {
-
 		usrb := userEntry{user.UserID, user.ServerIP, addUser}
 
 		this.req <- &usrb
@@ -100,6 +99,7 @@ func (this *OnlineUserManager) Remove(user general.UserKey) error {
 	if user.MDUserID != "" && user.MySQLUserID != 0 {
 		user := userEntry{user, "", removeUser}
 
+
 		this.req <- &user
 		replier := <-this.rep
 
@@ -112,7 +112,6 @@ func (this *OnlineUserManager) Remove(user general.UserKey) error {
 
 func (this *OnlineUserManager) Query(uid general.UserKey) (string, error) {
 	if uid.MDUserID != "" && uid.MySQLUserID != 0 {
-
 		user := userEntry{uid, "", queryUser}
 
 		this.req <- &user
