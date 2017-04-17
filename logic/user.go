@@ -41,6 +41,7 @@ func userLoginRequestHandler(req interface{}) interface{} {
 	)
 
 	login = req.(*api.UserLogin)
+
 	logger.Debug("userLoginRequestHandler userID:", login.UserID)
 
 	err := OnLineUserMag.Add(login)
@@ -104,7 +105,8 @@ func MessageHandler(req interface{}) interface{} {
 
 	if err != nil {
 		addHistMessage(msg.To, msg)
-		logger.Error("MessageHandler-->addHistMessage", err)
+
+		logger.Error("MessageHandler-->OnLineUserMag.Query()", err)
 
 		reply = &api.Reply{
 			Code: api.ErrUserQuery,

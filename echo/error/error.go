@@ -24,17 +24,25 @@
 
 /*
  * Revision History:
- *     Initial: 2017/04/11        Feng Yifei
+ *     Initial: 2017/04/16        Feng Yifei
  */
 
-package handler
+package error
 
-import (
-	"net/http"
-	"github.com/labstack/echo"
-	e "hypercube/echo/error"
-)
+type httpError struct {
+	Code        int        `json:"code"`
+	Key         *string    `json:"error"`
+	Message     *string    `json:"message"`
+}
 
-func Dummy(c echo.Context) error {
-	return e.NewHTTPError(http.StatusUnauthorized, "Dummy", "Error handler test")
+func (this *httpError) Error() string {
+	return *this.Key + ":" + *this.Message
+}
+
+func NewHTTPError(code int, key string, message string) *httpError {
+	return &httpError{
+		Code: code,
+		Key: &key,
+		Message: &message,
+	}
 }

@@ -29,16 +29,18 @@
 
 package api
 
+import "hypercube/proto/general"
+
 type UsrInfo struct {
-	UserID       uint64
+	UserID       general.UserKey
 	ServerIP     string
 }
 
 type UserLogin struct {
-	UserID        uint64
+	UserID        general.UserKey
 	ServerIP      string
 }
 
 type UserLogout struct {
-	UserID        uint64
+	UserID        general.UserKey
 }

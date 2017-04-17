@@ -29,17 +29,21 @@
 
 package general
 
+type UserKey struct {
+	MDUserID      string
+	MySQLUserID   uint64
+}
 type Message struct {
-	From        uint64      `json:"fr"`
-	To          uint64      `json:"to"`
+	From        UserKey      `json:"fr"`
+	To          UserKey      `json:"to"`
 	Pushed      bool
 	Content     string      `json:"co"`
 }
 
 type Keepalive struct {
-	Uid         uint64      `json:"uid"`
+	Uid         UserKey      `json:"uid"`
 }
 
 type UserAccess struct {
-	UserID 		uint64
+	UserID 		UserKey
 }

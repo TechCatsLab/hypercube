@@ -26,19 +26,19 @@
  * Revision History:
  *     Initial: 2017/04/13        He ChengJun
  *      Modify: 2017/04/15        Yang ChengLong
- *          Content: 修改文件名称，更改消息存储方式，使用环形队列存储消息，更改消息发送方式
- *           issues: 用户上线后，发送离线消息 #60
+ *          #60 使用环形队列存储消息
+ *
  */
 
 package main
 
 import (
-    "hypercube/common/workq"
-    "hypercube/proto/general"
-    "hypercube/common/container"
+	"hypercube/common/workq"
+	"hypercube/proto/general"
+	"hypercube/common/container"
 )
 var(
-    msgbuf map[uint64]*container.Ring
+    msgbuf map[general.UserKey]*container.Ring
 )
 
 const (
@@ -46,11 +46,11 @@ const (
 )
 
 func init()  {
-    msgbuf = make(map[uint64]*container.Ring)
+    msgbuf = make(map[general.UserKey]*container.Ring)
     initSendMessageQueue()
 }
 
-func addHistMessage(userID uint64, msg interface{})  {
+func addHistMessage(userID general.UserKey, msg interface{})  {
     if msgbuf[userID] == nil {
         msgbuf[userID] = container.NewRing(maxMsgSize)
     }
@@ -62,11 +62,11 @@ func addHistMessage(userID uint64, msg interface{})  {
     }
 }
 
-func getHistMessages(userID uint64) (interface{}, error) {
+func getHistMessages(userID general.UserKey) (interface{}, error) {
     return msgbuf[userID].Pop()
 }
 
-func clearHistMessages(userID uint64) {
+func clearHistMessages(userID general.UserKey) {
     msgbuf[userID].MPop(msgbuf[userID].Len())
 }
 
@@ -78,9 +78,9 @@ var (
     sendWorkQueue *workq.Dispatcher
 )
 
-func userSendMessageHandler(userID uint64) error {
+func userSendMessageHandler(userID general.UserKey) error {
     var (
-	    message *pushMessageJob
+	    message  *pushMessageJob
     )
 	num := msgbuf[userID].Len()
 

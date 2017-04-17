@@ -38,6 +38,7 @@ import (
 	"github.com/gorilla/websocket"
 
 	"hypercube/proto/api"
+	"hypercube/proto/general"
 )
 
 var OnLineManagement *OnLineTable
@@ -49,17 +50,17 @@ type onlineEntry struct {
 
 type OnLineTable struct {
 	locker 		sync.RWMutex
-	onLineMap	map[uint64]*onlineEntry
+	onLineMap	map[general.UserKey]*onlineEntry
 }
 
 func init() {
 	OnLineManagement = &OnLineTable{
-		onLineMap: map[uint64]*onlineEntry{},
+		onLineMap: map[general.UserKey]*onlineEntry{},
 	}
 }
 
 // 用户登录时，保存用户id 和 connection到在线用户表，并把用户id 传到逻辑层
-func (this *OnLineTable) OnConnect(userID uint64, conn *websocket.Conn) error {
+func (this *OnLineTable) OnConnect(userID general.UserKey, conn *websocket.Conn) error {
 	var err	error
 
 	this.locker.Lock()
@@ -70,14 +71,14 @@ func (this *OnLineTable) OnConnect(userID uint64, conn *websocket.Conn) error {
 
 	err = OnLineManagement.loginReport(userID)
 	if err != nil {
-		logger.Error(err)
+		logger.Error("User OnConnect error:",err)
 	}
 
 	return err
 }
 
 // 用户登出时，把用户 id 和 connection 从在线用户表中删除，并通知逻辑层
-func (this *OnLineTable) OnDisconnect(userID uint64) error {
+func (this *OnLineTable) OnDisconnect(userID general.UserKey) error {
 	var err error
 
 	this.locker.Lock()
@@ -90,14 +91,14 @@ func (this *OnLineTable) OnDisconnect(userID uint64) error {
 	
 	err = OnLineManagement.logoutReport(userID)
 	if err != nil {
-		logger.Error(err)
+		logger.Error("User OnDisonnect error",err)
 	}
 
 	return err
 }
 
 // 通过用户 id 获取对应的 connection
-func (this *OnLineTable) GetEntryByID(userID uint64) (*onlineEntry, bool) {
+func (this *OnLineTable) GetEntryByID(userID general.UserKey) (*onlineEntry, bool) {
 	this.locker.RLock()
 	defer this.locker.RUnlock()
 
@@ -106,7 +107,8 @@ func (this *OnLineTable) GetEntryByID(userID uint64) (*onlineEntry, bool) {
 }
 
 // 通过 connection 获取对应的用户id
-func (this *OnLineTable) GetIDByConnection(conn *websocket.Conn) (uint64, bool) {
+func (this *OnLineTable) GetIDByConnection(conn *websocket.Conn) (general.UserKey, bool) {
+	var user = general.UserKey{}
 	this.locker.RLock()
 	defer this.locker.RUnlock()
 
@@ -116,11 +118,11 @@ func (this *OnLineTable) GetIDByConnection(conn *websocket.Conn) (uint64, bool) 
 		}
 	}
 
-	return 0, false
+	return user, false
 }
 
 // 用户登录时，通知逻辑层并把用户 id 传到逻辑层，并作出错误处理
-func (this *OnLineTable) loginReport(userID uint64) error {
+func (this *OnLineTable) loginReport(userID general.UserKey) error {
 	var (
 		userlog api.UserLogin
 		proto 	*api.Request
@@ -158,7 +160,7 @@ func (this *OnLineTable) loginReport(userID uint64) error {
 }
 
 // 用户登出时，通知逻辑层并把用户id 传过去，并作出错误处理
-func (this *OnLineTable) logoutReport(userID uint64) error {
+func (this *OnLineTable) logoutReport(userID general.UserKey) error {
 	var (
 		userlog api.UserLogout
 		proto 	*api.Request

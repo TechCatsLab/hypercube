@@ -148,8 +148,8 @@ func webSocketConnectionHandler(conn *websocket.Conn) {
 		user       *general.UserAccess = &general.UserAccess{}
 		v          interface{}
 		handler    handlerFunc
-		id 		   uint64
-		ok 		   bool
+		id 	   general.UserKey
+		ok 	   bool
 	)
 
 	for {

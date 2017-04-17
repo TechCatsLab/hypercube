@@ -33,6 +33,7 @@ import (
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 	"hypercube/middleware/session"
+	e "hypercube/echo/error"
 )
 
 const (
@@ -57,6 +58,7 @@ func initEchoServer() {
 	initSessionStore()
 
 	server = echo.New()
+	server.HTTPErrorHandler = e.HTTPErrorHandler
 
 	server.Use(middleware.Logger())
 	server.Use(middleware.Recover())
