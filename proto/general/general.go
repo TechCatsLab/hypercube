@@ -30,8 +30,8 @@
 package general
 
 type UserKey struct {
-	MDUserID      string
-	MySQLUserID   uint64
+	MDUserID      string    `json:"mgo_id"`
+	MySQLUserID   uint64    `json:"sql_id"`
 }
 type Message struct {
 	From        UserKey      `json:"fr"`

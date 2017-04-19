@@ -33,9 +33,24 @@ import (
 	"net/http"
 	"github.com/labstack/echo"
 	"hypercube/middleware/session"
+	"hypercube/proto/general"
 )
 
+type User struct {
+	Name        string  `json:"name"    form:"name"   query:"name"`
+	MDUserID    string  `json:"mgo_id"  form:"mgo_id" query:"mgo_id"`
+}
+
 func Login(c echo.Context) error {
+	var (
+		userid general.UserKey = general.UserKey{}
+		user User                  = User{}
+	)
+
+	if err := c.Bind(user); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]interface{}{"status": 1})
+	}
+
 	session := session.GetSession(c)
 
 	if session == nil {
@@ -43,14 +58,17 @@ func Login(c echo.Context) error {
 		return c.JSON(http.StatusOK, map[string]interface{}{"status": 0})
 	}
 
-	userID := session.Get("id")
+	userID := session.Get("user")
 
 	if userID == nil {
 		logger.Debug("Not login, try login")
 	}
 
-	session.Set("id", 100)
+	session.Set("user", user)
 	session.Save()
+
+	userid.MySQLUserID = 0
+	userid.MDUserID = session.Get("user").(User).MDUserID
 
 	return c.JSON(http.StatusOK, map[string]interface{}{"status": 0})
 }
