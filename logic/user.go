@@ -47,7 +47,7 @@ func userLoginRequestHandler(req interface{}) interface{} {
 	err := OnLineUserMag.Add(login)
 
 	if err != nil {
-		logger.Error("userLoginRequestHandler-->errlogin", err)
+		logger.Error("userLoginRequestHandler-->login err:", err)
 
 		reply = &api.Reply{
 			Code: api.ErrLogin,
@@ -60,7 +60,7 @@ func userLoginRequestHandler(req interface{}) interface{} {
 
 	err = userSendMessageHandler(login.UserID)
 	if err != nil {
-		logger.Error("userLoginRequestHandler-->userSendMessageHandler", err)
+		logger.Error("userLoginRequestHandler-->userSendMessageHandler:", err)
 	}
 
 	return reply
@@ -78,7 +78,7 @@ func userLogoutRequestHandler(req interface{}) interface{} {
 	err := OnLineUserMag.Remove(logout.UserID)
 
 	if err != nil {
-		logger.Error("userLogoutRequestHandler--errlogout", err)
+		logger.Error("userLogoutRequestHandler--> err logout:", err)
 
 		reply = &api.Reply{
 			Code: api.ErrLogout,
@@ -106,7 +106,7 @@ func MessageHandler(req interface{}) interface{} {
 	if err != nil {
 		addHistMessage(msg.To, msg)
 
-		logger.Error("MessageHandler-->OnLineUserMag.Query()", err)
+		logger.Error("MessageHandler-->OnLineUserMag.Query():", err)
 
 		reply = &api.Reply{
 			Code: api.ErrUserQuery,
@@ -119,7 +119,7 @@ func MessageHandler(req interface{}) interface{} {
 		err = req.SendMessage(msg)
 
 		if err != nil {
-			logger.Error("MessageHandler-->SendMessage", err)
+			logger.Error("MessageHandler-->SendMessage:", err)
 
 			reply = &api.Reply{
 				Code: api.ErrSendToAccess,
@@ -150,7 +150,7 @@ func AccessConnectHandler(req interface{}) interface{} {
 	err := OnLineUserMag.AddAccess(access)
 
 	if err != nil {
-		logger.Error("AccessConnectHandler-->AddAccess", err)
+		logger.Error("AccessConnectHandler-->AddAccess:", err)
 
 		reply = &api.Reply{
 			Code: api.ErrAddAccess,

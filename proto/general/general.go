@@ -45,5 +45,5 @@ type Keepalive struct {
 }
 
 type UserAccess struct {
-	UserID 		UserKey
+	UserID 		UserKey  `json:"uid"`
 }

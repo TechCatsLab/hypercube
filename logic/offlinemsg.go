@@ -82,6 +82,11 @@ func userSendMessageHandler(userID general.UserKey) error {
     var (
 	    message  *pushMessageJob
     )
+	if msgbuf[userID] == nil {
+		logger.Debug("User has no history message")
+
+		return nil
+	}
 	num := msgbuf[userID].Len()
 
     for i := 0; i < num; i++ {
