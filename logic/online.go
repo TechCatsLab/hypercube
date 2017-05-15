@@ -113,7 +113,8 @@ func (this *OnlineUserManager) Remove(user general.UserKey) error {
 
 
 func (this *OnlineUserManager) Query(uid general.UserKey) (string, error) {
-	if uid.MDUserID != "" && uid.MySQLUserID == 0 {
+	logger.Debug(uid)
+	if uid.MDUserID != "" {
 		user := userEntry{uid, "", queryUser}
 
 		this.req <- &user

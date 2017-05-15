@@ -73,7 +73,7 @@ func (this *OnLineTable) OnConnect(userID general.UserKey, conn *websocket.Conn)
 	if err != nil {
 		logger.Error("User OnConnect error:",err)
 	}
-
+	this.PrintDebugInfo()
 	return err
 }
 
@@ -179,7 +179,7 @@ func (this *OnLineTable) logoutReport(userID general.UserKey) error {
 	}
 
 	proto = &api.Request{
-		Type:    api.ApiTypeUserLogin,
+		Type:    api.ApiTypeUserLogout,
 		Content: conv,
 	}
 
@@ -188,6 +188,7 @@ func (this *OnLineTable) logoutReport(userID general.UserKey) error {
 		logger.Error("UserLogoutHandler send request error:", err)
 	}
 
+	logger.Debug("A logout request from :",userID)
 	return err
 }
 

@@ -99,7 +99,7 @@ func MessageHandler(req interface{}) interface{} {
 	)
 
 	msg = req.(*general.Message)
-	logger.Debug("userToUserMsgHandler:", msg)
+	logger.Debug("userToUserMsgHandler:", *msg)
 
 	accessip, err := OnLineUserMag.Query(msg.To)
 
@@ -125,6 +125,7 @@ func MessageHandler(req interface{}) interface{} {
 				Code: api.ErrSendToAccess,
 			}
 		} else {
+			logger.Debug("SendMessage Succeed")
 			reply = &api.Reply{
 				Code: api.ErrSucceed,
 			}
