@@ -39,6 +39,7 @@ func init()  {
     receiveLogicRPC()
 
     HttpPprof()
+    initEchoServer()
     initWebsocket()
     initPrometheus()
 }

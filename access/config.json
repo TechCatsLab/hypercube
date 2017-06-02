@@ -1,5 +1,5 @@
 {
-  "addrs": ["10.0.0.200:10086"],
+  "addrs": ["10.0.0.104:10086"],
 
   "websocket": {
     "readBufferSize": 4096,
@@ -15,5 +15,15 @@
   "monitor": {
     "pprofAddrs": "localhost:6060",
     "prometheusPort": ":9200"
+  },
+
+  "server": {
+    "address": ":20004"
+  },
+
+  "middleware": {
+    "cors": {
+      "hosts": ["https://labstack.com", "https://labstack.net"]
+    }
   }
 }

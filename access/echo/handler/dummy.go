@@ -27,23 +27,14 @@
  *     Initial: 2017/04/11        Feng Yifei
  */
 
-package main
+package handler
 
 import (
-	"hypercube/common/log"
+	"net/http"
+	"github.com/labstack/echo"
+	e "hypercube/common/error"
 )
 
-var (
-	logger *log.S8ELogger = log.S8ECreateLogger(
-		&log.S8ELogTag{
-			log.LogTagService: "Echo Server Sample",
-			log.LogTagType: "Server",
-		},
-		log.S8ELogLevelDefault)
-)
-
-// package main 全部初始化都在这里添加
-func init() {
-	readConfiguration()
-	initEchoServer()
+func Dummy(c echo.Context) error {
+	return e.NewHTTPError(http.StatusUnauthorized, "Dummy", "Error handler test")
 }

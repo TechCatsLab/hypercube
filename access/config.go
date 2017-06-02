@@ -56,6 +56,11 @@ type AccessLayerConfig struct {
 	RecChanel 			string
 	PprofAddrs          string
 	PrometheusPort      string
+	Address             string
+	RedisAddress        string
+	SessionSecret       string
+	SessionName         string
+	CorsHosts           []string
 }
 
 // 初始化配置
@@ -78,5 +83,10 @@ func readConfiguration() {
 		RecChanel: 			   viper.GetString("nats.subject"),
 		PprofAddrs:            viper.GetString("monitor.pprofAddrs"),
 		PrometheusPort:        viper.GetString("monitor.prometheusPort"),
+		Address:               viper.GetString("server.address"),
+		RedisAddress:          viper.GetString("middleware.session.address"),
+		SessionSecret:         viper.GetString("middleware.session.secret"),
+		SessionName:           viper.GetString("middleware.session.name"),
+		CorsHosts:             viper.GetStringSlice("middleware.cors.hosts"),
 	}
 }

@@ -54,14 +54,14 @@ func Login(c echo.Context) error {
 	session := session.GetSession(c)
 
 	if session == nil {
-		logger.Error("Server session error")
+		//logger.Error("Server session error")
 		return c.JSON(http.StatusOK, map[string]interface{}{"status": 0})
 	}
 
 	userID := session.Get("user")
 
 	if userID == nil {
-		logger.Debug("Not login, try login")
+		//logger.Debug("Not login, try login")
 	}
 
 	session.Set("user", user)
@@ -79,7 +79,7 @@ func Logout(c echo.Context) error {
 	userID := session.Get("id")
 
 	if userID == nil {
-		logger.Debug("Not login, exit")
+		//logger.Debug("Not login, exit")
 		return c.JSON(http.StatusOK, map[string]interface{}{"status": 1})
 	}
 

@@ -29,7 +29,15 @@
 
 package main
 
+import (
+	"hypercube/access/echo/router"
+)
+
 func main() {
 	sendAccessInfo()
+
+	router.InitRouter(server)
+	server.Logger.Fatal(server.Start(":1323"))
+
 	sigHandler.Wait()
 }

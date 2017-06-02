@@ -27,14 +27,20 @@
  *     Initial: 2017/04/11        Feng Yifei
  */
 
-package handler
+package router
 
 import (
-	"net/http"
 	"github.com/labstack/echo"
-	e "hypercube/echo/error"
+	"hypercube/access/echo/handler"
 )
 
-func Dummy(c echo.Context) error {
-	return e.NewHTTPError(http.StatusUnauthorized, "Dummy", "Error handler test")
+func InitRouter(server *echo.Echo) {
+	if server == nil {
+		panic("[initRouter], server couldn't be nil")
+	}
+
+	server.GET("/login", handler.Login)
+	server.GET("/logout", handler.Logout)
+
+	server.GET("/dummy", handler.Dummy)
 }

@@ -39,6 +39,7 @@ import (
 	"hypercube/proto/api"
 	"time"
 	"strings"
+	"github.com/labstack/echo"
 )
 
 var (
@@ -58,8 +59,7 @@ func initWebsocket()  {
 		},
 	}
 
-	mux = http.NewServeMux()
-	mux.HandleFunc("/join", serveWebSocket)
+	server.GET("/join", serveWebSocket)
 
 	logger.Debug("Configuration finished, starting servers...")
 
@@ -119,22 +119,23 @@ func sendAccessInfo()  {
 	}
 }
 
-func serveWebSocket(w http.ResponseWriter, req *http.Request) {
+func serveWebSocket(c echo.Context) error {
 	logger.Debug("New connection")
 
-	if req.Method != "GET" {
-		http.Error(w, "Method Not Allowed", 405)
-		return
+	if c.Request().Method != "GET" {
+		return c.JSON(http.StatusMethodNotAllowed, "Method Not Allowed")
 	}
 
-	connection, err := upgrader.Upgrade(w, req, nil)
+	connection, err := upgrader.Upgrade(c.Response().Writer, c.Request(), nil)
 	if err != nil {
 		logger.Error("websocket upgrade error:", err)
-		return
+		return err
 	}
 	defer connection.Close()
 
 	webSocketConnectionHandler(connection)
+
+	return c.JSON(http.StatusInternalServerError,"serveWebSocket connection error")
 }
 
 type handlerFunc func(p interface{},req interface{}) interface{}

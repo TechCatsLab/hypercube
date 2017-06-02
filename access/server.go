@@ -30,37 +30,42 @@
 package main
 
 import (
-	"github.com/spf13/viper"
+	"github.com/labstack/echo"
+	"github.com/labstack/echo/middleware"
+	"hypercube/middleware/session"
+	e "hypercube/common/error"
 )
 
-// 配置文件结构
-type EchoConfig struct {
-	Address                 string
-	RedisAddress            string
-	SessionSecret           string
-	SessionName             string
-	CorsHosts               []string
-}
+const (
+	maxRedisIdleConnectionSize = 32
+)
 
 var (
-	configuration    *EchoConfig
+	server *echo.Echo
+	store  session.Store
 )
 
-// 初始化配置
-func readConfiguration() {
-	viper.AddConfigPath("./")
-	viper.SetConfigName("config")
+func initSessionStore() {
+	var err    error
 
-	if err := viper.ReadInConfig(); err != nil {
-		logger.Error("Read configuration file with error:", err)
+	store, err = session.NewRediStore(maxRedisIdleConnectionSize, "tcp", configuration.RedisAddress, "", []byte(configuration.SessionSecret))
+	if err != nil {
 		panic(err)
 	}
+}
 
-	configuration = &EchoConfig{
-		Address:          viper.GetString("server.address"),
-		RedisAddress:     viper.GetString("middleware.session.address"),
-		SessionSecret:    viper.GetString("middleware.session.secret"),
-		SessionName:      viper.GetString("middleware.session.name"),
-		CorsHosts:        viper.GetStringSlice("middleware.cors.hosts"),
-	}
+func initEchoServer() {
+	//initSessionStore()
+
+	server = echo.New()
+
+	server.HTTPErrorHandler = e.HTTPErrorHandler
+
+	server.Use(middleware.Logger())
+	server.Use(middleware.Recover())
+
+	server.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+		AllowOrigins:    configuration.CorsHosts,
+		AllowMethods:    []string{echo.GET, echo.POST},
+	}))
 }
