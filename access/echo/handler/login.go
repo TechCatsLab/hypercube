@@ -29,7 +29,3 @@
 
 package handler
 
-type User struct {
-	Name        string  `json:"name"    form:"name"   query:"name"`
-	MDUserID    string  `json:"mgo_id"  form:"mgo_id" query:"mgo_id"`
-}

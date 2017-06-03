@@ -34,10 +34,10 @@ import (
 	"hypercube/access/echo/handler"
 )
 
-func InitRouter(server *echo.Echo) {
-	if server == nil {
+func InitRouter(e *echo.Echo) {
+	if e == nil {
 		panic("[initRouter], server couldn't be nil")
 	}
 
-	server.GET("/dummy", handler.Dummy)
+	e.GET("/dummy", handler.Dummy)
 }

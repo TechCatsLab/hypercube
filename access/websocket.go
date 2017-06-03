@@ -49,8 +49,6 @@ var (
 )
 
 func initWebsocket()  {
-	var err error
-
 	upgrader = &websocket.Upgrader{
 		ReadBufferSize:     configuration.WSReadBufferSize,
 		WriteBufferSize:    configuration.WSWriteBufferSize,
@@ -62,22 +60,17 @@ func initWebsocket()  {
 	server.GET("/join", serveWebSocket)
 
 	logger.Debug("Configuration finished, starting servers...")
-
-	if err = initWebSocketServer(); err != nil {
-		panic(err)
-	}
 }
 
 func initWebSocketServer() error {
 	var (
-		server      *ws.WebSocketServer
+		servers      *ws.WebSocketServer
 		err         error
 	)
 
 	webSocketServers = make([]*ws.WebSocketServer, len(configuration.Addrs))
 
 	for index, address := range configuration.Addrs {
-		server, err = ws.CreateWebSocketServer(address, mux)
 
 		if err != nil {
 			logger.Error("start websocket server error:", err, " , address:", address)
@@ -88,7 +81,6 @@ func initWebSocketServer() error {
 		logger.Debug("start websocket server succeed at address:", address)
 
 		webSocketServers[index] = server
-		server.Run()
 	}
 
 	return err
