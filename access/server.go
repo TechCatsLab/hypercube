@@ -32,31 +32,14 @@ package main
 import (
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
-	"hypercube/middleware/session"
 	e "hypercube/common/error"
-)
-
-const (
-	maxRedisIdleConnectionSize = 32
 )
 
 var (
 	server *echo.Echo
-	store  session.Store
 )
 
-func initSessionStore() {
-	var err    error
-
-	store, err = session.NewRediStore(maxRedisIdleConnectionSize, "tcp", configuration.RedisAddress, "", []byte(configuration.SessionSecret))
-	if err != nil {
-		panic(err)
-	}
-}
-
 func initEchoServer() {
-	//initSessionStore()
-
 	server = echo.New()
 
 	server.HTTPErrorHandler = e.HTTPErrorHandler

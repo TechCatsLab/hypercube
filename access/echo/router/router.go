@@ -39,8 +39,5 @@ func InitRouter(server *echo.Echo) {
 		panic("[initRouter], server couldn't be nil")
 	}
 
-	server.GET("/login", handler.Login)
-	server.GET("/logout", handler.Logout)
-
 	server.GET("/dummy", handler.Dummy)
 }

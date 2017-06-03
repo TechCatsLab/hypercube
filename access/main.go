@@ -37,7 +37,7 @@ func main() {
 	sendAccessInfo()
 
 	router.InitRouter(server)
-	server.Logger.Fatal(server.Start(":1323"))
+	server.Logger.Fatal(server.Start(":7000"))
 
 	sigHandler.Wait()
 }
