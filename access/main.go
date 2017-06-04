@@ -25,18 +25,13 @@
 /*
  * Revision History:
  *     Initial: 2017/03/28        Feng Yifei
+ *     AddEcho: 2017/06/04        Yang Chenglong
  */
 
 package main
 
-import (
-	"hypercube/access/echo/router"
-)
-
 func main() {
 	sendAccessInfo()
-
-	router.InitRouter(server)
 
 	server.Logger.Fatal(server.Start(":7000"))
 

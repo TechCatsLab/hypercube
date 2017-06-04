@@ -26,6 +26,7 @@
  * Revision History:
  *     Initial: 2017/03/29        Feng Yifei
  *	   AddFunction: 2017/04/06    Yusan Kurban
+ *     AddEcho: 2017/06/04        Yang Chenglong
  */
 
 package main
@@ -33,7 +34,6 @@ package main
 import (
 	"net/http"
 	"github.com/gorilla/websocket"
-	ws "hypercube/common/server/websocket"
 	"hypercube/proto/general"
 	"encoding/json"
 	"hypercube/proto/api"
@@ -41,50 +41,6 @@ import (
 	"strings"
 	"github.com/labstack/echo"
 )
-
-var (
-	upgrader              *websocket.Upgrader
-	mux                   *http.ServeMux
-	webSocketServers      []*ws.WebSocketServer
-)
-
-func initWebsocket()  {
-	upgrader = &websocket.Upgrader{
-		ReadBufferSize:     configuration.WSReadBufferSize,
-		WriteBufferSize:    configuration.WSWriteBufferSize,
-		CheckOrigin:        func(r *http.Request) bool {
-			return true
-		},
-	}
-
-	server.GET("/join", serveWebSocket)
-
-	logger.Debug("Configuration finished, starting servers...")
-}
-
-func initWebSocketServer() error {
-	var (
-		servers      *ws.WebSocketServer
-		err         error
-	)
-
-	webSocketServers = make([]*ws.WebSocketServer, len(configuration.Addrs))
-
-	for index, address := range configuration.Addrs {
-
-		if err != nil {
-			logger.Error("start websocket server error:", err, " , address:", address)
-
-			break
-		}
-
-		logger.Debug("start websocket server succeed at address:", address)
-
-		webSocketServers[index] = server
-	}
-
-	return err
-}
 
 func sendAccessInfo()  {
 	var (
@@ -112,6 +68,14 @@ func sendAccessInfo()  {
 }
 
 func serveWebSocket(c echo.Context) error {
+	var upgrader = &websocket.Upgrader{
+		ReadBufferSize:     configuration.WSReadBufferSize,
+		WriteBufferSize:    configuration.WSWriteBufferSize,
+		CheckOrigin:        func(r *http.Request) bool {
+			return true
+		},
+	}
+
 	logger.Debug("New connection")
 
 	if c.Request().Method != "GET" {

@@ -25,6 +25,7 @@
 /*
  * Revision History:
  *     Initial: 2017/04/11        Feng Yifei
+ *     ModifyFunction: 2017/06/04        Yang Chenglong
  */
 
 package main
@@ -46,6 +47,7 @@ func initEchoServer() {
 
 	server.Use(middleware.Logger())
 	server.Use(middleware.Recover())
+	server.Use(middleware.JWTWithConfig())
 
 	server.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowOrigins:    configuration.CorsHosts,

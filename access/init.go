@@ -24,7 +24,8 @@
 
 /*
  * Revision History:
- *     Initial: 2017/04/05      HeCJ
+ *     Initial: 2017/04/05            HeCJ
+ *     AddFunction: 2017/06/04        Yang Chenglong
  */
 
 package main
@@ -40,6 +41,6 @@ func init()  {
 
     HttpPprof()
     initEchoServer()
-    initWebsocket()
+    InitRouter(server)
     initPrometheus()
 }

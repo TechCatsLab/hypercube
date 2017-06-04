@@ -25,13 +25,16 @@
 /*
  * Revision History:
  *     Initial: 2017/04/11        Feng Yifei
+ *     AddFunction: 2017/06/04    Yang Chenglong
  */
 
-package router
+package main
 
 import (
 	"github.com/labstack/echo"
 	"hypercube/access/echo/handler"
+	"github.com/labstack/echo/middleware"
+	jwt "github.com/dgrijalva/jwt-go"
 )
 
 func InitRouter(e *echo.Echo) {
@@ -40,4 +43,16 @@ func InitRouter(e *echo.Echo) {
 	}
 
 	e.GET("/dummy", handler.Dummy)
+	e.POST("/chat/login", handler.Login)
+
+	server.GET("/chat/join", serveWebSocket)
+
+	r := e.Group("/chat")
+
+	config := middleware.JWTConfig{
+		Claims:     &jwt.StandardClaims{},
+		SigningKey: []byte("secret"),
+	}
+	r.Use(middleware.JWTWithConfig(config))
+
 }

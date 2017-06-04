@@ -25,6 +25,7 @@
 /*
  * Revision History:
  *     Initial: 2017/03/28        Feng Yifei
+ *     AddEchoConfig: 2017/06/04        Yang Chenglong
  */
 
 package main
