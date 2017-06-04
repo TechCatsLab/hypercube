@@ -30,12 +30,8 @@
 package handler
 
 import (
-	"net/http"
-	"time"
-
-	jwt "github.com/dgrijalva/jwt-go"
 	"github.com/labstack/echo"
-	"log"
+	"github.com/dgrijalva/jwt-go"
 )
 
 type User struct {
@@ -43,40 +39,16 @@ type User struct {
 	MDUserID    string  `json:"mgo_id"  form:"mgo_id" query:"mgo_id"`
 }
 
-func Login(c echo.Context) error {
-	name := c.FormValue("name")
-	mgoid := c.FormValue("mgo_id")
+func LoginMiddleWare(next echo.HandlerFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		var u User
 
-	log.Println(name, mgoid)
+		user := c.Get("user").(*jwt.Token)
+		claims := user.Claims.(jwt.MapClaims)
 
-	if name != "" && mgoid != "" {
-		claims := jwt.StandardClaims{
-			Id: mgoid,
-			ExpiresAt: time.Now().Add(time.Hour * 72).Unix(),
-		}
+		u.Name = claims["name"].(string)
+		u.MDUserID = claims["mgo_id"].(string)
 
-		token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-
-		t, err := token.SignedString([]byte("secret"))
-		if err != nil {
-			return err
-		}
-
-		return c.JSON(http.StatusOK, echo.Map{
-			"token": t,
-		})
+		return next(c)
 	}
-
-	return echo.ErrUnauthorized
-}
-
-func Accessible(c echo.Context) error {
-	return c.String(http.StatusOK, "Accessible")
-}
-
-func Restricted(c echo.Context) error {
-	user := c.Get("user").(*jwt.Token)
-	claims := user.Claims.(jwt.StandardClaims)
-
-	return c.String(http.StatusOK, "Welcome "+claims.Subject+"!")
 }

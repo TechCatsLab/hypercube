@@ -1,5 +1,5 @@
 {
-  "addrs": ["10.0.0.104:10086"],
+  "addrs": "10.0.0.104:7000",
 
   "websocket": {
     "readBufferSize": 4096,
@@ -24,6 +24,8 @@
   "middleware": {
     "cors": {
       "hosts": ["https://labstack.com", "https://labstack.net"]
-    }
+    },
+
+    "secretkey": "secret"
   }
 }

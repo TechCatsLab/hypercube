@@ -33,7 +33,7 @@ package main
 func main() {
 	sendAccessInfo()
 
-	server.Logger.Fatal(server.Start(":7000"))
+	server.Logger.Fatal(server.Start(configuration.Addrs))
 
 	sigHandler.Wait()
 }

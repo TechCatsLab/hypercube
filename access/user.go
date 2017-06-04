@@ -133,7 +133,7 @@ func (this *OnLineTable) loginReport(userID general.UserKey) error {
 
 	userlog = api.UserLogin{
 		UserID: 	userID,
-		ServerIP:   strings.Split(configuration.Addrs[0], ":")[0],
+		ServerIP:   strings.Split(configuration.Addrs, ":")[0],
 	}
 
 	conv, err = json.Marshal(&userlog)

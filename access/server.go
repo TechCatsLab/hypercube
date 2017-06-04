@@ -33,7 +33,10 @@ package main
 import (
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
+
 	e "hypercube/common/error"
+	"hypercube/access/echo/handler"
+	"github.com/dgrijalva/jwt-go"
 )
 
 var (
@@ -47,10 +50,18 @@ func initEchoServer() {
 
 	server.Use(middleware.Logger())
 	server.Use(middleware.Recover())
-	server.Use(middleware.JWTWithConfig())
+
+	server.Use(handler.LoginMiddleWare)
 
 	server.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowOrigins:    configuration.CorsHosts,
 		AllowMethods:    []string{echo.GET, echo.POST},
 	}))
+
+	config := middleware.JWTConfig{
+		Claims:         jwt.MapClaims{},
+		SigningKey:     []byte(configuration.SecretKey),
+	}
+
+	server.Use(middleware.JWTWithConfig(config))
 }

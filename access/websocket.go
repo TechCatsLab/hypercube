@@ -48,23 +48,20 @@ func sendAccessInfo()  {
 		serverinfo  api.Access
 	)
 
-	for _, address := range configuration.Addrs {
-		addr := strings.Split(address, ":")[0]
-		serverinfo.ServerIp = &addr
-		serverinfo.Subject = &configuration.Subject
+	addr := strings.Split(configuration.Addrs, ":")[0]
 
-		info, _ := json.Marshal(serverinfo)
+	serverinfo.ServerIp = &addr
+	serverinfo.Subject = &configuration.Subject
 
-		err := logicRequester.Request(&api.Request{Type: api.ApiTypeAccessInfo, Content: info}, &r, time.Duration(100) * time.Millisecond)
+	info, _ := json.Marshal(serverinfo)
 
-		if err != nil {
-			logger.Error("send access info error:", err, " , address:", address)
+	err := logicRequester.Request(&api.Request{Type: api.ApiTypeAccessInfo, Content: info}, &r, time.Duration(100) * time.Millisecond)
 
-			break
-		}
-
-		logger.Debug("send access info to logic:", serverinfo, " received reply:", r.Code)
+	if err != nil {
+		logger.Error("send access info error:", err, " , address:", configuration.Addrs)
 	}
+
+	logger.Debug("send access info to logic:", serverinfo, " received reply:", r.Code)
 }
 
 func serveWebSocket(c echo.Context) error {

@@ -48,7 +48,7 @@ var (
 
 // 配置文件结构
 type AccessLayerConfig struct {
-	Addrs               []string
+	Addrs               string
 	WSReadBufferSize	int
 	WSWriteBufferSize   int
 	NatsUrl             string
@@ -62,6 +62,7 @@ type AccessLayerConfig struct {
 	SessionSecret       string
 	SessionName         string
 	CorsHosts           []string
+	SecretKey           string
 }
 
 // 初始化配置
@@ -75,7 +76,7 @@ func readConfiguration() {
 	}
 
 	configuration = &AccessLayerConfig{
-		Addrs:                 viper.GetStringSlice("addrs"),
+		Addrs:                 viper.GetString("addrs"),
 		WSReadBufferSize:      viper.GetInt("websocket.readBufferSize"),
 		WSWriteBufferSize:     viper.GetInt("websocket.writeBufferSize"),
 		NatsUrl:               viper.GetString("nats.urls"),
@@ -89,5 +90,6 @@ func readConfiguration() {
 		SessionSecret:         viper.GetString("middleware.session.secret"),
 		SessionName:           viper.GetString("middleware.session.name"),
 		CorsHosts:             viper.GetStringSlice("middleware.cors.hosts"),
+		SecretKey:             viper.GetString("middleware.secretkey"),
 	}
 }
