@@ -25,13 +25,21 @@
 /*
  * Revision History:
  *     Initial: 2017/04/11        Feng Yifei
+ *     Modify: 2017/06/05         Yang Chenglong   添加login中间件
  */
 
 package handler
 
 import (
+	"net/http"
+
 	"github.com/labstack/echo"
 	"github.com/dgrijalva/jwt-go"
+)
+
+const(
+	TokenIndex = 0
+	BearerSize = 7
 )
 
 type User struct {
@@ -39,15 +47,28 @@ type User struct {
 	MDUserID    string  `json:"mgo_id"  form:"mgo_id" query:"mgo_id"`
 }
 
+func GetUser(user *jwt.Token) (interface{}, error) {
+	var u User
+
+	claims := user.Claims.(jwt.MapClaims)
+	u.Name = claims["name"].(string)
+	u.MDUserID = claims["mgo_id"].(string)
+
+	return u, nil
+}
+
 func LoginMiddleWare(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		var u User
+		token := c.Request().Header["Authorization"]
 
-		user := c.Get("user").(*jwt.Token)
-		claims := user.Claims.(jwt.MapClaims)
+		t := token[TokenIndex][BearerSize:]
 
-		u.Name = claims["name"].(string)
-		u.MDUserID = claims["mgo_id"].(string)
+		u, err := jwt.Parse(t, GetUser)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, "Token Parse Err")
+		}
+
+		c.JSON(http.StatusOK, u.Claims)
 
 		return next(c)
 	}

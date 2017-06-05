@@ -50,9 +50,7 @@ func initEchoServer() {
 
 	server.Use(middleware.Logger())
 	server.Use(middleware.Recover())
-
 	server.Use(handler.LoginMiddleWare)
-
 	server.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowOrigins:    configuration.CorsHosts,
 		AllowMethods:    []string{echo.GET, echo.POST},
