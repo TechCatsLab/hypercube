@@ -25,6 +25,7 @@
 /*
  * Revision History:
  *     Initial: 2017/04/04        Feng Yifei
+ *     Modify:  2017/06/07        Yang Chenglong     添加AccessHeart类型
  */
 
 package api
@@ -36,4 +37,5 @@ const (
 	ApiTypeUserOnDisConnect        = 0x103
 
 	ApiTypeAccessInfo              = 0x104
+	ApiTypeAccessHeart             = 0x108
 )

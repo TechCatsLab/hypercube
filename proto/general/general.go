@@ -25,6 +25,7 @@
 /*
  * Revision History:
  *     Initial: 2017/04/02        Liu Jiachang
+ *     Modify:  2017/06/07        Yang Chenglong     添加AccessHeart类型
  */
 
 package general
@@ -42,6 +43,10 @@ type Message struct {
 
 type Keepalive struct {
 	Uid         UserKey      `json:"uid"`
+}
+
+type AccessHeart struct {
+	Ver          uint16      `json:"ver"`
 }
 
 type UserAccess struct {

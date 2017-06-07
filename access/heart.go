@@ -25,12 +25,16 @@
 /*
  * Revision History:
  *     Initial: 2017/04/05        Yang Chenglong
+ *     Modify:  2017/06/07        Yang Chenglong   添加向logic发送心跳
  */
 
 package main
 
 import (
+	"encoding/json"
+	"time"
 	"hypercube/proto/general"
+	"hypercube/proto/api"
 )
 
 func keepAliveRequestHandler(p interface{},req interface{}) interface{} {
@@ -51,4 +55,35 @@ func keepAliveRequestHandler(p interface{},req interface{}) interface{} {
 	logger.Debug("a heartbeat from UserId:", heart.Uid)
 
 	return nil
+}
+
+func sendAccessHeart() {
+	var (
+		r 		api.Reply
+		ver     general.AccessHeart
+	)
+
+	ver.Ver = general.CurVer
+	v, _ := json.Marshal(&ver)
+
+
+	heart   := &api.Request{
+		Type:      api.ApiTypeAccessHeart,
+		Content:   v,
+
+	}
+
+	for {
+		err := logicRequester.Request(heart, &r, time.Duration(100) * time.Millisecond)
+
+		if err != nil {
+			logger.Error("sendAccessHeart error:", err)
+		}
+
+		if r.Code != api.ErrSucceed {
+			logger.Error("request error code:", r.Code)
+		}
+
+		time.Sleep(10 * time.Second)
+	}
 }

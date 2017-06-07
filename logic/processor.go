@@ -25,6 +25,7 @@
 /*
  * Revision History:
  *     Initial: 2017/04/04        Feng Yifei
+ *     Modify:  2017/06/07        Yang Chenglong       添加AccessHeart处理
  */
 
 package main
@@ -47,6 +48,7 @@ func requestProcessor(req []byte) interface{} {
 		access       api.Access
 		v            interface{}
 		handler      handlerFunc
+		heart        general.Proto
 	)
 
 	err = json.Unmarshal(req, &request)
@@ -73,6 +75,9 @@ func requestProcessor(req []byte) interface{} {
 	case api.ApiTypeAccessInfo:
 		v = &access
 		handler = AccessConnectHandler
+	case api.ApiTypeAccessHeart:
+		v = &heart
+		handler = AccessHeartHandler
 	}
 
 	if v != nil {

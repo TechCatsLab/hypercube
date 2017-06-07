@@ -25,6 +25,7 @@
 /*
  * Revision History:
  *     Initial: 2017/04/04        Feng Yifei
+ *     Modify:  2017/06/07        Yang Chenglong  添加AccessHeartHandler
  */
 
 package main
@@ -157,6 +158,24 @@ func AccessConnectHandler(req interface{}) interface{} {
 			Code: api.ErrAddAccess,
 		}
 	}
+
+	return reply
+}
+
+func AccessHeartHandler(req interface{}) interface{} {
+	var (
+		heart          *general.Proto
+		reply          *api.Reply
+	)
+
+	heart = req.(*general.Proto)
+
+	if _, err := heart.VerCheck(); err != general.ErrSucceed {
+		logger.Error("keepAliveRequestHandler vercheck:", err)
+		return err
+	}
+
+	logger.Debug("a heartbeat from access which versions is:", heart.Ver)
 
 	return reply
 }
