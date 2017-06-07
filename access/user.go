@@ -25,6 +25,7 @@
 /*
  * Revision History:
  *     Initial: 2017/04/05        Yusan Kurban
+ *     Modify:  2017/06/04        Yang Chenglong    添加在线用户数量统计
  */
 
 package main
@@ -73,6 +74,9 @@ func (this *OnLineTable) OnConnect(userID general.UserKey, conn *websocket.Conn)
 	if err != nil {
 		logger.Error("User OnConnect error:",err)
 	}
+
+	onlineUserCounter.Inc()
+
 	this.PrintDebugInfo()
 	return err
 }
@@ -93,6 +97,8 @@ func (this *OnLineTable) OnDisconnect(userID general.UserKey) error {
 	if err != nil {
 		logger.Error("User OnDisonnect error",err)
 	}
+
+	onlineUserCounter.Desc()
 
 	return err
 }

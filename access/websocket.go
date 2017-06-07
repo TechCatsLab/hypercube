@@ -27,6 +27,7 @@
  *     Initial: 2017/03/29        Feng Yifei
  *	   AddFunction: 2017/04/06    Yusan Kurban
  *     AddEcho: 2017/06/04        Yang Chenglong
+ *     Modify:  2017/06/07        Yang Chenglong    添加接收消息数量统计
  */
 
 package main
@@ -128,6 +129,7 @@ func webSocketConnectionHandler(conn *websocket.Conn) {
 		case general.GeneralTypeTextMsg:
 			v = mes
 			handler = userMessageHandler
+			receiveMessageCounter.Inc()
 		case general.GeneralTypeLogin:
 			v = user
 		case general.GeneralTypeLogout:

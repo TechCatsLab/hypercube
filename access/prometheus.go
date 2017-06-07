@@ -25,6 +25,7 @@
 /*
  * Revision History:
  *     Initial: 2017/03/31        Feng Yifei
+ *     Modify: 2017/06/04         Yang Chenglong  修改counter创建
  */
 
 package main
@@ -38,38 +39,44 @@ import (
 )
 
 var (
-	onlineUserDurations = prometheus.NewCounterVec(
-		prometheus.CounterOpts{
-			Name:       "onlineUser_durations_seconds",
-			Help:       "OnlineUser latency distributions.",
-		},
-		[]string{"service"},
-	)
+	onlineUserCounter = prometheus.NewCounter(prometheus.CounterOpts{
+		Name: "onlineUser",
+		Help: "Number of onlineUser",
+	})
 
-	sendMessageDurations = prometheus.NewCounterVec(
-		prometheus.CounterOpts{
-			Name:       "sendMessage_durations_seconds",
-			Help:       "SendMessage latency distributions.",
-		},
-		[]string{"service"},
-	)
+	sendMessageCounter = prometheus.NewCounter(prometheus.CounterOpts{
+		Name: "sendMessage",
+		Help: "Number of sendMessage",
+	})
 
-	resiveMessageDurations = prometheus.NewCounterVec(
-		prometheus.CounterOpts{
-			Name:       "resiveMessage_durations_seconds",
-			Help:       "ResiveMessage latency distributions.",
-		},
-		[]string{"service"},
-	)
+	receiveMessageCounter = prometheus.NewCounter(prometheus.CounterOpts{
+		Name: "resiveMessage",
+		Help: "Number of resiveMessage",
+	})
 )
 
 func initPrometheus() {
-	prometheus.MustRegister(onlineUserDurations)
-	prometheus.MustRegister(sendMessageDurations)
-	prometheus.MustRegister(resiveMessageDurations)
+	err := prometheus.Register(onlineUserCounter)
+	if err != nil {
+		logger.Error("onlineUser counter couldn't be registered AGAIN, no counting will happen:", err)
+		return
+	}
+
+	err = prometheus.Register(sendMessageCounter)
+	if err != nil {
+		logger.Error("sendMessage counter couldn't be registered AGAIN, no counting will happen:", err)
+		return
+	}
+
+	err = prometheus.Register(receiveMessageCounter)
+	if err != nil {
+		logger.Error("resiveMessage counter couldn't be registered AGAIN, no counting will happen:", err)
+		return
+	}
 
 	go func() {
 		http.Handle("/metrics", promhttp.Handler())
+
 		log.Fatal(http.ListenAndServe(configuration.PrometheusPort, nil))
 	}()
 }

@@ -25,6 +25,7 @@
 /*
  * Revision History:
  *     Initial: 2017/04/12        Feng Yifei
+ *     Modify:  2017/06/07        Yang Chenglong    添加发送消息数量统计
  */
 
 package main
@@ -87,6 +88,8 @@ func (this *pushMessageJob) Do() error {
 	}
 
 	logger.Debug("Sending:", this.message.From, "->", this.message.To)
+
+	sendMessageCounter.Inc()
 
 	conn.mutex.Lock()
 	defer conn.mutex.Unlock()
