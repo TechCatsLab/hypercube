@@ -31,7 +31,7 @@ package main
 
 import (
 	"hypercube/proto/general"
-	"hypercube/proto/api"
+	"hypercube/proto/types"
 	"encoding/json"
 )
 
@@ -40,7 +40,7 @@ type ReceiveHandler func(p interface{}, req interface{}) interface{}
 func receiveRequestProcessor(req []byte) interface{} {
 	var (
 		err     error
-		request api.Request
+		request general.Request
 		msg     general.Message
 		handler ReceiveHandler
 		p       interface{}
@@ -55,7 +55,7 @@ func receiveRequestProcessor(req []byte) interface{} {
 	msg.Pushed = true
 	
 	switch request.Type{
-	case general.GeneralTypeTextMsg:
+	case types.GeneralTypeTextMsg:
 		p = &msg
 		handler = userMessageHandler
 	}

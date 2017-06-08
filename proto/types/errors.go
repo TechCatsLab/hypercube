@@ -25,17 +25,20 @@
 /*
  * Revision History:
  *     Initial: 2017/04/04        Feng Yifei
- *     Modify:  2017/06/07        Yang Chenglong     添加AccessHeart类型
+ *     Modify: 2017/06/08         Yang Chenglong     整理err常量
  */
 
-package api
+package types
 
 const (
-	ApiTypeUserLogin               = 0x100
-	ApiTypeUserLogout              = 0x101
-	ApiTypeUserOnConnect           = 0x102
-	ApiTypeUserOnDisConnect        = 0x103
+	ErrSucceed            = uint32(0x0000)
+	ErrLogin              = uint32(0x0001)
+	ErrLogout             = uint32(0x0002)
+	ErrUserQuery          = uint32(0x0003)
+	ErrSendToAccess       = uint32(0x0004)
+	ErrFindAccess         = uint32(0x0005)
+	ErrAddAccess          = uint32(0x0006)
 
-	ApiTypeAccessInfo              = 0x104
-	ApiTypeAccessHeart             = 0x108
+	ErrVerConf            = uint32(0x1001)     // Protocol conflict
+	ErrSpiteAtt           = uint32(0x1002)     // someone spite attack
 )

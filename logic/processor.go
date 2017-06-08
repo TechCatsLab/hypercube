@@ -31,7 +31,7 @@
 package main
 
 import (
-	"hypercube/proto/api"
+	"hypercube/proto/types"
 	"hypercube/proto/general"
 	"encoding/json"
 )
@@ -41,11 +41,11 @@ type handlerFunc func(interface{}) interface{}
 func requestProcessor(req []byte) interface{} {
 	var (
 		err          error
-		request      api.Request
-		login        api.UserLogin
-		logout       api.UserLogout
+		request      general.Request
+		login        general.UserLogin
+		logout       general.UserLogout
 		msg          general.Message
-		access       api.Access
+		access       general.Access
 		v            interface{}
 		handler      handlerFunc
 		heart        general.Proto
@@ -61,21 +61,21 @@ func requestProcessor(req []byte) interface{} {
 	logger.Debug("Logic RPC received message type:", request.Type)
 
 	switch request.Type {
-	case api.ApiTypeUserOnConnect:
-	case api.ApiTypeUserOnDisConnect:
-	case api.ApiTypeUserLogin:
+	case types.ApiTypeUserOnConnect:
+	case types.ApiTypeUserOnDisConnect:
+	case types.ApiTypeUserLogin:
 		v = &login
 		handler = userLoginRequestHandler
-	case api.ApiTypeUserLogout:
+	case types.ApiTypeUserLogout:
 		v = &logout
 		handler = userLogoutRequestHandler
-	case general.GeneralTypeTextMsg:
+	case types.GeneralTypeTextMsg:
 		v = &msg
 		handler = MessageHandler
-	case api.ApiTypeAccessInfo:
+	case types.ApiTypeAccessInfo:
 		v = &access
 		handler = AccessConnectHandler
-	case api.ApiTypeAccessHeart:
+	case types.ApiTypeAccessHeart:
 		v = &heart
 		handler = AccessHeartHandler
 	}

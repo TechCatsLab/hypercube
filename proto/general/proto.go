@@ -33,6 +33,7 @@ import (
 	"fmt"
 	"encoding/json"
 	"github.com/gorilla/websocket"
+	"hypercube/proto/types"
 )
 
 var (
@@ -56,11 +57,11 @@ func (p *Proto) String() string {
 
 func (p *Proto) VerCheck() (*Proto, uint32) {
 	if p.Ver > CurVer {
-		p.Type = GeneralTypeVersionConflict
-		return  p, ErrVerConf
+		p.Type = types.GeneralTypeVersionConflict
+		return  p, types.ErrVerConf
 	}
 
-	return p, ErrSucceed
+	return p, types.ErrSucceed
 }
 
 func (p *Proto) ReadWebSocket(wr *websocket.Conn) error {

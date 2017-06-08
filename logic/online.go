@@ -33,10 +33,10 @@
 package main
 
 import (
-	"hypercube/proto/api"
-	"hypercube/common/mq"
 	"errors"
 	"fmt"
+
+	"hypercube/common/mq"
 	"hypercube/proto/general"
 )
 
@@ -54,7 +54,7 @@ var (
 
 func init() {
 	OnLineUserMag = &OnlineUserManager{
-		users:  make(map[general.UserKey]*api.UsrInfo),
+		users:  make(map[general.UserKey]*general.UsrInfo),
 		access: make(map[string]mq.Requester),
 		req:    make(chan interface{}),
 		rep:    make(chan reply),
@@ -64,7 +64,7 @@ func init() {
 }
 
 type OnlineUserManager struct {
-	users  map[general.UserKey]*api.UsrInfo
+	users  map[general.UserKey]*general.UsrInfo
 	access map[string]mq.Requester
 	req    chan interface{}
 	rep    chan reply
@@ -81,7 +81,7 @@ type reply struct {
 	Err          error
 }
 
-func (this *OnlineUserManager) Add(user *api.UserLogin) error {
+func (this *OnlineUserManager) Add(user *general.UserLogin) error {
 	logger.Debug(*user)
 
 	if user.ServerIP != "" && user.UserID.MDUserID != "" && user.UserID.MySQLUserID == 0 {
@@ -126,7 +126,7 @@ func (this *OnlineUserManager) Query(uid general.UserKey) (string, error) {
 	return "", ParamErr
 }
 
-func (this *OnlineUserManager) AddAccess(access *api.Access) error {
+func (this *OnlineUserManager) AddAccess(access *general.Access) error {
 	if *access.ServerIp != "" && *access.Subject != "" {
 		this.req <- access
 		replier := <- this.rep
@@ -149,7 +149,7 @@ func (this *OnlineUserManager)loop() {
 			if user, ok := request.(*userEntry); ok {
 				switch {
 				case user.Type == addUser:
-					userLogic := api.UsrInfo{UserID: user.UserID, ServerIP: user.ServerIP}
+					userLogic := general.UsrInfo{UserID: user.UserID, ServerIP: user.ServerIP}
 					this.users[user.UserID] = &userLogic
 
 					this.rep <- replier
@@ -174,7 +174,7 @@ func (this *OnlineUserManager)loop() {
 				}
 			}
 
-			if access, ok := request.(*api.Access); ok {
+			if access, ok := request.(*general.Access); ok {
 				req := createAccessRPC(access.Subject)
 				if req != nil {
 					this.access[*access.ServerIp] = req

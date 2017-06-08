@@ -27,5 +27,7 @@
     },
 
     "secretkey": "secret"
-  }
+  },
+
+  "accessHeartRate": 10
 }

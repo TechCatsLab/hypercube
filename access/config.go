@@ -63,6 +63,7 @@ type AccessLayerConfig struct {
 	SessionName         string
 	CorsHosts           []string
 	SecretKey           string
+	AccessHeartRate     int
 }
 
 // 初始化配置
@@ -91,5 +92,6 @@ func readConfiguration() {
 		SessionName:           viper.GetString("middleware.session.name"),
 		CorsHosts:             viper.GetStringSlice("middleware.cors.hosts"),
 		SecretKey:             viper.GetString("middleware.secretkey"),
+		AccessHeartRate:       viper.GetInt("accessHeartRate"),
 	}
 }

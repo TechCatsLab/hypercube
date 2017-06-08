@@ -24,12 +24,23 @@
 
 /*
  * Revision History:
- *     Initial: 2017/04/04        Liu Jiachang
+ *     Initial: 2017/04/04        Feng Yifei
+ *     Modify: 2017/06/08         Yang Chenglong     修改文件位置，数据结构和type常量分开放置
  */
 
-package push
+package general
 
-// 推送消息
-type PushMsg struct {
-	Content     string
+
+type UsrInfo struct {
+	UserID       UserKey
+	ServerIP     string
+}
+
+type UserLogin struct {
+	UserID        UserKey
+	ServerIP      string
+}
+
+type UserLogout struct {
+	UserID        UserKey
 }

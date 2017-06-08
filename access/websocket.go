@@ -37,7 +37,7 @@ import (
 	"github.com/gorilla/websocket"
 	"hypercube/proto/general"
 	"encoding/json"
-	"hypercube/proto/api"
+	"hypercube/proto/types"
 	"time"
 	"strings"
 	"github.com/labstack/echo"
@@ -45,8 +45,8 @@ import (
 
 func sendAccessInfo()  {
 	var (
-		r           api.Reply
-		serverinfo  api.Access
+		r           general.Reply
+		serverinfo  general.Access
 	)
 
 	addr := strings.Split(configuration.Addrs, ":")[0]
@@ -56,7 +56,7 @@ func sendAccessInfo()  {
 
 	info, _ := json.Marshal(serverinfo)
 
-	err := logicRequester.Request(&api.Request{Type: api.ApiTypeAccessInfo, Content: info}, &r, time.Duration(100) * time.Millisecond)
+	err := logicRequester.Request(&general.Request{Type: types.ApiTypeAccessInfo, Content: info}, &r, time.Duration(100) * time.Millisecond)
 
 	if err != nil {
 		logger.Error("send access info error:", err, " , address:", configuration.Addrs)
@@ -123,16 +123,16 @@ func webSocketConnectionHandler(conn *websocket.Conn) {
 		logger.Debug("Websocket received message type:", p.Type)
 
 		switch p.Type {
-		case general.GeneralTypeKeepAlive:
+		case types.GeneralTypeKeepAlive:
 			v = ver
 			handler = keepAliveRequestHandler
-		case general.GeneralTypeTextMsg:
+		case types.GeneralTypeTextMsg:
 			v = mes
 			handler = userMessageHandler
 			receiveMessageCounter.Inc()
-		case general.GeneralTypeLogin:
+		case types.GeneralTypeLogin:
 			v = user
-		case general.GeneralTypeLogout:
+		case types.GeneralTypeLogout:
 			v = user
 		}
 
@@ -144,13 +144,13 @@ func webSocketConnectionHandler(conn *websocket.Conn) {
 				continue
 			} else {
 				switch p.Type {
-				case general.GeneralTypeLogin:
+				case types.GeneralTypeLogin:
 					user = v.(*general.UserAccess)
 					err = OnLineManagement.OnConnect(user.UserID, conn)
 					if err != nil {
 						logger.Error("User Login failed:", err)
 					}
-				case general.GeneralTypeLogout:
+				case types.GeneralTypeLogout:
 					user = v.(*general.UserAccess)
 					err = OnLineManagement.OnDisconnect(user.UserID)
 					if err != nil {

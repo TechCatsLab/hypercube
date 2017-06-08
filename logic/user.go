@@ -31,17 +31,17 @@
 package main
 
 import (
-	"hypercube/proto/api"
+	"hypercube/proto/types"
 	"hypercube/proto/general"
 )
 
 func userLoginRequestHandler(req interface{}) interface{} {
 	var (
-		login       *api.UserLogin
-		reply       *api.Reply
+		login       *general.UserLogin
+		reply       *general.Reply
 	)
 
-	login = req.(*api.UserLogin)
+	login = req.(*general.UserLogin)
 
 	logger.Debug("userLoginRequestHandler userID:", login.UserID)
 
@@ -50,12 +50,12 @@ func userLoginRequestHandler(req interface{}) interface{} {
 	if err != nil {
 		logger.Error("userLoginRequestHandler-->login err:", err)
 
-		reply = &api.Reply{
-			Code: api.ErrLogin,
+		reply = &general.Reply{
+			Code: types.ErrLogin,
 		}
 	} else {
-		reply = &api.Reply{
-			Code: api.ErrSucceed,
+		reply = &general.Reply{
+			Code: types.ErrSucceed,
 		}
 	}
 
@@ -69,11 +69,11 @@ func userLoginRequestHandler(req interface{}) interface{} {
 
 func userLogoutRequestHandler(req interface{}) interface{} {
 	var (
-		reply        *api.Reply
-		logout       *api.UserLogout
+		reply        *general.Reply
+		logout       *general.UserLogout
 	)
 
-	logout = req.(*api.UserLogout)
+	logout = req.(*general.UserLogout)
 	logger.Debug("userLogoutRequestHandler userID:", logout.UserID)
 
 	err := OnLineUserMag.Remove(logout.UserID)
@@ -81,12 +81,12 @@ func userLogoutRequestHandler(req interface{}) interface{} {
 	if err != nil {
 		logger.Error("userLogoutRequestHandler--> err logout:", err)
 
-		reply = &api.Reply{
-			Code: api.ErrLogout,
+		reply = &general.Reply{
+			Code: types.ErrLogout,
 		}
 	} else {
-		reply = &api.Reply{
-			Code: api.ErrSucceed,
+		reply = &general.Reply{
+			Code: types.ErrSucceed,
 		}
 	}
 
@@ -96,7 +96,7 @@ func userLogoutRequestHandler(req interface{}) interface{} {
 func MessageHandler(req interface{}) interface{} {
 	var (
 		msg          *general.Message
-		reply        *api.Reply
+		reply        *general.Reply
 	)
 
 	msg = req.(*general.Message)
@@ -109,8 +109,8 @@ func MessageHandler(req interface{}) interface{} {
 
 		logger.Error("MessageHandler-->OnLineUserMag.Query():", err)
 
-		reply = &api.Reply{
-			Code: api.ErrUserQuery,
+		reply = &general.Reply{
+			Code: types.ErrUserQuery,
 		}
 
 		return reply
@@ -122,18 +122,18 @@ func MessageHandler(req interface{}) interface{} {
 		if err != nil {
 			logger.Error("MessageHandler-->SendMessage:", err)
 
-			reply = &api.Reply{
-				Code: api.ErrSendToAccess,
+			reply = &general.Reply{
+				Code: types.ErrSendToAccess,
 			}
 		} else {
 			logger.Debug("SendMessage Succeed")
-			reply = &api.Reply{
-				Code: api.ErrSucceed,
+			reply = &general.Reply{
+				Code: types.ErrSucceed,
 			}
 		}
 	} else {
-		reply = &api.Reply{
-			Code: api.ErrFindAccess,
+		reply = &general.Reply{
+			Code: types.ErrFindAccess,
 		}
 	}
 
@@ -142,11 +142,11 @@ func MessageHandler(req interface{}) interface{} {
 
 func AccessConnectHandler(req interface{}) interface{} {
 	var (
-		access          *api.Access
-		reply           *api.Reply
+		access          *general.Access
+		reply           *general.Reply
 	)
 
-	access = req.(*api.Access)
+	access = req.(*general.Access)
 	logger.Debug("userToUserMsgHandler:", access)
 
 	err := OnLineUserMag.AddAccess(access)
@@ -154,8 +154,8 @@ func AccessConnectHandler(req interface{}) interface{} {
 	if err != nil {
 		logger.Error("AccessConnectHandler-->AddAccess:", err)
 
-		reply = &api.Reply{
-			Code: api.ErrAddAccess,
+		reply = &general.Reply{
+			Code: types.ErrAddAccess,
 		}
 	}
 
@@ -165,12 +165,12 @@ func AccessConnectHandler(req interface{}) interface{} {
 func AccessHeartHandler(req interface{}) interface{} {
 	var (
 		heart          *general.Proto
-		reply          *api.Reply
+		reply          *general.Reply
 	)
 
 	heart = req.(*general.Proto)
 
-	if _, err := heart.VerCheck(); err != general.ErrSucceed {
+	if _, err := heart.VerCheck(); err != types.ErrSucceed {
 		logger.Error("keepAliveRequestHandler vercheck:", err)
 		return err
 	}

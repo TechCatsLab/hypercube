@@ -38,7 +38,7 @@ import (
 
 	"github.com/gorilla/websocket"
 
-	"hypercube/proto/api"
+	"hypercube/proto/types"
 	"hypercube/proto/general"
 )
 
@@ -130,14 +130,14 @@ func (this *OnLineTable) GetIDByConnection(conn *websocket.Conn) (general.UserKe
 // 用户登录时，通知逻辑层并把用户 id 传到逻辑层，并作出错误处理
 func (this *OnLineTable) loginReport(userID general.UserKey) error {
 	var (
-		userlog api.UserLogin
-		proto 	*api.Request
+		userlog general.UserLogin
+		proto 	*general.Request
 		conv 	[]byte
-		r		api.Reply
+		r		general.Reply
 		err		error
 	)
 
-	userlog = api.UserLogin{
+	userlog = general.UserLogin{
 		UserID: 	userID,
 		ServerIP:   strings.Split(configuration.Addrs, ":")[0],
 	}
@@ -147,8 +147,8 @@ func (this *OnLineTable) loginReport(userID general.UserKey) error {
 		logger.Error("UserLoginHandler marshall error:", err)
 	}
 
-	proto = &api.Request{
-		Type:    api.ApiTypeUserLogin,
+	proto = &general.Request{
+		Type:    types.ApiTypeUserLogin,
 		Content: conv,
 	}
 
@@ -158,7 +158,7 @@ func (this *OnLineTable) loginReport(userID general.UserKey) error {
 		logger.Error("UserLoginHandler request receive error:", err)
 	}
 
-	if r.Code != api.ErrSucceed {
+	if r.Code != types.ErrSucceed {
 		logger.Error("request error code:", r.Code)
 	}
 
@@ -168,14 +168,14 @@ func (this *OnLineTable) loginReport(userID general.UserKey) error {
 // 用户登出时，通知逻辑层并把用户id 传过去，并作出错误处理
 func (this *OnLineTable) logoutReport(userID general.UserKey) error {
 	var (
-		userlog api.UserLogout
-		proto 	*api.Request
+		userlog general.UserLogout
+		proto 	*general.Request
 		conv    []byte
-		r		api.Reply
+		r		general.Reply
 		err		error
 	)
 
-	userlog = api.UserLogout{
+	userlog = general.UserLogout{
 		UserID: 	userID,
 	}
 
@@ -184,8 +184,8 @@ func (this *OnLineTable) logoutReport(userID general.UserKey) error {
 		logger.Error("UserLogoutHandler format request error:", err)
 	}
 
-	proto = &api.Request{
-		Type:    api.ApiTypeUserLogout,
+	proto = &general.Request{
+		Type:    types.ApiTypeUserLogout,
 		Content: conv,
 	}
 

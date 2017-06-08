@@ -35,7 +35,7 @@ import (
 	"errors"
 
 	"hypercube/common/workq"
-	"hypercube/proto/api"
+	"hypercube/proto/types"
 	"hypercube/proto/general"
 )
 
@@ -70,8 +70,8 @@ func (this *pushMessageJob) sendToLogic() error {
 		return err
 	}
 
-	return logicRequester.SendMessage(&api.Request{
-		Type:    general.GeneralTypeTextMsg,
+	return logicRequester.SendMessage(&general.Request{
+		Type:    types.GeneralTypeTextMsg,
 		Content: msg,
 	})
 }

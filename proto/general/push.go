@@ -25,19 +25,12 @@
 /*
  * Revision History:
  *     Initial: 2017/04/04        Liu Jiachang
+ *     Modify: 2017/06/08         Yang Chenglong     修改文件位置，数据结构和type常量分开放置
  */
 
 package general
 
-const (
-	GeneralTypeKeepAlive       = uint32(0x1000)            // heartbeat
-	GeneralTypeVersionConflict = uint32(0x1001)            // proto version conflict
-	GeneralTypeLogin           = uint32(0x1002)            // login access type
-	GeneralTypeLogout          = uint32(0x1003)            // logout access type
-
-	GeneralTypeTextMsg         = uint32(0x1004)            // user to user message
-
-
-	PushTypePushMsg            = uint32(0x200)            // logic server push message to all people
-
-)
+// 推送消息
+type PushMsg struct {
+	Content     string
+}

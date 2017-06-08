@@ -24,10 +24,30 @@
 
 /*
  * Revision History:
- *     Initial: 2017/04/11        Liu Jiachang
+ *     Initial: 2017/04/02        Feng Yifei
+ *     Modify: 2017/06/08         Yang Chenglong     修改文件位置，数据结构和type常量分开放置
  */
 
-package api
+package general
+
+import (
+	"encoding/json"
+)
+
+type Request struct {
+	Type       uint32
+	Content    json.RawMessage
+}
+
+type Reply struct {
+	Code        uint32
+	Content     json.RawMessage
+}
+
+type Access struct {
+	ServerIp   *string
+	Subject    *string
+}
 
 type AccessInfo struct {
 	Subject         string

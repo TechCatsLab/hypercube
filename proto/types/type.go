@@ -25,22 +25,28 @@
 /*
  * Revision History:
  *     Initial: 2017/04/04        Feng Yifei
+ *     Modify:  2017/06/07        Yang Chenglong     添加AccessHeart类型
+ *     Modify: 2017/06/08         Yang Chenglong     整理type常量
  */
 
-package api
+package types
 
-import "hypercube/proto/general"
+const (
+	ApiTypeUserLogin                = 0x1000
+	ApiTypeUserLogout               = 0x1001
+	ApiTypeUserOnConnect            = 0x1002
+	ApiTypeUserOnDisConnect         = 0x1003
 
-type UsrInfo struct {
-	UserID       general.UserKey
-	ServerIP     string
-}
+	ApiTypeAccessInfo               = 0x1004
+	ApiTypeAccessHeart              = 0x1008
 
-type UserLogin struct {
-	UserID        general.UserKey
-	ServerIP      string
-}
+	GeneralTypeKeepAlive  			= uint32(0x2000)            // heartbeat
+	GeneralTypeVersionConflict      = uint32(0x2001)            // proto version conflict
+	GeneralTypeLogin           		= uint32(0x2002)            // login access type
+	GeneralTypeLogout          		= uint32(0x2003)            // logout access type
 
-type UserLogout struct {
-	UserID        general.UserKey
-}
+	GeneralTypeTextMsg         		= uint32(0x2004)            // user to user message
+
+	PushTypePushMsg            		= uint32(0x4000)            // logic server push message to all people
+
+)

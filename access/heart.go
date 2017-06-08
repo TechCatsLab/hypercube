@@ -34,7 +34,7 @@ import (
 	"encoding/json"
 	"time"
 	"hypercube/proto/general"
-	"hypercube/proto/api"
+	"hypercube/proto/types"
 )
 
 func keepAliveRequestHandler(p interface{},req interface{}) interface{} {
@@ -45,7 +45,7 @@ func keepAliveRequestHandler(p interface{},req interface{}) interface{} {
 
 	pro = p.(*general.Proto)
 
-	if _, err := pro.VerCheck(); err != general.ErrSucceed {
+	if _, err := pro.VerCheck(); err != types.ErrSucceed {
 		logger.Error("keepAliveRequestHandler vercheck:", err)
 		return err
 	}
@@ -59,7 +59,7 @@ func keepAliveRequestHandler(p interface{},req interface{}) interface{} {
 
 func sendAccessHeart() {
 	var (
-		r 		api.Reply
+		r 		general.Reply
 		ver     general.AccessHeart
 	)
 
@@ -67,10 +67,9 @@ func sendAccessHeart() {
 	v, _ := json.Marshal(&ver)
 
 
-	heart   := &api.Request{
-		Type:      api.ApiTypeAccessHeart,
+	heart   := &general.Request{
+		Type:      types.ApiTypeAccessHeart,
 		Content:   v,
-
 	}
 
 	for {
@@ -80,10 +79,10 @@ func sendAccessHeart() {
 			logger.Error("sendAccessHeart error:", err)
 		}
 
-		if r.Code != api.ErrSucceed {
+		if r.Code != types.ErrSucceed {
 			logger.Error("request error code:", r.Code)
 		}
 
-		time.Sleep(10 * time.Second)
+		time.Sleep(time.Duration(configuration.AccessHeartRate) * time.Second)
 	}
 }
