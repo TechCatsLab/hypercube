@@ -26,19 +26,20 @@
  * Revision History:
  *     Initial: 2017/04/02        Liu Jiachang
  *     Modify:  2017/06/07        Yang Chenglong     添加AccessHeart类型
+ *     Modify: 2017/06/08         Yang Chenglong     修改UserKey命名
  */
 
 package general
 
 type UserKey struct {
-	MDUserID      string    `json:"mgo_id"`
-	MySQLUserID   uint64    `json:"sql_id"`
+	Token    string   `json:"token"`
+	UserID   int64    `json:"uid"`
 }
 type Message struct {
 	From        UserKey      `json:"fr"`
 	To          UserKey      `json:"to"`
 	Pushed      bool
-	Content     string      `json:"co"`
+	Content     string       `json:"co"`
 }
 
 type Keepalive struct {

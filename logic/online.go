@@ -84,7 +84,7 @@ type reply struct {
 func (this *OnlineUserManager) Add(user *general.UserLogin) error {
 	logger.Debug(*user)
 
-	if user.ServerIP != "" && user.UserID.MDUserID != "" && user.UserID.MySQLUserID == 0 {
+	if user.ServerIP != "" && user.UserID.Token != "" && user.UserID.UserID == 0 {
 		usrb := userEntry{user.UserID, user.ServerIP, addUser}
 
 		this.req <- &usrb
@@ -98,7 +98,7 @@ func (this *OnlineUserManager) Add(user *general.UserLogin) error {
 
 
 func (this *OnlineUserManager) Remove(user general.UserKey) error {
-	if user.MDUserID != "" && user.MySQLUserID == 0 {
+	if user.Token != "" && user.UserID == 0 {
 		user := userEntry{user, "", removeUser}
 
 
@@ -114,7 +114,7 @@ func (this *OnlineUserManager) Remove(user general.UserKey) error {
 
 func (this *OnlineUserManager) Query(uid general.UserKey) (string, error) {
 	logger.Debug(uid)
-	if uid.MDUserID != "" {
+	if uid.Token != "" {
 		user := userEntry{uid, "", queryUser}
 
 		this.req <- &user

@@ -43,16 +43,16 @@ const(
 )
 
 type User struct {
-	Name        string  `json:"name"    form:"name"   query:"name"`
-	MDUserID    string  `json:"mgo_id"  form:"mgo_id" query:"mgo_id"`
+	Token        string  `json:"token"    form:"token"   query:"token"`
+	UserID       string  `json:"uid"      form:"uid"     query:"uid"`
 }
 
 func GetUser(user *jwt.Token) (interface{}, error) {
 	var u User
 
 	claims := user.Claims.(jwt.MapClaims)
-	u.Name = claims["name"].(string)
-	u.MDUserID = claims["mgo_id"].(string)
+	u.Token = claims["token"].(string)
+	u.UserID = claims["uid"].(string)
 
 	return u, nil
 }
