@@ -1,5 +1,5 @@
-hash: 5a20866489b7869f6c2cfecfe9dc3496fc0286a77788d6ae7b1b940502244cae
-updated: 2017-07-05T18:31:30.295040014+08:00
+hash: f226dee17571c44bbe8ccef27166881ec2ad3c64a372760e64eb4b1ceae55ba8
+updated: 2017-07-05T18:48:16.321115537+08:00
 imports:
 - name: github.com/beorn7/perks
   version: 4c0e84591b9aa9e6dcfdf3e020114cd81f89d5f9
@@ -49,10 +49,6 @@ imports:
   - pbutil
 - name: github.com/mitchellh/mapstructure
   version: d0303fe809921458f417bcf828397a65db30a7e4
-- name: github.com/nats-io/go-nats
-  version: 61923ed1eaf8398000991fbbee2ef11ab5a5be0d
-- name: github.com/nats-io/go-nats-streaming
-  version: 6e620057a207bd61e992c1c5b6a2de7b6a4cb010
 - name: github.com/pelletier/go-toml
   version: 69d355db5304c0f7f809a2edc054553e7142f016
 - name: github.com/prometheus/client_golang
