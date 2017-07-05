@@ -24,13 +24,7 @@
 
 /*
  * Revision History:
- *     Initial: 2017/04/09        HeCJ
+ *     Initial: 2017/07/05        Feng Yifei
  */
 
-package cmq
-
-type ChatMessageQueue interface {
-    NewPublisher(v interface{}) interface{}
-    NewSubscriber(v interface{}) interface{}
-    NewHistory(v interface{}) interface{}
-}
+package rpc
