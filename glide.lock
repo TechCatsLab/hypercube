@@ -1,5 +1,5 @@
-hash: 3a6a807739a7d2829989a4855f12efa1e9559553b1cbe0a137e458d0b5f1f77e
-updated: 2017-07-05T16:35:26.815919882+08:00
+hash: 3fef02ffbb8d81add01df0db1021271505bf9a0ca2e1a6b86f9df804de6d4623
+updated: 2017-07-05T17:07:27.130038142+08:00
 imports:
 - name: github.com/dgrijalva/jwt-go
   version: d2709f9f1f31ebcda9651b03077758c1f3a0018c
@@ -15,8 +15,6 @@ imports:
   version: c5b7fccd204277076155f10851dad72b76a49317
 - name: github.com/prometheus/common
   version: 49fee292b27bfff7f354ee0f64e1bc4850462edf
-- name: github.com/Sirupsen/logrus
-  version: ba1b36c82c5e05c4f912a88eab0dcd91a171688f
 - name: github.com/spf13/viper
   version: 84f94806c67f59dd7ae87bc5351f7a9c94a4558d
 - name: golang.org/x/sys
