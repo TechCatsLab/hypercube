@@ -29,13 +29,13 @@ func TestCSRF(t *testing.T) {
 	assert.Contains(t, rec.Header().Get(echo.HeaderSetCookie), "_csrf")
 
 	// Without CSRF cookie
-	req, _ = http.NewRequest(echo.POST, "/", nil)
+	req = httptest.NewRequest(echo.POST, "/", nil)
 	rec = httptest.NewRecorder()
 	c = e.NewContext(req, rec)
 	assert.Error(t, h(c))
 
 	// Empty/invalid CSRF token
-	req, _ = http.NewRequest(echo.POST, "/", nil)
+	req = httptest.NewRequest(echo.POST, "/", nil)
 	rec = httptest.NewRecorder()
 	c = e.NewContext(req, rec)
 	req.Header.Set(echo.HeaderXCSRFToken, "")
@@ -61,7 +61,7 @@ func TestCSRFTokenFromForm(t *testing.T) {
 	if assert.NoError(t, err) {
 		assert.Equal(t, "token", token)
 	}
-	token, err = csrfTokenFromForm("invalid")(c)
+	_, err = csrfTokenFromForm("invalid")(c)
 	assert.Error(t, err)
 }
 
@@ -76,7 +76,7 @@ func TestCSRFTokenFromQuery(t *testing.T) {
 	if assert.NoError(t, err) {
 		assert.Equal(t, "token", token)
 	}
-	token, err = csrfTokenFromQuery("invalid")(c)
+	_, err = csrfTokenFromQuery("invalid")(c)
 	assert.Error(t, err)
 	csrfTokenFromQuery("csrf")
 }
