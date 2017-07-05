@@ -35,7 +35,7 @@ import (
 	"github.com/spf13/viper"
 )
 
-
+var configuration *AccessLayerConfig
 
 // 配置文件结构
 type AccessLayerConfig struct {
