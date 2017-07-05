@@ -32,48 +32,32 @@ package main
 
 import (
 	"net/http"
-	"hypercube/libs/log"
 
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/prometheus/client_golang/prometheus"
+
+	"hypercube/libs/log"
+	pro "hypercube/libs/metrics/prometheus"
 )
 
 var (
-	onlineUserCounter = prometheus.NewCounter(prometheus.CounterOpts{
+	onlineUserCounter = pro.NewCounterFrom(prometheus.CounterOpts{
 		Name: "onlineUser",
 		Help: "Number of onlineUser",
-	})
+	}, []string{"onlineUser"})
 
-	sendMessageCounter = prometheus.NewCounter(prometheus.CounterOpts{
+	sendMessageCounter = pro.NewCounterFrom(prometheus.CounterOpts{
 		Name: "sendMessage",
 		Help: "Number of sendMessage",
-	})
+	}, []string{"sendMessage"})
 
-	receiveMessageCounter = prometheus.NewCounter(prometheus.CounterOpts{
+	receiveMessageCounter = pro.NewCounterFrom(prometheus.CounterOpts{
 		Name: "resiveMessage",
 		Help: "Number of resiveMessage",
-	})
+	}, []string{"resiveMessage"})
 )
 
 func initPrometheus() {
-	err := prometheus.Register(onlineUserCounter)
-	if err != nil {
-		log.GlobalLogger.Error("onlineUser counter couldn't be registered AGAIN, no counting will happen:", err)
-		return
-	}
-
-	err = prometheus.Register(sendMessageCounter)
-	if err != nil {
-		log.GlobalLogger.Error("sendMessage counter couldn't be registered AGAIN, no counting will happen:", err)
-		return
-	}
-
-	err = prometheus.Register(receiveMessageCounter)
-	if err != nil {
-		log.GlobalLogger.Error("resiveMessage counter couldn't be registered AGAIN, no counting will happen:", err)
-		return
-	}
-
 	go func() {
 		http.Handle("/metrics", promhttp.Handler())
 

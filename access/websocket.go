@@ -130,7 +130,7 @@ func webSocketConnectionHandler(conn *websocket.Conn) {
 		case types.GeneralTypeTextMsg:
 			v = mes
 			handler = userMessageHandler
-			receiveMessageCounter.Inc()
+			receiveMessageCounter.Add(1)
 		case types.GeneralTypeLogin:
 			v = user
 		case types.GeneralTypeLogout:

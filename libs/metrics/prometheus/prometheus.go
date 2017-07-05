@@ -35,14 +35,12 @@ import (
 
 type LabelValues []string
 
-
 func (lvs LabelValues) With(labelValues ...string) LabelValues {
 	if len(labelValues)%2 != 0 {
 		labelValues = append(labelValues, "unknown")
 	}
 	return append(lvs, labelValues...)
 }
-
 
 type Counter struct {
 	cv  *prometheus.CounterVec
@@ -61,7 +59,7 @@ func NewCounter(cv *prometheus.CounterVec) *Counter {
 	}
 }
 
-func (c *Counter) With(labelValues ...string) Counter {
+func (c *Counter) With(labelValues ...string) *Counter {
 	return &Counter{
 		cv:  c.cv,
 		lvs: c.lvs.With(labelValues...),
@@ -89,7 +87,7 @@ func NewGauge(gv *prometheus.GaugeVec) *Gauge {
 	}
 }
 
-func (g *Gauge) With(labelValues ...string) Gauge {
+func (g *Gauge) With(labelValues ...string) *Gauge {
 	return &Gauge{
 		gv:  g.gv,
 		lvs: g.lvs.With(labelValues...),
@@ -121,7 +119,7 @@ func NewSummary(sv *prometheus.SummaryVec) *Summary {
 	}
 }
 
-func (s *Summary) With(labelValues ...string) Histogram {
+func (s *Summary) With(labelValues ...string) *Summary {
 	return &Summary{
 		sv:  s.sv,
 		lvs: s.lvs.With(labelValues...),
@@ -149,7 +147,7 @@ func NewHistogram(hv *prometheus.HistogramVec) *Histogram {
 	}
 }
 
-func (h *Histogram) With(labelValues ...string) Histogram {
+func (h *Histogram) With(labelValues ...string) *Histogram {
 	return &Histogram{
 		hv:  h.hv,
 		lvs: h.lvs.With(labelValues...),

@@ -90,7 +90,7 @@ func (this *pushMessageJob) Do() error {
 
 	log.GlobalLogger.Debug("Sending:", this.message.From, "->", this.message.To)
 
-	sendMessageCounter.Inc()
+	sendMessageCounter.Add(1)
 
 	conn.mutex.Lock()
 	defer conn.mutex.Unlock()
