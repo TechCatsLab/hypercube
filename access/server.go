@@ -34,7 +34,7 @@ import (
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 
-	e "hypercube/common/error"
+	e "hypercube/libs/error"
 	"hypercube/access/echo/handler"
 	"github.com/dgrijalva/jwt-go"
 )

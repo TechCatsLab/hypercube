@@ -34,9 +34,9 @@ package main
 
 import (
 	"hypercube/libs/log"
-	"hypercube/common/workq"
-	"hypercube/proto/general"
-	"hypercube/common/container"
+	"hypercube/libs/workq"
+	"hypercube/message/general"
+	"hypercube/libs/container"
 )
 var(
     msgbuf map[general.UserKey]*container.Ring

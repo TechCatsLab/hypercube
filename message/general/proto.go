@@ -33,7 +33,7 @@ import (
 	"fmt"
 	"encoding/json"
 	"github.com/gorilla/websocket"
-	"hypercube/proto/types"
+	"hypercube/message/types"
 )
 
 var (

@@ -30,7 +30,7 @@
 package main
 
 import (
-	"hypercube/common/log"
+	"hypercube/libs/log"
 	"github.com/spf13/viper"
 )
 

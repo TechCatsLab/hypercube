@@ -37,8 +37,7 @@ import (
 	"fmt"
 
 	"hypercube/libs/log"
-	"hypercube/common/mq"
-	"hypercube/proto/general"
+	"hypercube/message/general"
 )
 
 const (
@@ -50,36 +49,36 @@ const (
 var (
 	OnLineUserMag *OnlineUserManager
 
-	ParamErr     = errors.New("Your input parametric error!")
+	ParamErr = errors.New("Your input parametric error!")
 )
 
 func init() {
 	OnLineUserMag = &OnlineUserManager{
-		users:  make(map[general.UserKey]*general.UsrInfo),
-		access: make(map[string]mq.Requester),
-		req:    make(chan interface{}),
-		rep:    make(chan reply),
+		users: make(map[general.UserKey]*general.UsrInfo),
+		//access: make(map[string]mq.Requester),
+		req: make(chan interface{}),
+		rep: make(chan reply),
 	}
 
 	OnLineUserMag.loop()
 }
 
 type OnlineUserManager struct {
-	users  map[general.UserKey]*general.UsrInfo
-	access map[string]mq.Requester
-	req    chan interface{}
-	rep    chan reply
+	users map[general.UserKey]*general.UsrInfo
+	//access map[string]mq.Requester
+	req chan interface{}
+	rep chan reply
 }
 
 type userEntry struct {
-	UserID       general.UserKey
-	ServerIP     string
-	Type         uint8
+	UserID   general.UserKey
+	ServerIP string
+	Type     uint8
 }
 
 type reply struct {
-	ServerIP     string
-	Err          error
+	ServerIP string
+	Err      error
 }
 
 func (this *OnlineUserManager) Add(user *general.UserLogin) error {
@@ -97,11 +96,9 @@ func (this *OnlineUserManager) Add(user *general.UserLogin) error {
 	return ParamErr
 }
 
-
 func (this *OnlineUserManager) Remove(user general.UserKey) error {
 	if user.Token != "" && user.UserID == 0 {
 		user := userEntry{user, "", removeUser}
-
 
 		this.req <- &user
 		replier := <-this.rep
@@ -111,7 +108,6 @@ func (this *OnlineUserManager) Remove(user general.UserKey) error {
 
 	return ParamErr
 }
-
 
 func (this *OnlineUserManager) Query(uid general.UserKey) (string, error) {
 	log.GlobalLogger.Debug(uid)
@@ -130,7 +126,7 @@ func (this *OnlineUserManager) Query(uid general.UserKey) (string, error) {
 func (this *OnlineUserManager) AddAccess(access *general.Access) error {
 	if *access.ServerIp != "" && *access.Subject != "" {
 		this.req <- access
-		replier := <- this.rep
+		replier := <-this.rep
 
 		return replier.Err
 	}
@@ -138,12 +134,12 @@ func (this *OnlineUserManager) AddAccess(access *general.Access) error {
 	return ParamErr
 }
 
-func (this *OnlineUserManager)loop() {
+func (this *OnlineUserManager) loop() {
 	go func() {
 		for {
 			replier := reply{
-				ServerIP:    "",
-				Err:         nil,
+				ServerIP: "",
+				Err:      nil,
 			}
 			request := <-this.req
 
@@ -190,6 +186,6 @@ func (this *OnlineUserManager)loop() {
 	}()
 }
 
-func (this *OnlineUserManager) PrintDebugInfo()  {
+func (this *OnlineUserManager) PrintDebugInfo() {
 	log.GlobalLogger.Debug(fmt.Sprintf("Online user manager:(%+v, %+v)", this.users, this.access))
 }

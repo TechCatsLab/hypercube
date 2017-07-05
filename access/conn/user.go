@@ -38,8 +38,8 @@ import (
 
 	"github.com/gorilla/websocket"
 
-	"hypercube/proto/types"
-	"hypercube/proto/general"
+	"hypercube/message/types"
+	"hypercube/message/general"
 )
 
 var OnLineManagement *OnLineTable

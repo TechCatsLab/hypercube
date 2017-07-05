@@ -30,7 +30,7 @@
 package main
 
 import (
-	"hypercube/common/interrupt"
+	"hypercube/libs/interrupt"
 	"os"
 	"syscall"
 	"hypercube/libs/log"
