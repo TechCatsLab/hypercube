@@ -36,6 +36,12 @@ import (
 	"time"
 )
 
+const (
+	dialTimeout  = 5 * time.Second
+	callTimeout  = 3 * time.Second
+	pingDuration = 1 * time.Second
+)
+
 var (
 	// ErrRPCNotAvailable - rpc service not available
 	ErrRPCNotAvailable = errors.New("rpc service not available")
@@ -78,18 +84,22 @@ func (c *Client) dial() (err error) {
 }
 
 // Call - Invoke the remote method by name, wait for the reply.
-func (c *Client) Call(serviceMethod string, args interface{}, reply interface{}) (err error) {
+func (c *Client) Call(serviceMethod string, args interface{}, reply interface{}) error {
+	var (
+		err error
+	)
+
 	if c.Client == nil {
-		err = ErrRpc
-		return
+		return ErrRPCNotAvailable
 	}
+
 	select {
 	case call := <-c.Client.Go(serviceMethod, args, reply, make(chan *rpc.Call, 1)).Done:
 		err = call.Error
 	case <-time.After(callTimeout):
-		err = ErrRpcTimeout
+		err = ErrRPCTimeout
 	}
-	return
+	return err
 }
 
 func (c *Client) Error() error {
@@ -103,5 +113,36 @@ func (c *Client) Close() {
 
 // Ping - Ping the rpc server or reconnect when has an error.
 func (c *Client) Ping(serviceMethod string) {
+	var (
+		arg   = ReqKeepAlive{}
+		reply = RespKeepAlive{}
+		err   error
+	)
 
+	for {
+		select {
+		case <-c.quit:
+			goto closed
+		default:
+		}
+
+		if c.Client != nil && c.err == nil {
+			if err = c.Call(serviceMethod, &arg, &reply); err != nil {
+				c.err = err
+				if err != rpc.ErrShutdown {
+					c.Client.Close()
+				}
+			}
+		} else {
+			if err = c.dial(); err == nil {
+				c.err = nil
+			}
+		}
+		time.Sleep(pingDuration)
+	}
+
+closed:
+	if c.Client != nil {
+		c.Client.Close()
+	}
 }
