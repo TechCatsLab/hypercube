@@ -33,7 +33,6 @@ import (
 	"errors"
 	"net"
 	"net/rpc"
-	"rpcx/log"
 	"time"
 )
 
@@ -71,7 +70,7 @@ func (c *Client) dial() (err error) {
 	var conn net.Conn
 	conn, err = net.DialTimeout(c.options.Proto, c.options.Addr, dialTimeout)
 	if err != nil {
-		log.Error("net.Dial(%s, %s), error(%v)", c.options.Proto, c.options.Addr, err)
+		// Todo
 	} else {
 		c.Client = rpc.NewClient(conn)
 	}
