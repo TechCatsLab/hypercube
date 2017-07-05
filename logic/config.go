@@ -34,16 +34,6 @@ import (
 	"github.com/spf13/viper"
 )
 
-var (
-	logger *log.S8ELogger = log.S8ECreateLogger(
-		&log.S8ELogTag{
-			log.LogTagService: "Logic Layer",
-			log.LogTagType: "common",
-		},
-		log.S8ELogLevelDefault)
-
-	configuration *LogicLayerConfig
-)
 
 // 配置文件结构
 type LogicLayerConfig struct {

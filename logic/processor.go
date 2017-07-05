@@ -31,6 +31,7 @@
 package main
 
 import (
+	"hypercube/libs/log"
 	"hypercube/proto/types"
 	"hypercube/proto/general"
 	"encoding/json"
@@ -54,11 +55,11 @@ func requestProcessor(req []byte) interface{} {
 	err = json.Unmarshal(req, &request)
 
 	if err != nil {
-		logger.Error("Logic request processor error:", err)
+		log.GlobalLogger.Error("Logic request processor error:", err)
 		return nil
 	}
 
-	logger.Debug("Logic RPC received message type:", request.Type)
+	log.GlobalLogger.Debug("Logic RPC received message type:", request.Type)
 
 	switch request.Type {
 	case types.ApiTypeUserOnConnect:
@@ -83,7 +84,7 @@ func requestProcessor(req []byte) interface{} {
 	if v != nil {
 		err = json.Unmarshal(request.Content, v)
 		if err != nil {
-			logger.Error("Logic request processor content error:", err)
+			log.GlobalLogger.Error("Logic request processor content error:", err)
 			return nil
 		}
 

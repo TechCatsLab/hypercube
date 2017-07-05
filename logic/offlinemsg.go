@@ -33,6 +33,7 @@
 package main
 
 import (
+	"hypercube/libs/log"
 	"hypercube/common/workq"
 	"hypercube/proto/general"
 	"hypercube/common/container"
@@ -83,7 +84,7 @@ func userSendMessageHandler(userID general.UserKey) error {
 	    message  *pushMessageJob
     )
 	if msgbuf[userID] == nil {
-		logger.Debug("User has no history message")
+		log.GlobalLogger.Debug("User has no history message")
 
 		return nil
 	}
@@ -93,7 +94,7 @@ func userSendMessageHandler(userID general.UserKey) error {
 	    mes,err := getHistMessages(userID)
 
 	    if err != nil {
-		    logger.Error("User get history err:", err)
+		    log.GlobalLogger.Error("User get history err:", err)
 
 		    return err
 	    }
@@ -125,7 +126,7 @@ func (this *pushMessageJob) Do() error {
         req.SendMessage(this.message)
     }
 
-    logger.Debug("Sending:", this.message.From, "->", this.message.To)
+    log.GlobalLogger.Debug("Sending:", this.message.From, "->", this.message.To)
 
     return nil
 }
@@ -133,5 +134,5 @@ func (this *pushMessageJob) Do() error {
 func initSendMessageQueue() {
     sendWorkQueue = workq.NewDispatcher(workersCount)
     sendWorkQueue.Run()
-    logger.Debug("message queue is running")
+    log.GlobalLogger.Debug("message queue is running")
 }

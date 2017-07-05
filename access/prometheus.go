@@ -32,7 +32,7 @@ package main
 
 import (
 	"net/http"
-	"log"
+	"hypercube/libs/log"
 
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/prometheus/client_golang/prometheus"
@@ -58,25 +58,25 @@ var (
 func initPrometheus() {
 	err := prometheus.Register(onlineUserCounter)
 	if err != nil {
-		logger.Error("onlineUser counter couldn't be registered AGAIN, no counting will happen:", err)
+		log.GlobalLogger.Error("onlineUser counter couldn't be registered AGAIN, no counting will happen:", err)
 		return
 	}
 
 	err = prometheus.Register(sendMessageCounter)
 	if err != nil {
-		logger.Error("sendMessage counter couldn't be registered AGAIN, no counting will happen:", err)
+		log.GlobalLogger.Error("sendMessage counter couldn't be registered AGAIN, no counting will happen:", err)
 		return
 	}
 
 	err = prometheus.Register(receiveMessageCounter)
 	if err != nil {
-		logger.Error("resiveMessage counter couldn't be registered AGAIN, no counting will happen:", err)
+		log.GlobalLogger.Error("resiveMessage counter couldn't be registered AGAIN, no counting will happen:", err)
 		return
 	}
 
 	go func() {
 		http.Handle("/metrics", promhttp.Handler())
 
-		log.Fatal(http.ListenAndServe(configuration.PrometheusPort, nil))
+		log.GlobalLogger.Fatal(http.ListenAndServe(configuration.PrometheusPort, nil))
 	}()
 }

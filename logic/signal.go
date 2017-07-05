@@ -32,6 +32,7 @@ package main
 import (
 	"os"
 	"syscall"
+	"hypercube/libs/log"
 	"hypercube/common/interrupt"
 )
 
@@ -41,21 +42,21 @@ var (
 
 func init() {
 	sigHandler = interrupt.New(finalHandler, func(){})
-	logger.Debug("Interrupt handler initialized")
+	log.GlobalLogger.Debug("Interrupt handler initialized")
 }
 
 func finalHandler(sig os.Signal) {
 	switch sig {
 	case syscall.SIGQUIT, syscall.SIGTERM, syscall.SIGINT:
-		logger.Info("Signal quit/term/int captured")
+		log.GlobalLogger.Info("Signal quit/term/int captured")
 		return
 
 	case syscall.SIGHUP:
-		logger.Info("Signal hup captured")
+		log.GlobalLogger.Info("Signal hup captured")
 		return
 
 	case syscall.SIGALRM:
-		logger.Info("Signal alrm captured")
+		log.GlobalLogger.Info("Signal alrm captured")
 
 		OnLineUserMag.PrintDebugInfo()
 		return

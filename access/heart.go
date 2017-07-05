@@ -33,6 +33,7 @@ package main
 import (
 	"encoding/json"
 	"time"
+	"hypercube/libs/log"
 	"hypercube/proto/general"
 	"hypercube/proto/types"
 )
@@ -46,13 +47,13 @@ func keepAliveRequestHandler(p interface{},req interface{}) interface{} {
 	pro = p.(*general.Proto)
 
 	if _, err := pro.VerCheck(); err != types.ErrSucceed {
-		logger.Error("keepAliveRequestHandler vercheck:", err)
+		log.GlobalLogger.Error("keepAliveRequestHandler vercheck:", err)
 		return err
 	}
 
 	heart = req.(*general.Keepalive)
 
-	logger.Debug("a heartbeat from UserId:", heart.Uid)
+	log.GlobalLogger.Debug("a heartbeat from UserId:", heart.Uid)
 
 	return nil
 }
@@ -76,11 +77,11 @@ func sendAccessHeart() {
 		err := logicRequester.Request(heart, &r, time.Duration(100) * time.Millisecond)
 
 		if err != nil {
-			logger.Error("sendAccessHeart error:", err)
+			log.GlobalLogger.Error("sendAccessHeart error:", err)
 		}
 
 		if r.Code != types.ErrSucceed {
-			logger.Error("request error code:", r.Code)
+			log.GlobalLogger.Error("request error code:", r.Code)
 		}
 
 		time.Sleep(time.Duration(configuration.AccessHeartRate) * time.Second)

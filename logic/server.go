@@ -30,6 +30,7 @@
 package main
 
 import (
+	"hypercube/libs/log"
 	"hypercube/common/mq"
 	"os"
 )
@@ -52,18 +53,18 @@ func setupApiServer() {
 
 	natsMQ, err = mq.NewNatsMQ(&configuration.NatsUrl)
 	if err != nil {
-		logger.Error("Starting API Server error:", err)
+		log.GlobalLogger.Error("Starting API Server error:", err)
 		goto exit
 	}
 
 	processor, err = natsMQ.CreateProcessor(&configuration.ApiChannel)
 	if err != nil {
-		logger.Error("Creating processor with error:", err)
+		log.GlobalLogger.Error("Creating processor with error:", err)
 		goto exit
 	}
 
 	processor.SetRequestHandler(requestProcessor)
-	logger.Info("API Server setup finished!")
+	log.GlobalLogger.Info("API Server setup finished!")
 	return
 
 exit:
@@ -82,11 +83,11 @@ func createAccessRPC(sub *string) mq.Requester{
 
 	logicRequester, err = natsMQ.CreateRequester(sub)
 	if err != nil {
-		logger.Error("Initialize RPC channel with error:", err)
+		log.GlobalLogger.Error("Initialize RPC channel with error:", err)
 		goto exit
 	}
 
-	logger.Debug("RPC messaging channel connected...")
+	log.GlobalLogger.Debug("RPC messaging channel connected...")
 	return logicRequester
 
 exit:

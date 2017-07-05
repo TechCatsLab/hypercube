@@ -31,20 +31,11 @@
 package main
 
 import (
-	"hypercube/common/log"
+	"hypercube/libs/log"
 	"github.com/spf13/viper"
 )
 
-var (
-	logger *log.S8ELogger = log.S8ECreateLogger(
-		&log.S8ELogTag{
-			log.LogTagService: "access layer",
-			log.LogTagType: "config",
-		},
-		log.S8ELogLevelDefault)
 
-	configuration *AccessLayerConfig
-)
 
 // 配置文件结构
 type AccessLayerConfig struct {
@@ -72,7 +63,7 @@ func readConfiguration() {
 	viper.SetConfigName("config")
 
 	if err := viper.ReadInConfig(); err != nil {
-		logger.Error("Read configuration file with error:", err)
+		log.GlobalLogger.Error("Read configuration file with error:", err)
 		panic(err)
 	}
 

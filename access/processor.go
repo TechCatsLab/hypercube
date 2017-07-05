@@ -30,6 +30,7 @@
 package main
 
 import (
+	"hypercube/libs/log"
 	"hypercube/proto/general"
 	"hypercube/proto/types"
 	"encoding/json"
@@ -49,7 +50,7 @@ func receiveRequestProcessor(req []byte) interface{} {
 
 	err = json.Unmarshal(req, &request)
 	if err != nil {
-		logger.Error("receiveRequestProcessor unmarshall error:", err)
+		log.GlobalLogger.Error("receiveRequestProcessor unmarshall error:", err)
 	}
 
 	msg.Pushed = true
@@ -63,7 +64,7 @@ func receiveRequestProcessor(req []byte) interface{} {
 	if p != nil {
 		err = json.Unmarshal(request.Content, p)
 		if err != nil {
-			logger.Error("Receive Request Logic Processor connect error:", err)
+			log.GlobalLogger.Error("Receive Request Logic Processor connect error:", err)
 			return nil
 		}
 

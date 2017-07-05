@@ -35,6 +35,7 @@ import (
 	"errors"
 
 	"hypercube/common/workq"
+	"hypercube/libs/log"
 	"hypercube/proto/types"
 	"hypercube/proto/general"
 )
@@ -81,13 +82,13 @@ func (this *pushMessageJob) Do() error {
 
 	if !ok {
 		if !this.message.Pushed {
-			logger.Debug("User not on this server, sending to logic:", this.message.From, "->", this.message.To)
+			log.GlobalLogger.Debug("User not on this server, sending to logic:", this.message.From, "->", this.message.To)
 			return this.sendToLogic()
 		}
 		return errors.New("user is offline")
 	}
 
-	logger.Debug("Sending:", this.message.From, "->", this.message.To)
+	log.GlobalLogger.Debug("Sending:", this.message.From, "->", this.message.To)
 
 	sendMessageCounter.Inc()
 
@@ -100,11 +101,11 @@ func (this *pushMessageJob) Do() error {
 func initPushMessageQueue() {
 	pushWorkQueue = workq.NewDispatcher(workersCount)
 	pushWorkQueue.Run()
-	logger.Debug("message queue is running")
+	log.GlobalLogger.Debug("message queue is running")
 }
 
 func appendPushMessage(msg *pushMessageJob) error {
-	logger.Debug("push to job queue...", msg.message.From, "->", msg.message.To)
+	log.GlobalLogger.Debug("push to job queue...", msg.message.From, "->", msg.message.To)
 
 	pushWorkQueue.PushToJobQ(msg)
 

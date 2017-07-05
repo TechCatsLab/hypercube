@@ -35,6 +35,7 @@ package main
 import (
 	"net/http"
 	"github.com/gorilla/websocket"
+	"hypercube/libs/log"
 	"hypercube/proto/general"
 	"encoding/json"
 	"hypercube/proto/types"
@@ -59,10 +60,10 @@ func sendAccessInfo()  {
 	err := logicRequester.Request(&general.Request{Type: types.ApiTypeAccessInfo, Content: info}, &r, time.Duration(100) * time.Millisecond)
 
 	if err != nil {
-		logger.Error("send access info error:", err, " , address:", configuration.Addrs)
+		log.GlobalLogger.Error("send access info error:", err, " , address:", configuration.Addrs)
 	}
 
-	logger.Debug("send access info to logic:", serverinfo, " received reply:", r.Code)
+	log.GlobalLogger.Debug("send access info to logic:", serverinfo, " received reply:", r.Code)
 }
 
 func serveWebSocket(c echo.Context) error {
@@ -74,7 +75,7 @@ func serveWebSocket(c echo.Context) error {
 		},
 	}
 
-	logger.Debug("New connection")
+	log.GlobalLogger.Debug("New connection")
 
 	if c.Request().Method != "GET" {
 		return c.JSON(http.StatusMethodNotAllowed, "Method Not Allowed")
@@ -82,7 +83,7 @@ func serveWebSocket(c echo.Context) error {
 
 	connection, err := upgrader.Upgrade(c.Response().Writer, c.Request(), nil)
 	if err != nil {
-		logger.Error("websocket upgrade error:", err)
+		log.GlobalLogger.Error("websocket upgrade error:", err)
 		return err
 	}
 	defer connection.Close()
@@ -113,14 +114,14 @@ func webSocketConnectionHandler(conn *websocket.Conn) {
 			if ok {
 				err = OnLineManagement.OnDisconnect(id)
 				if err != nil {
-					logger.Error("User Logout failed:", err)
+					log.GlobalLogger.Error("User Logout failed:", err)
 				}
 			}
-			logger.Error("conn read error:", err)
+			log.GlobalLogger.Error("conn read error:", err)
 			break
 		}
 
-		logger.Debug("Websocket received message type:", p.Type)
+		log.GlobalLogger.Debug("Websocket received message type:", p.Type)
 
 		switch p.Type {
 		case types.GeneralTypeKeepAlive:
@@ -140,7 +141,7 @@ func webSocketConnectionHandler(conn *websocket.Conn) {
 			err = json.Unmarshal(p.Body, v)
 
 			if err != nil {
-				logger.Error("Receive unknown message:", err)
+				log.GlobalLogger.Error("Receive unknown message:", err)
 				continue
 			} else {
 				switch p.Type {
@@ -148,13 +149,13 @@ func webSocketConnectionHandler(conn *websocket.Conn) {
 					user = v.(*general.UserAccess)
 					err = OnLineManagement.OnConnect(user.UserID, conn)
 					if err != nil {
-						logger.Error("User Login failed:", err)
+						log.GlobalLogger.Error("User Login failed:", err)
 					}
 				case types.GeneralTypeLogout:
 					user = v.(*general.UserAccess)
 					err = OnLineManagement.OnDisconnect(user.UserID)
 					if err != nil {
-						logger.Error("User Logout failed:", err)
+						log.GlobalLogger.Error("User Logout failed:", err)
 					}
 				default:
 					handler(p,v)

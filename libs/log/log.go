@@ -29,61 +29,37 @@
 
 package log
 
-/*
- * Example:
- *    logger := log.S8ECreateLogger(&log.S8ELogTag{"key": "value"}, log.S8ELogLevelInfo)
- *    logger.Debug("....")
- */
 import (
-	"github.com/Sirupsen/logrus"
+	"go.uber.org/zap"
+	"fmt"
+	"log"
 )
 
-type S8ELogLevel logrus.Level
+type RecordLog struct {}
 
-const (
-	S8ELogLevelDebug = S8ELogLevel(logrus.DebugLevel)
-	S8ELogLevelInfo = S8ELogLevel(logrus.InfoLevel)
-	S8ELogLevelWarn = S8ELogLevel(logrus.WarnLevel)
-	S8ELogLevelError = S8ELogLevel(logrus.ErrorLevel)
-
-	// 设置全局日志设定
-	S8ELogLevelDefault = S8ELogLevelDebug
+var (
+	GlobalLogger *RecordLog
+	Logger *zap.Logger
 )
 
-// 日志通用接口
-type S8ELoggerInf interface {
-	Debug(args ...interface{})
-	Info(args ...interface{})
-	Warn(args ...interface{})
-	Error(args ...interface{})
+func init() {
+	GlobalLogger = &RecordLog{}
 }
 
-type S8ELogger struct {
-	entry *logrus.Entry
+func (l *RecordLog) Error(desc string, err error) {
+	Logger.Error(desc, zap.Error(err))
 }
 
-type S8ELogTag logrus.Fields
-
-// 创建日志管理工具
-func S8ECreateLogger(tags *S8ELogTag, level S8ELogLevel) *S8ELogger {
-	entry := logrus.WithFields(logrus.Fields(*tags))
-	entry.Logger.Level = logrus.Level(level)
-
-	return &S8ELogger{entry: entry}
+func (l *RecordLog) Debug(format string, a ...interface{}) {
+	info := fmt.Sprintf(format, a)
+	Logger.Debug(info, zap.Skip())
 }
 
-func (this *S8ELogger) Debug(args ...interface{}) {
-	this.entry.Debug(args)
+func (l *RecordLog) Fatal(v ...interface{}){
+	log.Fatal(v)
 }
 
-func (this *S8ELogger) Info(args ...interface{}) {
-	this.entry.Info(args)
-}
-
-func (this *S8ELogger) Warn(args ...interface{}) {
-	this.entry.Warn(args)
-}
-
-func (this *S8ELogger) Error(args ...interface{}) {
-	this.entry.Error(args)
+func (l *RecordLog) Info (format string, a ...interface{}) {
+	info := fmt.Sprintf(format, a)
+	Logger.Info(info, zap.Skip())
 }
