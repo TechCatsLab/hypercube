@@ -39,7 +39,7 @@ import (
 
 	"github.com/gorilla/websocket"
 
-	"hypercube/message/general"
+	"hypercube/message"
 )
 
 const (

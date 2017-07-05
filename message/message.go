@@ -24,32 +24,18 @@
 
 /*
  * Revision History:
- *     Initial: 2017/04/02        Feng Yifei
- *     Modify: 2017/06/08         Yang Chenglong     修改文件位置，数据结构和type常量分开放置
+ *     Initial: 2017/07/05        Feng Yifei
  */
 
-package general
+package message
 
 import (
 	"encoding/json"
 )
 
-type Request struct {
-	Type       uint32
-	Content    json.RawMessage
-}
-
-type Reply struct {
-	Code        uint32
-	Content     json.RawMessage
-}
-
-type Access struct {
-	ServerIp   *string
-	Subject    *string
-}
-
-type AccessInfo struct {
-	Subject         string
-	OnlineUserNum   uint64
+// Message - General message struct.
+type Message struct {
+	Type    uint16          `json:"type"`
+	Version uint16          `json:"version"`
+	Content json.RawMessage `json:"content"`
 }

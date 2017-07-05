@@ -32,8 +32,8 @@ package main
 
 import (
 	"hypercube/libs/log"
-	"hypercube/message/types"
-	"hypercube/message/general"
+	"hypercube/message"
+	"hypercube/message"
 	"encoding/json"
 )
 

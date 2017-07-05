@@ -34,8 +34,8 @@ import (
 	"encoding/json"
 	"time"
 	"hypercube/libs/log"
-	"hypercube/message/general"
-	"hypercube/message/types"
+	"hypercube/message"
+	"hypercube/message"
 )
 
 func keepAliveRequestHandler(p interface{},req interface{}) interface{} {

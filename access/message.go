@@ -36,8 +36,8 @@ import (
 
 	"hypercube/libs/workq"
 	"hypercube/libs/log"
-	"hypercube/message/types"
-	"hypercube/message/general"
+	"hypercube/message"
+	"hypercube/message"
 )
 
 const (

@@ -24,13 +24,27 @@
 
 /*
  * Revision History:
- *     Initial: 2017/04/04        Liu Jiachang
- *     Modify: 2017/06/08         Yang Chenglong     修改文件位置，数据结构和type常量分开放置
+ *     Initial: 2017/07/05        Feng Yifei
  */
 
-package general
+package message
 
-// 推送消息
-type PushMsg struct {
-	Content     string
-}
+const (
+	// MessageTypeLogin - Login
+	MessageTypeLogin = 0x0001
+
+	// MessageTypeLogout - Logout
+	MessageTypeLogout = 0x0002
+
+	// MessageTypeKeepAlive - Client to server keepalive message
+	MessageTypeKeepAlive = 0x0003
+
+	// MessageTypePlainText - Plain text message
+	MessageTypePlainText = 0x0100
+
+	// MessageTypeGroupPlainText - Group plain text message
+	MessageTypeGroupPlainText = 0x0200
+
+	// MessageTypePushPlainText - Push plain text message
+	MessageTypePushPlainText = 0x0300
+)

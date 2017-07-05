@@ -32,8 +32,8 @@ package main
 
 import (
 	"hypercube/libs/log"
-	"hypercube/message/types"
-	"hypercube/message/general"
+	"hypercube/message"
+	"hypercube/message"
 )
 
 func userLoginRequestHandler(req interface{}) interface{} {

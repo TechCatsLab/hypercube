@@ -37,7 +37,7 @@ import (
 	"fmt"
 
 	"hypercube/libs/log"
-	"hypercube/message/general"
+	"hypercube/message"
 )
 
 const (

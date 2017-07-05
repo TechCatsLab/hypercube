@@ -35,7 +35,7 @@ package main
 import (
 	"hypercube/libs/log"
 	"hypercube/libs/workq"
-	"hypercube/message/general"
+	"hypercube/message"
 	"hypercube/libs/container"
 )
 var(
