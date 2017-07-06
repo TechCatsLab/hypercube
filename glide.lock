@@ -1,5 +1,5 @@
-hash: f226dee17571c44bbe8ccef27166881ec2ad3c64a372760e64eb4b1ceae55ba8
-updated: 2017-07-05T18:48:16.321115537+08:00
+hash: 2909caada1fb6759f49ddf008202ca217bd58f858a85207fb4c172e4906894e9
+updated: 2017-07-06T19:46:24.710210607+08:00
 imports:
 - name: github.com/beorn7/perks
   version: 4c0e84591b9aa9e6dcfdf3e020114cd81f89d5f9
@@ -9,8 +9,10 @@ imports:
   version: d2709f9f1f31ebcda9651b03077758c1f3a0018c
 - name: github.com/fsnotify/fsnotify
   version: 4da3e2cfbabc9f751898f250b49f2439785783a1
+- name: github.com/gizak/termui
+  version: 24acd523c756fd9728824cdfac66aad9d8982fb7
 - name: github.com/golang/protobuf
-  version: 5a0f697c9ed9d68fef0116532c6e05cfeae00e55
+  version: 6a1fa9404c0aebf36c879bc50152edcc953910d2
   subpackages:
   - proto
 - name: github.com/gorilla/websocket
@@ -61,13 +63,13 @@ imports:
   subpackages:
   - go
 - name: github.com/prometheus/common
-  version: 49fee292b27bfff7f354ee0f64e1bc4850462edf
+  version: 0866df4b85a18d652b6965be022d007cdf076822
   subpackages:
   - expfmt
   - internal/bitbucket.org/ww/goautoneg
   - model
 - name: github.com/prometheus/procfs
-  version: a1dba9ce8baed984a2495b658c82687f8157b98f
+  version: e645f4e5aaa8506fc71d6edbc5c4ff02c04c46f2
   subpackages:
   - xfs
 - name: github.com/spf13/afero
@@ -79,35 +81,36 @@ imports:
 - name: github.com/spf13/jwalterweatherman
   version: 0efa5202c04663c757d84f90f5219c1250baf94f
 - name: github.com/spf13/pflag
-  version: 08b1a584251b5b62f458943640fc8ebd4d50aaa5
+  version: e57e3eeb33f795204c1ca35f56c44f83227c6e66
 - name: github.com/spf13/viper
-  version: 84f94806c67f59dd7ae87bc5351f7a9c94a4558d
+  version: c1de95864d73a5465492829d7cb2dd422b19ac96
 - name: github.com/valyala/bytebufferpool
   version: e746df99fe4a3986f4d4f79e13c1e0117ce9c2f7
 - name: github.com/valyala/fasttemplate
   version: dcecefd839c4193db0d35b88ec65b4c12d360ab0
 - name: go.uber.org/atomic
-  version: 4e336646b2ef9fc6e47be8e21594178f98e5ebcf
+  version: 0506d69f5564c56e25797bf7183c28921d4c6360
+- name: go.uber.org/multierr
+  version: 3c4937480c32f4c13a875a1829af76c98ca3d40a
 - name: go.uber.org/zap
-  version: 9cabc84638b70e564c3dab2766efcb1ded2aac9f
+  version: 632ab30b6b6a94138278b0240ad61ed29f498589
   subpackages:
   - buffer
   - internal/bufferpool
   - internal/color
   - internal/exit
-  - internal/multierror
   - zapcore
 - name: golang.org/x/crypto
-  version: 51714a8c4ac1764f07ab4127d7f739351ced4759
+  version: d625dfd80595a76324dea1452ceb9cfbcaee8e3e
   subpackages:
   - acme
   - acme/autocert
 - name: golang.org/x/sys
-  version: 9a7256cb28ed514b4e1e5f68959914c4c28a92e0
+  version: 6faef541c73732f438fb660a212750a9ba9f9362
   subpackages:
   - unix
 - name: golang.org/x/text
-  version: c3b0cbb40eb9a862fdc91f79bed8c7ac8e7a36e8
+  version: 2bf8f2a19ec09c670e931282edfe6567f6be21c9
   subpackages:
   - transform
   - unicode/norm
