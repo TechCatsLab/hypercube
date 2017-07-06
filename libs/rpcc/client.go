@@ -72,15 +72,18 @@ func Dial(options Options) *Client {
 	return c
 }
 
-func (c *Client) dial() (err error) {
-	var conn net.Conn
+func (c *Client) dial() error {
+	var (
+		err  error
+		conn net.Conn
+	)
+
 	conn, err = net.DialTimeout(c.options.Proto, c.options.Addr, dialTimeout)
-	if err != nil {
-		// Todo
-	} else {
+	if err == nil {
 		c.Client = rpc.NewClient(conn)
 	}
-	return
+
+	return err
 }
 
 // Call - Invoke the remote method by name, wait for the reply.
