@@ -24,18 +24,20 @@
 
 /**
  * Created by HeChengJun on 12/04/2017.
+ * Modify by SunAnxiang on 2017/07/06.
  */
 
 package main
 
 import (
-	"encoding/json"
-	"log"
-	"math/rand"
-	"net/url"
 	"os"
-	"os/signal"
+	"log"
+	"sync"
 	"time"
+	"net/url"
+	"math/rand"
+	"os/signal"
+	"encoding/json"
 
 	"github.com/gorilla/websocket"
 
@@ -43,12 +45,13 @@ import (
 )
 
 const (
-	userCount = 10
-	debugMsg  = false
-	Duration = 600
+	userCount		= 10
+	debugMsg		= false
+	Duration		= 600
+	Version			= 1
 )
 
-var addrs []string = []string{"10.0.0.106:10086", "10.0.0.103:10086"}
+var addrs 	string   = "127.0.0.1:8080"
 var userIDs []uint64 = []uint64{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
 
 func main() {
@@ -58,21 +61,15 @@ func main() {
 	for i := 0; i < userCount; i++ {
 		newRoutine(userIDs[i])
 	}
+
 	select {
 	case <-interrupt:
 		return
 	}
 }
 
-var i int = 0
-
-func getAddr() string {
-    i ++
-	return addrs[i % len(addrs)]
-}
-
 func newRoutine(from uint64) {
-	go testRoutine(getAddr(), from)
+	go testRoutine(addrs, from)
 }
 
 func randUserID() uint64 {
@@ -80,8 +77,7 @@ func randUserID() uint64 {
 }
 
 func dial(addr string) (*websocket.Conn, error) {
-
-	u := url.URL{Scheme: "ws", Host: addr, Path: "/join"}
+	u := url.URL{Scheme: "ws", Host: addr, Path: "/echo"}
 	log.Printf("connecting to %s", u.String())
 
 	c, _, err := websocket.DefaultDialer.Dial(u.String(), nil)
@@ -89,16 +85,20 @@ func dial(addr string) (*websocket.Conn, error) {
 	return c, err
 }
 
+type UserAccess struct {
+	UserID	uint64
+}
+
 func loginPackage(from uint64) []byte {
-	message := general.UserAccess{
+	messages := UserAccess{
 		UserID: from,
 	}
-	byteMessage, _ := json.Marshal(message)
+	byteMessage, _ := json.Marshal(messages)
 
-	msg := &general.Proto{
-		Ver:  general.CurVer,
-		Type: general.GeneralTypeLogin,
-		Body: byteMessage,
+	msg := message.Message{
+		Version: Version,
+		Type: message.MessageTypeLogin,
+		Content: byteMessage,
 	}
 	byteMsg, _ := json.Marshal(msg)
 
@@ -109,17 +109,39 @@ func loginPackage(from uint64) []byte {
 	return byteMsg
 }
 
+type Message struct {
+	From uint64
+	To   uint64
+	Content string
+	SendOrder int64
+}
+
+type Count struct {
+	counter int64
+	lock sync.Mutex
+}
+
+var counter = Count{
+	counter: 0,
+	lock: sync.Mutex{},
+}
+
 func testPackage(from, to uint64, t time.Time) []byte {
-	message := &general.Message{
+	counter.lock.Lock()
+	counter.counter ++
+	messages := Message{
 		From:    from,
 		To:      to,
 		Content: t.String(),
+		SendOrder: counter.counter,
 	}
-	byteMessage, _ := json.Marshal(message)
-	msg := &general.Proto{
-		Ver:  general.CurVer,
-		Type: general.GeneralTypeTextMsg,
-		Body: byteMessage,
+	counter.lock.Unlock()
+	byteMessage, _ := json.Marshal(messages)
+
+	msg := message.Message{
+		Version:  Version,
+		Type: message.MessageTypePlainText,
+		Content: byteMessage,
 	}
 	byteMsg, _ := json.Marshal(msg)
 
@@ -134,11 +156,10 @@ func writeRoutine(c *websocket.Conn, addr string, from uint64) {
 	var msgCount int32 = 0
 
 	// 写入计时
-	ticker := time.NewTicker(time.Microsecond * time.Duration(1))
+	ticker := time.NewTicker(time.Microsecond * time.Duration(Duration))
 	defer ticker.Stop()
 
 	// 退出计时
-	//exitTimer := time.NewTimer(time.Second * time.Duration(rand.Uint32()%60+1))
     exitTimer := time.NewTimer(time.Second * time.Duration(Duration))
 	defer exitTimer.Stop()
 
@@ -147,13 +168,14 @@ func writeRoutine(c *websocket.Conn, addr string, from uint64) {
 		case t := <-ticker.C:
 			// 发送
 			to := randUserID()
-			message := testPackage(from, to, t)
-			err := c.WriteMessage(websocket.TextMessage, message)
+			messages := testPackage(from, to, t)
+
+			err := c.WriteMessage(websocket.TextMessage, messages)
 			if err != nil {
 				log.Println("write:", err)
 				goto exit
 			}
-			msgCount++
+			msgCount ++
 		case <-exitTimer.C:
 			log.Println("exitTimer : go routine exit, from = ", from)
 			goto exit
@@ -175,8 +197,8 @@ func testRoutine(addr string, from uint64) {
 	defer c.Close()
 
 	// 发送登录数据包
-	message := loginPackage(from)
-	err = c.WriteMessage(websocket.TextMessage, message)
+	messages := loginPackage(from)
+	err = c.WriteMessage(websocket.TextMessage, messages)
 	if err != nil {
 		log.Println("write:", err)
 		return
@@ -195,18 +217,21 @@ func testRoutine(addr string, from uint64) {
 		case <- exitTimer.C :
 			goto exit
 		default:
-
 		}
-		_, _, err := c.ReadMessage()
+
+		_, msg, err := c.ReadMessage()
 		if err != nil {
 			log.Println("read:", err)
 			goto exit
 		}
+		log.Println("info:", string(msg))
+
 		msgCount++
+
         if debugMsg {
-            log.Printf("to: %d, count: %d, recv: %s \n", from, msgCount, message)
+            log.Printf("to: %d, count: %d, recv: %s \n", from, msgCount, messages)
         }
 	}
 exit:
-    log.Printf("recv %d messages, addr = %s, to = %d", msgCount, addr, from)
+    log.Printf("addr = %s recv %d messages, from = %d", addr, msgCount, from)
 }
