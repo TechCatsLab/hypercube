@@ -31,9 +31,9 @@ package main
 
 import (
 	"hypercube/libs/interrupt"
+	"hypercube/libs/log"
 	"os"
 	"syscall"
-	"hypercube/libs/log"
 )
 
 var (
@@ -57,8 +57,8 @@ func finalHandler(sig os.Signal) {
 
 	case syscall.SIGALRM:
 		log.GlobalLogger.Info("Signal alrm captured")
-		
-		OnLineManagement.PrintDebugInfo()
+
+		// TODO: Snapshot
 		return
 	}
 }

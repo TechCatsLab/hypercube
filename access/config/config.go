@@ -36,11 +36,6 @@ import (
 	"github.com/spf13/viper"
 )
 
-var (
-	// Configuration is for the access endpoint
-	Configuration *NodeConfig
-)
-
 // NodeConfig is used to config the access endpoint
 type NodeConfig struct {
 	Addrs             string
@@ -57,7 +52,8 @@ type NodeConfig struct {
 	AccessHeartRate   int
 }
 
-func init() {
+// Load loads the configuration.
+func Load() *NodeConfig {
 	viper.AddConfigPath("./")
 	viper.SetConfigName("config")
 
@@ -66,7 +62,7 @@ func init() {
 		panic(err)
 	}
 
-	Configuration = &NodeConfig{
+	conf := &NodeConfig{
 		Addrs:             viper.GetString("addrs"),
 		WSReadBufferSize:  viper.GetInt("websocket.readBufferSize"),
 		WSWriteBufferSize: viper.GetInt("websocket.writeBufferSize"),
@@ -80,4 +76,6 @@ func init() {
 		SecretKey:         viper.GetString("middleware.secretkey"),
 		AccessHeartRate:   viper.GetInt("accessHeartRate"),
 	}
+
+	return conf
 }

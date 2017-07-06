@@ -24,52 +24,38 @@
 
 /*
  * Revision History:
- *     Initial: 2017/04/11        Feng Yifei
- *      Modify: 2017/06/04        Yang Chenglong		ModifyFunction
+ *     Initial: 2017/07/06        Feng Yifei
  */
 
-package httpserver
+package endpoint
 
 import (
-	"github.com/labstack/echo"
-	"github.com/labstack/echo/middleware"
-
 	"hypercube/access/config"
-	"hypercube/access/httpserver/handler"
-
-	"github.com/dgrijalva/jwt-go"
 )
 
-var (
-	server *httpServer
-)
-
-type httpServer struct {
-	config *config.NodeConfig
-	server *echo.Echo
+// Endpoint represents a access server.
+type Endpoint struct {
+	Conf     *config.NodeConfig
+	wsServer *HTTPServer
 }
 
-func newHTTPServer(configuration *config.NodeConfig) *httpServer {
-	server := &httpServer{
-		config: configuration,
-		server: echo.New(),
+// NewEndpoint create a new access point.
+func NewEndpoint(conf *config.NodeConfig) (*Endpoint, error) {
+	var (
+		ep  *Endpoint
+		err error
+	)
+
+	ep = &Endpoint{
+		Conf: conf,
 	}
 
-	server.server.Use(middleware.Logger())
-	server.server.Use(middleware.Recover())
-	server.server.Use(handler.LoginMiddleWare)
-	server.server.Use(middleware.CORSWithConfig(middleware.CORSConfig{
-		AllowOrigins: configuration.CorsHosts,
-		AllowMethods: []string{echo.GET, echo.POST},
-	}))
+	ep.wsServer = NewHTTPServer(ep)
 
-	config := middleware.JWTConfig{
-		Claims:     jwt.MapClaims{},
-		SigningKey: []byte(configuration.SecretKey),
-	}
-	server.server.Use(middleware.JWTWithConfig(config))
+	return ep, err
+}
 
-	server.server.GET("/join", serveWebSocket)
-
-	return server
+// Run starts the access server.
+func (ep *Endpoint) Run() error {
+	return nil
 }

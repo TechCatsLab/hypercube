@@ -32,11 +32,5 @@
 package main
 
 func main() {
-	sendAccessInfo()
-
-	go sendAccessHeart()
-
-	server.Logger.Fatal(server.Start(configuration.Addrs))
-
-	sigHandler.Wait()
+	run()
 }

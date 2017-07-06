@@ -30,18 +30,32 @@
 
 package main
 
+import (
+	"hypercube/access/config"
+	"hypercube/access/endpoint"
+)
 
-func init()  {
-    initSignal()
+var (
+	configuration = config.Load()
+	ep            *endpoint.Endpoint
+)
 
-    readConfiguration()
+func init() {
+	initSignal()
 
-    initLogicRPC()
-    initPushMessageQueue()
-    receiveLogicRPC()
+}
 
-    HttpPprof()
-    initEchoServer()
-    InitRouter(server)
-    initPrometheus()
+func run() {
+	var (
+		err error
+	)
+
+	// Start a access endpoint.
+	if ep, err = endpoint.NewEndpoint(configuration); ep != nil {
+		panic(err)
+	}
+
+	ep.Run()
+
+	sigHandler.Wait()
 }
