@@ -33,22 +33,19 @@ package handler
 import (
 	"net/http"
 
-	"github.com/labstack/echo"
+	"hypercube/libs/message"
+
 	"github.com/dgrijalva/jwt-go"
+	"github.com/labstack/echo"
 )
 
-const(
+const (
 	TokenIndex = 0
 	BearerSize = 7
 )
 
-type User struct {
-	Token        string  `json:"token"    form:"token"   query:"token"`
-	UserID       string  `json:"uid"      form:"uid"     query:"uid"`
-}
-
 func GetUser(user *jwt.Token) (interface{}, error) {
-	var u User
+	var u message.User
 
 	claims := user.Claims.(jwt.MapClaims)
 	u.Token = claims["token"].(string)

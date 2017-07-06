@@ -27,43 +27,34 @@
  *     Initial: 2017/07/06        Feng Yifei
  */
 
-package endpoint
+package conn
 
 import (
-	"hypercube/access/config"
-	"hypercube/access/conn"
+	"hypercube/libs/message"
 )
 
-// Endpoint represents a access server.
-type Endpoint struct {
-	Conf    *config.NodeConfig
-	ws      *HTTPServer
-	hub     *conn.ClientHub
-	shudown chan struct{}
+// ClientHub represents a collection of client sessions.
+type ClientHub struct {
+	clients map[string]*Client
 }
 
-// NewEndpoint create a new access point.
-func NewEndpoint(conf *config.NodeConfig) (*Endpoint, error) {
-	var (
-		ep  *Endpoint
-		err error
-	)
+// NewClientHub creates a client hub.
+func NewClientHub() *ClientHub {
+	return &ClientHub{}
+}
 
-	ep = &Endpoint{
-		Conf: conf,
-		hub:  conn.NewClientHub(),
+// Add a client connection
+func (hub *ClientHub) Add(user *message.User, client *Client) {
+	if _, exists := hub.clients[user.UserID]; exists {
+		// Warning
 	}
-
-	ep.ws = NewHTTPServer(ep)
-
-	return ep, err
+	hub.clients[user.UserID] = client
 }
 
-func (ep *Endpoint) clientHub() *conn.ClientHub {
-	return ep.hub
-}
-
-// Run starts the access server.
-func (ep *Endpoint) Run() error {
-	return nil
+// Remove a client connection
+func (hub *ClientHub) Remove(user *message.User, client *Client) {
+	if _, exists := hub.clients[user.UserID]; !exists {
+		// Warning
+	}
+	delete(hub.clients, user.UserID)
 }

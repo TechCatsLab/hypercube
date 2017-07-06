@@ -29,6 +29,20 @@
 
 package session
 
+import (
+	"github.com/gorilla/websocket"
+)
+
 // Session represents a client connection.
 type Session struct {
+	ws *websocket.Conn
+}
+
+// NewSession creates a session.
+func NewSession(ws *websocket.Conn) *Session {
+	session := &Session{
+		ws: ws,
+	}
+
+	return session
 }

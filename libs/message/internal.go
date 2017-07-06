@@ -27,8 +27,10 @@
  *     Initial: 2017/07/06        Feng Yifei
  */
 
-package session
+package message
 
-// Hub represents a collection of client sessions.
-type Hub struct {
+// User represents a common user.
+type User struct {
+	UserID string `json:"uid"      form:"uid"     query:"uid"`
+	Token  string `json:"token"    form:"token"   query:"token"`
 }

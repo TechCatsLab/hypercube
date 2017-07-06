@@ -31,10 +31,16 @@
 package endpoint
 
 import (
+	"net/http"
+
+	"github.com/gorilla/websocket"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 
+	"hypercube/access/conn"
 	"hypercube/access/endpoint/handler"
+	"hypercube/access/session"
+	"hypercube/libs/message"
 
 	"github.com/dgrijalva/jwt-go"
 )
@@ -72,7 +78,37 @@ func NewHTTPServer(node *Endpoint) *HTTPServer {
 }
 
 func (server *HTTPServer) serve() echo.HandlerFunc {
+	var (
+		upgrader *websocket.Upgrader
+	)
+
+	upgrader = &websocket.Upgrader{
+		ReadBufferSize:  server.node.Conf.WSReadBufferSize,
+		WriteBufferSize: server.node.Conf.WSWriteBufferSize,
+		CheckOrigin: func(r *http.Request) bool {
+			return true
+		},
+	}
+
 	return func(c echo.Context) error {
-		return nil
+		var (
+			message message.Message
+		)
+
+		ws, err := upgrader.Upgrade(c.Response().Writer, c.Request(), nil)
+
+		if err != nil {
+			return err
+		}
+
+		client := conn.NewClient(nil, server.node.clientHub(), session.NewSession(ws))
+
+		if err = ws.ReadJSON(&message); err != nil {
+			client.Close()
+		} else {
+			err = client.Handle(&message)
+		}
+
+		return err
 	}
 }

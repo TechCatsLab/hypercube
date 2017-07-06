@@ -27,43 +27,48 @@
  *     Initial: 2017/07/06        Feng Yifei
  */
 
-package endpoint
+package conn
 
 import (
-	"hypercube/access/config"
-	"hypercube/access/conn"
+	"hypercube/access/session"
+	"hypercube/libs/message"
 )
 
-// Endpoint represents a access server.
-type Endpoint struct {
-	Conf    *config.NodeConfig
-	ws      *HTTPServer
-	hub     *conn.ClientHub
-	shudown chan struct{}
+// Client is a client connection.
+type Client struct {
+	user    *message.User
+	hub     *ClientHub
+	session *session.Session
 }
 
-// NewEndpoint create a new access point.
-func NewEndpoint(conf *config.NodeConfig) (*Endpoint, error) {
-	var (
-		ep  *Endpoint
-		err error
-	)
-
-	ep = &Endpoint{
-		Conf: conf,
-		hub:  conn.NewClientHub(),
+// NewClient creates a client.
+func NewClient(user *message.User, hub *ClientHub, session *session.Session) *Client {
+	client := &Client{
+		user:    user,
+		hub:     hub,
+		session: session,
 	}
 
-	ep.ws = NewHTTPServer(ep)
+	hub.Add(user, client)
 
-	return ep, err
+	return client
 }
 
-func (ep *Endpoint) clientHub() *conn.ClientHub {
-	return ep.hub
+// UID returns the user identify for this connection
+func (client *Client) UID() string {
+	return ""
 }
 
-// Run starts the access server.
-func (ep *Endpoint) Run() error {
+// Handle incoming messages
+func (client *Client) Handle(message *message.Message) error {
 	return nil
+}
+
+// Send messages from peers or push server
+func (client *Client) Send() error {
+	return nil
+}
+
+// Close finish the client message loop.
+func (client *Client) Close() {
 }
