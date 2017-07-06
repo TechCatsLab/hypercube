@@ -30,24 +30,23 @@
  *     Modify:  2017/06/07        Yang Chenglong    添加接收消息数量统计
  */
 
-package main
+package httpserver
 
 import (
-	"net/http"
-	"github.com/gorilla/websocket"
-	"hypercube/libs/log"
-	"hypercube/message"
 	"encoding/json"
-	"hypercube/message"
-	"time"
+	"hypercube/libs/log"
+	"net/http"
 	"strings"
+	"time"
+
+	"github.com/gorilla/websocket"
 	"github.com/labstack/echo"
 )
 
-func sendAccessInfo()  {
+func sendAccessInfo() {
 	var (
-		r           general.Reply
-		serverinfo  general.Access
+		r          general.Reply
+		serverinfo general.Access
 	)
 
 	addr := strings.Split(configuration.Addrs, ":")[0]
@@ -57,7 +56,7 @@ func sendAccessInfo()  {
 
 	info, _ := json.Marshal(serverinfo)
 
-	err := logicRequester.Request(&general.Request{Type: types.ApiTypeAccessInfo, Content: info}, &r, time.Duration(100) * time.Millisecond)
+	err := logicRequester.Request(&general.Request{Type: types.ApiTypeAccessInfo, Content: info}, &r, time.Duration(100)*time.Millisecond)
 
 	if err != nil {
 		log.GlobalLogger.Error("send access info error:", err, " , address:", configuration.Addrs)
@@ -68,9 +67,9 @@ func sendAccessInfo()  {
 
 func serveWebSocket(c echo.Context) error {
 	var upgrader = &websocket.Upgrader{
-		ReadBufferSize:     configuration.WSReadBufferSize,
-		WriteBufferSize:    configuration.WSWriteBufferSize,
-		CheckOrigin:        func(r *http.Request) bool {
+		ReadBufferSize:  configuration.WSReadBufferSize,
+		WriteBufferSize: configuration.WSWriteBufferSize,
+		CheckOrigin: func(r *http.Request) bool {
 			return true
 		},
 	}
@@ -90,22 +89,22 @@ func serveWebSocket(c echo.Context) error {
 
 	webSocketConnectionHandler(connection)
 
-	return c.JSON(http.StatusInternalServerError,"serveWebSocket connection error")
+	return c.JSON(http.StatusInternalServerError, "serveWebSocket connection error")
 }
 
-type handlerFunc func(p interface{},req interface{}) interface{}
+type handlerFunc func(p interface{}, req interface{}) interface{}
 
 func webSocketConnectionHandler(conn *websocket.Conn) {
 	var (
-		err        error
-		p          *general.Proto = &general.Proto{}
-		ver        *general.Keepalive = &general.Keepalive{}
-		mes        *general.Message = &general.Message{}
-		user       *general.UserAccess = &general.UserAccess{}
-		v          interface{}
-		handler    handlerFunc
-		id 	   general.UserKey
-		ok 	   bool
+		err     error
+		p       *general.Proto      = &general.Proto{}
+		ver     *general.Keepalive  = &general.Keepalive{}
+		mes     *general.Message    = &general.Message{}
+		user    *general.UserAccess = &general.UserAccess{}
+		v       interface{}
+		handler handlerFunc
+		id      general.UserKey
+		ok      bool
 	)
 
 	for {
@@ -158,7 +157,7 @@ func webSocketConnectionHandler(conn *websocket.Conn) {
 						log.GlobalLogger.Error("User Logout failed:", err)
 					}
 				default:
-					handler(p,v)
+					handler(p, v)
 				}
 			}
 		}

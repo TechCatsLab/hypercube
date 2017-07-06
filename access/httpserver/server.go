@@ -24,53 +24,52 @@
 
 /*
  * Revision History:
- *     Initial: 2017/04/13        Yusan Kurban
+ *     Initial: 2017/04/11        Feng Yifei
+ *      Modify: 2017/06/04        Yang Chenglong		ModifyFunction
  */
 
-package main
+package httpserver
 
 import (
-	"hypercube/libs/log"
-	"hypercube/message"
-	"hypercube/message"
-	"encoding/json"
+	"github.com/labstack/echo"
+	"github.com/labstack/echo/middleware"
+
+	"hypercube/access/config"
+	"hypercube/access/httpserver/handler"
+
+	"github.com/dgrijalva/jwt-go"
 )
 
-type ReceiveHandler func(p interface{}, req interface{}) interface{}
+var (
+	server *httpServer
+)
 
-func receiveRequestProcessor(req []byte) interface{} {
-	var (
-		err     error
-		request general.Request
-		msg     general.Message
-		handler ReceiveHandler
-		p       interface{}
-		r 		interface{}
-	)
+type httpServer struct {
+	config *config.NodeConfig
+	server *echo.Echo
+}
 
-	err = json.Unmarshal(req, &request)
-	if err != nil {
-		log.GlobalLogger.Error("receiveRequestProcessor unmarshall error:", err)
+func newHTTPServer(configuration *config.NodeConfig) *httpServer {
+	server := &httpServer{
+		config: configuration,
+		server: echo.New(),
 	}
 
-	msg.Pushed = true
-	
-	switch request.Type{
-	case types.GeneralTypeTextMsg:
-		p = &msg
-		handler = userMessageHandler
+	server.server.Use(middleware.Logger())
+	server.server.Use(middleware.Recover())
+	server.server.Use(handler.LoginMiddleWare)
+	server.server.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+		AllowOrigins: configuration.CorsHosts,
+		AllowMethods: []string{echo.GET, echo.POST},
+	}))
+
+	config := middleware.JWTConfig{
+		Claims:     jwt.MapClaims{},
+		SigningKey: []byte(configuration.SecretKey),
 	}
+	server.server.Use(middleware.JWTWithConfig(config))
 
-	if p != nil {
-		err = json.Unmarshal(request.Content, p)
-		if err != nil {
-			log.GlobalLogger.Error("Receive Request Logic Processor connect error:", err)
-			return nil
-		}
+	server.server.GET("/join", serveWebSocket)
 
-		return handler(r, p)
-	}
-
-	return nil
-
+	return server
 }
