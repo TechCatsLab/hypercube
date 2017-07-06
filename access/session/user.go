@@ -28,7 +28,7 @@
  *     Modify:  2017/06/04        Yang Chenglong    添加在线用户数量统计
  */
 
-package main
+package session
 
 import (
 	"strings"
