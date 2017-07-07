@@ -30,16 +30,18 @@
 package endpoint
 
 import (
+	"context"
+
 	"hypercube/access/config"
 	"hypercube/access/conn"
 )
 
 // Endpoint represents a access server.
 type Endpoint struct {
-	Conf    *config.NodeConfig
-	ws      *HTTPServer
-	hub     *conn.ClientHub
-	shudown chan struct{}
+	Conf     *config.NodeConfig
+	ws       *HTTPServer
+	hub      *conn.ClientHub
+	shutdown chan struct{}
 }
 
 // NewEndpoint create a new access point.
@@ -50,8 +52,9 @@ func NewEndpoint(conf *config.NodeConfig) (*Endpoint, error) {
 	)
 
 	ep = &Endpoint{
-		Conf: conf,
-		hub:  conn.NewClientHub(),
+		Conf:     conf,
+		hub:      conn.NewClientHub(),
+		shutdown: make(chan struct{}),
 	}
 
 	ep.ws = NewHTTPServer(ep)
@@ -65,5 +68,17 @@ func (ep *Endpoint) clientHub() *conn.ClientHub {
 
 // Run starts the access server.
 func (ep *Endpoint) Run() error {
-	return nil
+	ep.ws.server.Start(ep.Conf.Addrs)
+
+	for {
+		select {
+		case <-ep.shutdown:
+			return ep.ws.server.Server.Shutdown(context.Background())
+		}
+	}
+}
+
+// Shutdown stops the access server.
+func (ep *Endpoint) Shutdown() {
+	close(ep.shutdown)
 }
