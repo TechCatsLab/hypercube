@@ -25,6 +25,7 @@
 /*
  * Revision History:
  *     Initial: 2017/07/05        Feng Yifei
+ *     Modify:  2017/07/07        Liu  Jiachang
  */
 
 package message
@@ -38,4 +39,22 @@ type Message struct {
 	Type    uint16          `json:"type"`
 	Version uint16          `json:"version"`
 	Content json.RawMessage `json:"content"`
+}
+
+type PlainText struct {
+	From    User   `json:"from"`
+	To      User   `json:"to"`
+	Content string `json:"content"`
+}
+
+type PushPlainText struct {
+	Type    uint16 `json:"type"`
+	To      []User `json:"to"`
+	Content string `json:"content"`
+}
+
+type GroupPlainText struct {
+	From    User   `json:"from"`
+	To      []User `json:"to"`
+	Content string `json:"content"`
 }

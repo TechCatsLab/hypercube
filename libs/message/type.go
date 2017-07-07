@@ -25,6 +25,7 @@
 /*
  * Revision History:
  *     Initial: 2017/07/05        Feng Yifei
+ *     Modify:  2017/07/07        Liu  Jiachang
  */
 
 package message
@@ -47,4 +48,10 @@ const (
 
 	// MessageTypePushPlainText - Push plain text message
 	MessageTypePushPlainText = 0x0300
+
+	// PushToAll - Push plain text to all
+	PushToAll = 0x0301
+
+	// PushToPart - Push plain text to selected users
+	PushToPart = 0x0302
 )
