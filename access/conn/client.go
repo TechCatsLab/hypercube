@@ -81,7 +81,7 @@ func (client *Client) Handle(message *mes.Message) error {
 	}
 
 	if err != nil {
-		log.zapLog.Error("Handle Message Error: ", zap.Error(err))
+		log.Logger.Error("Handle Message Error: ", err)
 
 		return err
 	}
@@ -91,12 +91,7 @@ func (client *Client) Handle(message *mes.Message) error {
 func (client *Client) HandleUserMessage(message *mes.Message) error {
 	var mess mes.PlainText
 
-	by, err := message.Content.MarshalJSON()
-	if err != nil {
-		return err
-	}
-
-	err = json.Unmarshal(by, mess)
+	err := json.Unmarshal(message.Content, &mess)
 	if err != nil {
 		return err
 	}
@@ -119,12 +114,10 @@ func (client *Client) HandleUserMessage(message *mes.Message) error {
 func (client *Client) HandlePushMessage(pmessage *mes.Message) error {
 	var pmess mes.PushPlainText
 
-	by, err := pmessage.Content.MarshalJSON()
+	err := json.Unmarshal(pmessage.Content, &pmess)
 	if err != nil {
 		return err
 	}
-
-	err = json.Unmarshal(by, pmess)
 
 	switch pmess.Type {
 	case mes.PushToAll:
