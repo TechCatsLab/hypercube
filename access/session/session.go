@@ -35,8 +35,8 @@ import (
 
 // Session represents a client connection.
 type Session struct {
-	mq *MessageQueue
-	ws *websocket.Conn
+	Mq *MessageQueue
+	Ws *websocket.Conn
 }
 
 // NewSession creates a session.

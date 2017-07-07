@@ -32,6 +32,8 @@ package conn
 import (
 	"hypercube/access/session"
 	"hypercube/libs/message"
+	"errors"
+	"encoding/json"
 )
 
 // Client is a client connection.
@@ -40,6 +42,8 @@ type Client struct {
 	hub     *ClientHub
 	session *session.Session
 }
+
+var HubService = &ClientHub{}
 
 // NewClient creates a client.
 func NewClient(user *message.User, hub *ClientHub, session *session.Session) *Client {
@@ -64,6 +68,64 @@ func (client *Client) Handle(message *message.Message) error {
 
 	return nil
 }
+
+func (client *Client) HandleUserMessage(message *message.Message) error {
+	var mess message.PlainText
+
+	by, err := message.Content.MarshalJSON()
+	if err != nil {
+		return err
+	}
+
+	err = json.Unmarshal(by, mess)
+	if err != nil {
+		return err
+	}
+
+	if mess.To == *client.user {
+		return nil
+	}
+
+	to, ok := HubService.Get(mess.To.UserID)
+	if !ok {
+		err := errors.New("User not have session")
+		return err
+	}
+
+	to.session.Mq.PushMessage(message)
+
+	return nil
+}
+
+func (client *Client) HandlePushMessage(pmessage *message.Message) error {
+	var pmess message.PushPlainText
+
+	by, err := pmessage.Content.MarshalJSON()
+	if err != nil {
+		return err
+	}
+
+	err = json.Unmarshal(by, pmess)
+
+	switch pmess.Type {
+	case message.PushToAll:
+
+		HubService.PushMessageToAll(pmessage)
+		return nil
+
+	default:
+		for _, user := range pmess.To {
+			to, ok := HubService.Get(user.UserID)
+			if !ok {
+				continue
+			}
+
+			to.session.Mq.PushMessage(pmessage)
+		}
+		return nil
+	}
+}
+
 
 // Send messages from peers or push server
 func (client *Client) Send() error {
