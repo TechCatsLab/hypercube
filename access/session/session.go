@@ -42,8 +42,8 @@ type Session struct {
 // NewSession creates a session.
 func NewSession(ws *websocket.Conn) *Session {
 	session := &Session{
-		mq: NewMessageQueue(),
-		ws: ws,
+		Mq: NewMessageQueue(),
+		Ws: ws,
 	}
 
 	return session

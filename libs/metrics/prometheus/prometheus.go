@@ -27,7 +27,7 @@
  *     Initial: 2017/07/05        Yang Chenglong
  */
 
-package metrics
+package prometheus
 
 import (
 	"github.com/prometheus/client_golang/prometheus"

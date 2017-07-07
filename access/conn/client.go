@@ -31,14 +31,17 @@ package conn
 
 import (
 	"hypercube/access/session"
-	"hypercube/libs/message"
+	mes "hypercube/libs/message"
 	"errors"
 	"encoding/json"
+	"hypercube/libs/metrics/prometheus"
+	"hypercube/libs/log"
+	"go.uber.org/zap"
 )
 
 // Client is a client connection.
 type Client struct {
-	user    *message.User
+	user    *mes.User
 	hub     *ClientHub
 	session *session.Session
 }
@@ -46,7 +49,7 @@ type Client struct {
 var HubService = &ClientHub{}
 
 // NewClient creates a client.
-func NewClient(user *message.User, hub *ClientHub, session *session.Session) *Client {
+func NewClient(user *mes.User, hub *ClientHub, session *session.Session) *Client {
 	client := &Client{
 		user:    user,
 		hub:     hub,
@@ -64,13 +67,29 @@ func (client *Client) UID() string {
 }
 
 // Handle incoming messages
-func (client *Client) Handle(message *message.Message) error {
+func (client *Client) Handle(message *mes.Message) error {
+	var err error
+	switch message.Type {
+	case mes.MessageTypePlainText:
+		err = client.HandleUserMessage(message)
+	case mes.MessageTypePushPlainText:
+		err = client.HandlePushMessage(message)
+	case mes.MessageTypeLogin:
+		err = client.HandleLoginMessage(message)
+	case mes.MessageTypeLogout:
+		err = client.HandleLogoutMessage(message)
+	}
 
+	if err != nil {
+		log.Logger.Error("Handle Message Error: ", zap.Error(err))
+
+		return err
+	}
 	return nil
 }
 
-func (client *Client) HandleUserMessage(message *message.Message) error {
-	var mess message.PlainText
+func (client *Client) HandleUserMessage(message *mes.Message) error {
+	var mess mes.PlainText
 
 	by, err := message.Content.MarshalJSON()
 	if err != nil {
@@ -97,8 +116,8 @@ func (client *Client) HandleUserMessage(message *message.Message) error {
 	return nil
 }
 
-func (client *Client) HandlePushMessage(pmessage *message.Message) error {
-	var pmess message.PushPlainText
+func (client *Client) HandlePushMessage(pmessage *mes.Message) error {
+	var pmess mes.PushPlainText
 
 	by, err := pmessage.Content.MarshalJSON()
 	if err != nil {
@@ -108,7 +127,7 @@ func (client *Client) HandlePushMessage(pmessage *message.Message) error {
 	err = json.Unmarshal(by, pmess)
 
 	switch pmess.Type {
-	case message.PushToAll:
+	case mes.PushToAll:
 
 		HubService.PushMessageToAll(pmessage)
 		return nil
@@ -126,6 +145,40 @@ func (client *Client) HandlePushMessage(pmessage *message.Message) error {
 	}
 }
 
+func (client *Client)HandleLoginMessage(message *mes.Message) error {
+	var mess mes.User
+	user, err := message.Content.MarshalJSON()
+	if err != nil {
+		return err
+	}
+
+	err = json.Unmarshal(user, mess)
+	if err != nil {
+		return err
+	}
+
+	client.hub.Add(&mess, client)
+	prometheus.OnlineUserCounter.Add(1)
+	return nil
+}
+
+func (client *Client) HandleLogoutMessage(message *mes.Message) error {
+	var mess mes.User
+	user, err := message.Content.MarshalJSON()
+	if err != nil {
+		return err
+	}
+
+	err = json.Unmarshal(user, mess)
+	if err != nil {
+		return err
+	}
+
+	client.hub.Remove(&mess, client)
+	prometheus.OnlineUserCounter.Add(-1)
+
+	return nil
+}
 
 // Send messages from peers or push server
 func (client *Client) Send() error {

@@ -24,40 +24,28 @@
 
 /*
  * Revision History:
- *     Initial: 2017/04/05            HeCJ
- *     AddFunction: 2017/06/04        Yang Chenglong
+ *     Initial: 2017/07/07        Yang Chenglong
  */
 
-package main
+package prometheus
+
 
 import (
-	"hypercube/access/config"
-	"hypercube/access/endpoint"
+	"github.com/prometheus/client_golang/prometheus"
 )
-
 var (
-	configuration = config.Load()
-	ep            *endpoint.Endpoint
+	OnlineUserCounter = NewCounterFrom(prometheus.CounterOpts{
+		Name: "onlineUser",
+		Help: "Number of onlineUser",
+	}, []string{"onlineUser"})
+
+	SendMessageCounter = NewCounterFrom(prometheus.CounterOpts{
+		Name: "sendMessage",
+		Help: "Number of sendMessage",
+	}, []string{"sendMessage"})
+
+	ReceiveMessageCounter = NewCounterFrom(prometheus.CounterOpts{
+		Name: "resiveMessage",
+		Help: "Number of resiveMessage",
+	}, []string{"resiveMessage"})
 )
-
-func init() {
-	initSignal()
-	HttpPprof()
-	initPrometheus()
-
-}
-
-func run() {
-	var (
-		err error
-	)
-
-	// Start a access endpoint.
-	if ep, err = endpoint.NewEndpoint(configuration); ep != nil {
-		panic(err)
-	}
-
-	ep.Run()
-
-	sigHandler.Wait()
-}

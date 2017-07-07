@@ -34,27 +34,8 @@ import (
 	"net/http"
 
 	"github.com/prometheus/client_golang/prometheus/promhttp"
-	"github.com/prometheus/client_golang/prometheus"
 
 	"hypercube/libs/log"
-	pro "hypercube/libs/metrics/prometheus"
-)
-
-var (
-	onlineUserCounter = pro.NewCounterFrom(prometheus.CounterOpts{
-		Name: "onlineUser",
-		Help: "Number of onlineUser",
-	}, []string{"onlineUser"})
-
-	sendMessageCounter = pro.NewCounterFrom(prometheus.CounterOpts{
-		Name: "sendMessage",
-		Help: "Number of sendMessage",
-	}, []string{"sendMessage"})
-
-	receiveMessageCounter = pro.NewCounterFrom(prometheus.CounterOpts{
-		Name: "resiveMessage",
-		Help: "Number of resiveMessage",
-	}, []string{"resiveMessage"})
 )
 
 func initPrometheus() {
