@@ -84,7 +84,7 @@ func userSendMessageHandler(userID general.UserKey) error {
 	    message  *pushMessageJob
     )
 	if msgbuf[userID] == nil {
-		log.GlobalLogger.Debug("User has no history message")
+		log.Logger.Debug("User has no history message")
 
 		return nil
 	}
@@ -94,7 +94,7 @@ func userSendMessageHandler(userID general.UserKey) error {
 	    mes,err := getHistMessages(userID)
 
 	    if err != nil {
-		    log.GlobalLogger.Error("User get history err:", err)
+		    log.Logger.Error("User get history err:", err)
 
 		    return err
 	    }
@@ -126,7 +126,7 @@ func (this *pushMessageJob) Do() error {
         req.SendMessage(this.message)
     }
 
-    log.GlobalLogger.Debug("Sending:", this.message.From, "->", this.message.To)
+    log.Logger.Debug("Sending:", this.message.From, "->", this.message.To)
 
     return nil
 }
@@ -134,5 +134,5 @@ func (this *pushMessageJob) Do() error {
 func initSendMessageQueue() {
     sendWorkQueue = workq.NewDispatcher(workersCount)
     sendWorkQueue.Run()
-    log.GlobalLogger.Debug("message queue is running")
+    log.Logger.Debug("message queue is running")
 }

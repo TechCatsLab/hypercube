@@ -82,7 +82,7 @@ type reply struct {
 }
 
 func (this *OnlineUserManager) Add(user *general.UserLogin) error {
-	log.GlobalLogger.Debug(*user)
+	log.Logger.Debug(*user)
 
 	if user.ServerIP != "" && user.UserID.Token != "" && user.UserID.UserID == 0 {
 		usrb := userEntry{user.UserID, user.ServerIP, addUser}
@@ -110,7 +110,7 @@ func (this *OnlineUserManager) Remove(user general.UserKey) error {
 }
 
 func (this *OnlineUserManager) Query(uid general.UserKey) (string, error) {
-	log.GlobalLogger.Debug(uid)
+	log.Logger.Debug(uid)
 	if uid.Token != "" {
 		user := userEntry{uid, "", queryUser}
 
@@ -187,5 +187,5 @@ func (this *OnlineUserManager) loop() {
 }
 
 func (this *OnlineUserManager) PrintDebugInfo() {
-	log.GlobalLogger.Debug(fmt.Sprintf("Online user manager:(%+v, %+v)", this.users, this.access))
+	log.Logger.Debug(fmt.Sprintf("Online user manager:(%+v, %+v)", this.users, this.access))
 }

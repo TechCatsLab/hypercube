@@ -42,21 +42,21 @@ var (
 
 func init() {
 	sigHandler = interrupt.New(finalHandler, func(){})
-	log.GlobalLogger.Debug("Interrupt handler initialized")
+	log.Logger.Debug("Interrupt handler initialized")
 }
 
 func finalHandler(sig os.Signal) {
 	switch sig {
 	case syscall.SIGQUIT, syscall.SIGTERM, syscall.SIGINT:
-		log.GlobalLogger.Info("Signal quit/term/int captured")
+		log.Logger.Info("Signal quit/term/int captured")
 		return
 
 	case syscall.SIGHUP:
-		log.GlobalLogger.Info("Signal hup captured")
+		log.Logger.Info("Signal hup captured")
 		return
 
 	case syscall.SIGALRM:
-		log.GlobalLogger.Info("Signal alrm captured")
+		log.Logger.Info("Signal alrm captured")
 
 		OnLineUserMag.PrintDebugInfo()
 		return

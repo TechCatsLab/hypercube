@@ -81,7 +81,7 @@ func (client *Client) Handle(message *mes.Message) error {
 	}
 
 	if err != nil {
-		log.Logger.Error("Handle Message Error: ", zap.Error(err))
+		log.zapLog.Error("Handle Message Error: ", zap.Error(err))
 
 		return err
 	}

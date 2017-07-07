@@ -61,7 +61,7 @@ func Load() *NodeConfig {
 	viper.SetConfigName("config")
 
 	if err := viper.ReadInConfig(); err != nil {
-		log.GlobalLogger.Error("Read configuration file with error:", err)
+		log.Logger.Error("Read configuration file with error:", err)
 		panic(err)
 	}
 

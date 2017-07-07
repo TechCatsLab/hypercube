@@ -44,12 +44,12 @@ func userLoginRequestHandler(req interface{}) interface{} {
 
 	login = req.(*general.UserLogin)
 
-	log.GlobalLogger.Debug("userLoginRequestHandler userID:", login.UserID)
+	log.Logger.Debug("userLoginRequestHandler userID:", login.UserID)
 
 	err := OnLineUserMag.Add(login)
 
 	if err != nil {
-		log.GlobalLogger.Error("userLoginRequestHandler-->login err:", err)
+		log.Logger.Error("userLoginRequestHandler-->login err:", err)
 
 		reply = &general.Reply{
 			Code: types.ErrLogin,
@@ -62,7 +62,7 @@ func userLoginRequestHandler(req interface{}) interface{} {
 
 	err = userSendMessageHandler(login.UserID)
 	if err != nil {
-		log.GlobalLogger.Error("userLoginRequestHandler-->userSendMessageHandler:", err)
+		log.Logger.Error("userLoginRequestHandler-->userSendMessageHandler:", err)
 	}
 
 	return reply
@@ -75,12 +75,12 @@ func userLogoutRequestHandler(req interface{}) interface{} {
 	)
 
 	logout = req.(*general.UserLogout)
-	log.GlobalLogger.Debug("userLogoutRequestHandler userID:", logout.UserID)
+	log.Logger.Debug("userLogoutRequestHandler userID:", logout.UserID)
 
 	err := OnLineUserMag.Remove(logout.UserID)
 
 	if err != nil {
-		log.GlobalLogger.Error("userLogoutRequestHandler--> err logout:", err)
+		log.Logger.Error("userLogoutRequestHandler--> err logout:", err)
 
 		reply = &general.Reply{
 			Code: types.ErrLogout,
@@ -101,14 +101,14 @@ func MessageHandler(req interface{}) interface{} {
 	)
 
 	msg = req.(*general.Message)
-	log.GlobalLogger.Debug("userToUserMsgHandler:", *msg)
+	log.Logger.Debug("userToUserMsgHandler:", *msg)
 
 	accessip, err := OnLineUserMag.Query(msg.To)
 
 	if err != nil {
 		addHistMessage(msg.To, msg)
 
-		log.GlobalLogger.Error("MessageHandler-->OnLineUserMag.Query():", err)
+		log.Logger.Error("MessageHandler-->OnLineUserMag.Query():", err)
 
 		reply = &general.Reply{
 			Code: types.ErrUserQuery,
@@ -121,13 +121,13 @@ func MessageHandler(req interface{}) interface{} {
 		err = req.SendMessage(msg)
 
 		if err != nil {
-			log.GlobalLogger.Error("MessageHandler-->SendMessage:", err)
+			log.Logger.Error("MessageHandler-->SendMessage:", err)
 
 			reply = &general.Reply{
 				Code: types.ErrSendToAccess,
 			}
 		} else {
-			log.GlobalLogger.Debug("SendMessage Succeed")
+			log.Logger.Debug("SendMessage Succeed")
 			reply = &general.Reply{
 				Code: types.ErrSucceed,
 			}
@@ -148,12 +148,12 @@ func AccessConnectHandler(req interface{}) interface{} {
 	)
 
 	access = req.(*general.Access)
-	log.GlobalLogger.Debug("userToUserMsgHandler:", access)
+	log.Logger.Debug("userToUserMsgHandler:", access)
 
 	err := OnLineUserMag.AddAccess(access)
 
 	if err != nil {
-		log.GlobalLogger.Error("AccessConnectHandler-->AddAccess:", err)
+		log.Logger.Error("AccessConnectHandler-->AddAccess:", err)
 
 		reply = &general.Reply{
 			Code: types.ErrAddAccess,
@@ -172,11 +172,11 @@ func AccessHeartHandler(req interface{}) interface{} {
 	heart = req.(*general.Proto)
 
 	if _, err := heart.VerCheck(); err != types.ErrSucceed {
-		log.GlobalLogger.Error("keepAliveRequestHandler vercheck:", err)
+		log.Logger.Error("keepAliveRequestHandler vercheck:", err)
 		return err
 	}
 
-	log.GlobalLogger.Debug("a heartbeat from access which versions is:", heart.Ver)
+	log.Logger.Debug("a heartbeat from access which versions is:", heart.Ver)
 
 	return reply
 }

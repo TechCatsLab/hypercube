@@ -38,22 +38,22 @@ import (
 type RecordLog struct {}
 
 var (
-	GlobalLogger *RecordLog
-	Logger *zap.Logger
+	Logger *RecordLog
+	zapLog *zap.Logger
 )
 
 func init() {
-	GlobalLogger = &RecordLog{}
-	Logger, _ = zap.NewDevelopment()
+	Logger = &RecordLog{}
+	zapLog, _ = zap.NewDevelopment()
 }
 
 func (l *RecordLog) Error(desc string, err error) {
-	Logger.Error(desc, zap.Error(err))
+	zapLog.Error(desc, zap.Error(err))
 }
 
 func (l *RecordLog) Debug(format string, a ...interface{}) {
 	info := fmt.Sprintf(format, a)
-	Logger.Debug(info, zap.Skip())
+	zapLog.Debug(info, zap.Skip())
 }
 
 func (l *RecordLog) Fatal(v ...interface{}){
@@ -62,5 +62,5 @@ func (l *RecordLog) Fatal(v ...interface{}){
 
 func (l *RecordLog) Info (format string, a ...interface{}) {
 	info := fmt.Sprintf(format, a)
-	Logger.Info(info, zap.Skip())
+	zapLog.Info(info, zap.Skip())
 }
