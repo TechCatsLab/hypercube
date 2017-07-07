@@ -44,6 +44,7 @@ var (
 
 func init() {
 	GlobalLogger = &RecordLog{}
+	Logger, _ = zap.NewDevelopment()
 }
 
 func (l *RecordLog) Error(desc string, err error) {

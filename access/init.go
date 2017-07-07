@@ -53,7 +53,7 @@ func run() {
 	)
 
 	// Start a access endpoint.
-	if ep, err = endpoint.NewEndpoint(configuration); ep != nil {
+	if ep, err = endpoint.NewEndpoint(configuration); err != nil {
 		panic(err)
 	}
 
