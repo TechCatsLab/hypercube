@@ -36,7 +36,6 @@ import (
 	"encoding/json"
 	"hypercube/libs/metrics/prometheus"
 	"hypercube/libs/log"
-	"go.uber.org/zap"
 )
 
 // Client is a client connection.

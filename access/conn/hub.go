@@ -55,7 +55,7 @@ func (hub *ClientHub) Add(user *message.User, client *Client) {
 	defer hub.mux.Unlock()
 	if _, exists := hub.clients[user.UserID]; exists {
 		// Warning
-		log.zapLog.Debug("user already login")
+		log.Logger.Debug("user already login")
 	}
 	hub.clients[user.UserID] = client
 }
@@ -66,7 +66,7 @@ func (hub *ClientHub) Remove(user *message.User, client *Client) {
 	defer hub.mux.Unlock()
 	if _, exists := hub.clients[user.UserID]; !exists {
 		// Warning
-		log.zapLog.Debug("user hasn't login")
+		log.Logger.Debug("user hasn't login")
 	}
 	delete(hub.clients, user.UserID)
 }
