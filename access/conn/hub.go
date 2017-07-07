@@ -31,30 +31,51 @@ package conn
 
 import (
 	"hypercube/libs/message"
+	"hypercube/libs/log"
+	"sync"
 )
 
 // ClientHub represents a collection of client sessions.
 type ClientHub struct {
 	clients map[string]*Client
+	mux     sync.Mutex
 }
 
 // NewClientHub creates a client hub.
 func NewClientHub() *ClientHub {
-	return &ClientHub{}
+	return &ClientHub{
+		clients: map[string]*Client{},
+		mux:     sync.Mutex{},
+	}
 }
 
 // Add a client connection
 func (hub *ClientHub) Add(user *message.User, client *Client) {
+	hub.mux.Lock()
+	defer hub.mux.Unlock()
 	if _, exists := hub.clients[user.UserID]; exists {
 		// Warning
+		log.Logger.Debug("user already login")
 	}
 	hub.clients[user.UserID] = client
 }
 
 // Remove a client connection
 func (hub *ClientHub) Remove(user *message.User, client *Client) {
+	hub.mux.Lock()
+	defer hub.mux.Unlock()
 	if _, exists := hub.clients[user.UserID]; !exists {
 		// Warning
+		log.Logger.Debug("user hasn't login")
 	}
 	delete(hub.clients, user.UserID)
+}
+
+func (hub *ClientHub) Get(user string) (*Client, bool) {
+	hub.mux.Lock()
+	defer hub.mux.Unlock()
+
+	client, ok := hub.clients[user];
+
+	return client, ok
 }

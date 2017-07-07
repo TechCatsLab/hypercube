@@ -103,10 +103,12 @@ func (server *HTTPServer) serve() echo.HandlerFunc {
 
 		client := conn.NewClient(nil, server.node.clientHub(), session.NewSession(ws))
 
-		if err = ws.ReadJSON(&message); err != nil {
-			client.Close()
-		} else {
-			err = client.Handle(&message)
+		for {
+			if err = ws.ReadJSON(&message); err != nil {
+				client.Close()
+			} else {
+				err = client.Handle(&message)
+			}
 		}
 
 		return err

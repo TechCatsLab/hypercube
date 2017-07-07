@@ -65,7 +65,7 @@ func LoginMiddleWare(next echo.HandlerFunc) echo.HandlerFunc {
 			c.JSON(http.StatusInternalServerError, "Token Parse Err")
 		}
 
-		c.JSON(http.StatusOK, u.Claims)
+		c.Set("user", u.Claims)
 
 		return next(c)
 	}

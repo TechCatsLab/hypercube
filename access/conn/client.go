@@ -56,11 +56,12 @@ func NewClient(user *message.User, hub *ClientHub, session *session.Session) *Cl
 
 // UID returns the user identify for this connection
 func (client *Client) UID() string {
-	return ""
+	return client.user.UserID
 }
 
 // Handle incoming messages
 func (client *Client) Handle(message *message.Message) error {
+
 	return nil
 }
 
@@ -72,3 +73,4 @@ func (client *Client) Send() error {
 // Close finish the client message loop.
 func (client *Client) Close() {
 }
+
