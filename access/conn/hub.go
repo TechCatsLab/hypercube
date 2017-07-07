@@ -79,3 +79,12 @@ func (hub *ClientHub) Get(user string) (*Client, bool) {
 
 	return client, ok
 }
+
+func (hub *ClientHub) PushMessageToAll(message *message.Message) {
+	hub.mux.Lock()
+	defer hub.mux.Unlock()
+
+	for _, c := range hub.clients {
+		c.session.Mq.PushMessage(message)
+	}
+}
