@@ -97,22 +97,31 @@ func (server *HTTPServer) serve() echo.HandlerFunc {
 		)
 
 		ws, err := upgrader.Upgrade(c.Response().Writer, c.Request(), nil)
-
 		if err != nil {
 			log.Logger.Error("Upgrade error!", err)
 			return err
 		}
 
-		client := conn.NewClient(nil, server.node.clientHub(), session.NewSession(ws))
+		claim := c.Get("user")
+		user := claim.(message.User)
+		
+		client := conn.NewClient(&user, server.node.clientHub(), session.NewSession(ws))
 
 		for {
 			if err = ws.ReadJSON(&msg); err != nil {
+				log.Logger.Error("ReadMessage Error: %v", err)
+
 				client.Close()
 			} else {
 				err = client.Handle(&msg)
+				if err != nil {
+					log.Logger.Error("Handle Message Error: %v", err)
+
+					return err
+				}
 			}
 		}
 
-		return err
+		return nil
 	}
 }

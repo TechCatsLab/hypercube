@@ -44,10 +44,10 @@ const (
 	BearerSize = 7
 )
 
-func GetUser(user *jwt.Token) (interface{}, error) {
+func GetUser(token *jwt.Token) (interface{}, error) {
 	var u message.User
 
-	claims := user.Claims.(jwt.MapClaims)
+	claims := token.Claims.(jwt.MapClaims)
 	u.Token = claims["token"].(string)
 	u.UserID = claims["uid"].(string)
 

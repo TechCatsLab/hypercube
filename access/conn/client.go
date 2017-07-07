@@ -77,6 +77,8 @@ func (client *Client) Handle(message *mes.Message) error {
 		err = client.HandleLoginMessage(message)
 	case mes.MessageTypeLogout:
 		err = client.HandleLogoutMessage(message)
+	default:
+
 	}
 
 	if err != nil {
@@ -180,4 +182,3 @@ func (client *Client) Send() error {
 // Close finish the client message loop.
 func (client *Client) Close() {
 }
-

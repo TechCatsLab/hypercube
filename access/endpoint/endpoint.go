@@ -34,6 +34,7 @@ import (
 
 	"hypercube/access/config"
 	"hypercube/access/conn"
+	"hypercube/libs/log"
 )
 
 // Endpoint represents a access server.
@@ -68,7 +69,7 @@ func (ep *Endpoint) clientHub() *conn.ClientHub {
 
 // Run starts the access server.
 func (ep *Endpoint) Run() error {
-	ep.ws.server.Start(ep.Conf.Addrs)
+	log.Logger.Info("run %v", ep.ws.server.Start(ep.Conf.Addrs))
 
 	for {
 		select {

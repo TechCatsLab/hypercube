@@ -41,7 +41,7 @@ import (
 
 	"github.com/gorilla/websocket"
 
-	"hypercube/message"
+	"hypercube/libs/message"
 )
 
 const (
@@ -51,7 +51,7 @@ const (
 	Version			= 1
 )
 
-var addrs 	string   = "127.0.0.1:8080"
+var addrs 	string   = "10.0.0.116:7000"
 var userIDs []uint64 = []uint64{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
 
 func main() {
@@ -77,9 +77,8 @@ func randUserID() uint64 {
 }
 
 func dial(addr string) (*websocket.Conn, error) {
-	u := url.URL{Scheme: "ws", Host: addr, Path: "/echo"}
+	u := url.URL{Scheme: "ws", Host: addr, Path: "/join"}
 	log.Printf("connecting to %s", u.String())
-
 	c, _, err := websocket.DefaultDialer.Dial(u.String(), nil)
 
 	return c, err
@@ -110,8 +109,8 @@ func loginPackage(from uint64) []byte {
 }
 
 type Message struct {
-	From uint64
-	To   uint64
+	From message.User
+	To   message.User
 	Content string
 	SendOrder int64
 }
@@ -130,8 +129,8 @@ func testPackage(from, to uint64, t time.Time) []byte {
 	counter.lock.Lock()
 	counter.counter ++
 	messages := Message{
-		From:    from,
-		To:      to,
+		From:    message.User{UserID:"fdsjk"},
+		To:      message.User{UserID:"fdsjk"},
 		Content: t.String(),
 		SendOrder: counter.counter,
 	}
