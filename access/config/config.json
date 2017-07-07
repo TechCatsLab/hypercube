@@ -29,5 +29,6 @@
     "secretkey": "secret"
   },
 
-  "accessHeartRate": 10
+  "accessHeartRate": 10,
+  "queueBuffer": 100
 }

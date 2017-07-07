@@ -36,6 +36,8 @@ import (
 	"github.com/spf13/viper"
 )
 
+var GNodeConfig *NodeConfig
+
 // NodeConfig is used to config the access endpoint
 type NodeConfig struct {
 	Addrs             string
@@ -50,6 +52,7 @@ type NodeConfig struct {
 	CorsHosts         []string
 	SecretKey         string
 	AccessHeartRate   int
+	QueueBuffer       int
 }
 
 // Load loads the configuration.
@@ -62,7 +65,7 @@ func Load() *NodeConfig {
 		panic(err)
 	}
 
-	conf := &NodeConfig{
+	GNodeConfig = &NodeConfig{
 		Addrs:             viper.GetString("addrs"),
 		WSReadBufferSize:  viper.GetInt("websocket.readBufferSize"),
 		WSWriteBufferSize: viper.GetInt("websocket.writeBufferSize"),
@@ -75,7 +78,8 @@ func Load() *NodeConfig {
 		CorsHosts:         viper.GetStringSlice("middleware.cors.hosts"),
 		SecretKey:         viper.GetString("middleware.secretkey"),
 		AccessHeartRate:   viper.GetInt("accessHeartRate"),
+		QueueBuffer:       viper.GetInt("queueBuffer"),
 	}
 
-	return conf
+	return GNodeConfig
 }

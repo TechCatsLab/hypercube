@@ -25,10 +25,39 @@
 /*
  * Revision History:
  *     Initial: 2017/07/06        Feng Yifei
+ *     Initial: 2017/07/07        Liu  Jiachang
  */
 
 package session
 
+import (
+	"hypercube/libs/message"
+	"hypercube/access/config"
+)
+
 // MessageQueue buffers the message from or to a client.
 type MessageQueue struct {
+	queue       chan *message.Message
+}
+
+func NewMessageQueue(buff ...int) *MessageQueue {
+	var buffsize int
+
+	if len(buff) > 0 {
+		buffsize = buff[0]
+	} else {
+		buffsize = config.GNodeConfig.QueueBuffer
+	}
+
+	return &MessageQueue{
+		queue: make(chan *message.Message, buffsize),
+	}
+}
+
+func (m *MessageQueue) FetchMessage() *message.Message {
+	return <- m.queue
+}
+
+func (m *MessageQueue) PushMessage(mess *message.Message) {
+	m.queue <- mess
 }

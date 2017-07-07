@@ -35,12 +35,14 @@ import (
 
 // Session represents a client connection.
 type Session struct {
+	mq *MessageQueue
 	ws *websocket.Conn
 }
 
 // NewSession creates a session.
 func NewSession(ws *websocket.Conn) *Session {
 	session := &Session{
+		mq: NewMessageQueue(),
 		ws: ws,
 	}
 
