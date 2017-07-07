@@ -41,6 +41,7 @@ import (
 	"hypercube/access/endpoint/handler"
 	"hypercube/access/session"
 	"hypercube/libs/message"
+	"hypercube/libs/log"
 
 	"github.com/dgrijalva/jwt-go"
 )
@@ -92,22 +93,23 @@ func (server *HTTPServer) serve() echo.HandlerFunc {
 
 	return func(c echo.Context) error {
 		var (
-			message message.Message
+			msg message.Message
 		)
 
 		ws, err := upgrader.Upgrade(c.Response().Writer, c.Request(), nil)
 
 		if err != nil {
+			log.Logger.Error("Upgrade error!", err)
 			return err
 		}
 
 		client := conn.NewClient(nil, server.node.clientHub(), session.NewSession(ws))
 
 		for {
-			if err = ws.ReadJSON(&message); err != nil {
+			if err = ws.ReadJSON(&msg); err != nil {
 				client.Close()
 			} else {
-				err = client.Handle(&message)
+				err = client.Handle(&msg)
 			}
 		}
 
