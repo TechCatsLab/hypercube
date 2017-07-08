@@ -44,8 +44,6 @@ type Client struct {
 	session *session.Session
 }
 
-var HubService = &ClientHub{}
-
 // NewClient creates a client.
 func NewClient(user *mes.User, hub *ClientHub, session *session.Session) *Client {
 	client := &Client{
@@ -78,7 +76,6 @@ func (client *Client) Handle(message *mes.Message) error {
 
 	if err != nil {
 		log.Logger.Error("Handle Message Error: ", err)
-
 		return err
 	}
 

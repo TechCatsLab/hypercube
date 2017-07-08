@@ -24,8 +24,8 @@
 
 /*
  * Revision History:
- *     Initial: 2017/04/11        Feng Yifei
- *      Modify: 2017/06/04        Yang Chenglong		ModifyFunction
+ *     Initial: 2017/07/06        Feng Yifei
+ *      Modify: 2017/07/08        Liu Jiachang		ModifyFunction
  */
 
 package endpoint
@@ -109,22 +109,22 @@ func (server *HTTPServer) serve() echo.HandlerFunc {
 		}
 		user := claim.(message.User)
 
-		
 		client := conn.NewClient(&user, server.node.clientHub(), session.NewSession(ws, &user, server.node, server.node.Conf.QueueBuffer))
 		client.StartHandleMessage()
 
 		server.node.clientHub().Add(&user, client)
 
+		defer func() {
+			client.Close()
+		}()
+
 		for {
 			if err = ws.ReadJSON(&msg); err != nil {
 				log.Logger.Error("ReadMessage Error: %v", err)
-
-				client.Close()
 			} else {
 				err = client.Handle(&msg)
 				if err != nil {
 					log.Logger.Error("Handle Message Error: %v", err)
-
 					return err
 				}
 			}

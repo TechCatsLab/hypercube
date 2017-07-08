@@ -24,8 +24,7 @@
 
 /*
  * Revision History:
- *     Initial: 2017/03/28        Feng Yifei
- *     AddEchoConfig: 2017/06/04        Yang Chenglong
+ *     Initial: 2017/07/08        Feng Yife
  */
 
 package config

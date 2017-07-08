@@ -24,9 +24,7 @@
 
 /*
  * Revision History:
- *     Initial: 2017/03/28        Feng Yifei
- *     AddEcho: 2017/06/04        Yang Chenglong
- *     Modify:  2017/06/07        Yang Chenglong     添加向logic发送心跳
+ *     Initial: 2017/07/06        Feng Yifei
  */
 
 package main

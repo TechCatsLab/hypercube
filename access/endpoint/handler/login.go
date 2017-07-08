@@ -24,8 +24,7 @@
 
 /*
  * Revision History:
- *     Initial: 2017/04/11        Feng Yifei
- *     Modify: 2017/06/05         Yang Chenglong   添加login中间件
+ *     Initial: 2017/07/06       Yang Chenglong
  */
 
 package handler
