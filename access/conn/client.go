@@ -70,8 +70,6 @@ func (client *Client) Handle(message *mes.Message) error {
 	switch message.Type {
 	case mes.MessageTypePlainText:
 		err = client.HandleUserMessage(message)
-	case mes.MessageTypePushPlainText:
-		err = client.HandlePushMessage(message)
 	case mes.MessageTypeLogout:
 		err = client.HandleLogoutMessage(message)
 	default:
@@ -106,33 +104,6 @@ func (client *Client) HandleUserMessage(message *mes.Message) error {
 	client.hub.Send(&mess.To, message)
 
 	return nil
-}
-
-func (client *Client) HandlePushMessage(pmessage *mes.Message) error {
-	var pmess mes.PushPlainText
-
-	err := json.Unmarshal(pmessage.Content, &pmess)
-	if err != nil {
-		return err
-	}
-
-	switch pmess.Type {
-	case mes.PushToAll:
-
-		HubService.PushMessageToAll(pmessage)
-		return nil
-
-	default:
-		for _, user := range pmess.To {
-			to, ok := HubService.Get(user.UserID)
-			if !ok {
-				continue
-			}
-
-			to.session.PushMessage(pmessage)
-		}
-		return nil
-	}
 }
 
 func (client *Client) HandleLogoutMessage(message *mes.Message) error {

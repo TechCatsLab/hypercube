@@ -48,13 +48,6 @@ type PlainText struct {
 }
 
 type PushPlainText struct {
-	Type    uint16 `json:"type"`
-	To      []User `json:"to"`
-	Content string `json:"content"`
-}
-
-type GroupPlainText struct {
-	From    User   `json:"from"`
-	To      []User `json:"to"`
+	To      User   `json:"to"`
 	Content string `json:"content"`
 }

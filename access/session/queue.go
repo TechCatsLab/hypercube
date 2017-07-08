@@ -32,7 +32,6 @@ package session
 
 import (
 	"hypercube/libs/message"
-	"hypercube/access/config"
 )
 
 // MessageQueue buffers the message from or to a client.
@@ -40,11 +39,9 @@ type MessageQueue struct {
 	queue       chan *message.Message
 }
 
-func NewMessageQueue() *MessageQueue {
-	buffsize := config.GNodeConfig.QueueBuffer
-
+func NewMessageQueue(buff int) *MessageQueue {
 	return &MessageQueue{
-		queue: make(chan *message.Message, buffsize),
+		queue: make(chan *message.Message, buff),
 	}
 }
 
