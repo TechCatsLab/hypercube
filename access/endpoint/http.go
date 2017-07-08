@@ -110,7 +110,9 @@ func (server *HTTPServer) serve() echo.HandlerFunc {
 		user := claim.(message.User)
 
 		
-		client := conn.NewClient(&user, server.node.clientHub(), session.NewSession(ws, server.node.Conf.QueueBuffer))
+		client := conn.NewClient(&user, server.node.clientHub(), session.NewSession(ws, &user, server.node, server.node.Conf.QueueBuffer))
+		client.StartHandleMessage()
+
 		server.node.clientHub().Add(&user, client)
 
 		for {

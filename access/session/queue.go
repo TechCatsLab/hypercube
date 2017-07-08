@@ -36,7 +36,7 @@ import (
 
 // MessageQueue buffers the message from or to a client.
 type MessageQueue struct {
-	queue       chan *message.Message
+	queue chan *message.Message
 }
 
 func NewMessageQueue(buff int) *MessageQueue {
@@ -47,4 +47,8 @@ func NewMessageQueue(buff int) *MessageQueue {
 
 func (m *MessageQueue) PushMessage(msg *message.Message) {
 	m.queue <- msg
+}
+
+func (m *MessageQueue) FetchMessage() <-chan *message.Message {
+	return m.queue
 }

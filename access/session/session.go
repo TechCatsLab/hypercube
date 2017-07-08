@@ -31,20 +31,28 @@ package session
 
 import (
 	"hypercube/libs/message"
+	"hypercube/access/sender"
 	"github.com/gorilla/websocket"
+	"encoding/json"
 )
 
 // Session represents a client connection.
 type Session struct {
-	mq *MessageQueue
-	ws *websocket.Conn
+	user     *message.User
+	sender   sender.Sender
+	mq       *MessageQueue
+	ws       *websocket.Conn
+	shutdown chan struct{}
 }
 
 // NewSession creates a session.
-func NewSession(ws *websocket.Conn, buffSize int) *Session {
+func NewSession(ws *websocket.Conn, user *message.User, sender sender.Sender, buffSize int) *Session {
 	session := &Session{
-		mq: NewMessageQueue(buffSize),
-		ws: ws,
+		mq:             NewMessageQueue(buffSize),
+		ws:             ws,
+		user:           user,
+		sender:         sender,
+		shutdown:       make(chan struct{}),
 	}
 
 	return session
@@ -52,4 +60,38 @@ func NewSession(ws *websocket.Conn, buffSize int) *Session {
 
 func (s *Session)PushMessage(msg *message.Message) {
 	s.mq.PushMessage(msg)
+}
+
+func (s *Session) StartHandleMessage() {
+	go func() {
+		select {
+		case msg := <-s.mq.FetchMessage():
+			var (
+				user *message.User
+				plainMsg message.PlainText
+				pushMsg  message.PushPlainText
+			)
+
+			switch msg.Type {
+			case message.MessageTypePlainText:
+				json.Unmarshal(msg.Content, &plainMsg)
+				user = &plainMsg.To
+			case message.MessageTypePushPlainText:
+				json.Unmarshal(msg.Content, &pushMsg)
+				user = &pushMsg.To
+			}
+
+			if user.UserID == s.user.UserID {
+				s.ws.WriteJSON(*msg)
+			} else {
+				s.sender.Send(user, msg)
+			}
+		case <-s.shutdown:
+			return
+		}
+	}()
+}
+
+func (s *Session) StopHandleMessage() {
+	s.shutdown <- struct {}{}
 }

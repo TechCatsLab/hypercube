@@ -96,10 +96,7 @@ func (hub *ClientHub) Send(user *message.User, msg *message.Message) error {
 		return errors.New("User Hasn't Login")
 	}
 
-	err := client.Send(msg)
-	if err != nil {
-		log.Logger.Error("ClientHub Send Message Error: %v", err)
-	}
+	client.Send(msg)
 
 	return nil
 }
