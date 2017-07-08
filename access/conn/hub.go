@@ -100,3 +100,16 @@ func (hub *ClientHub) Send(user *message.User, msg *message.Message) error {
 
 	return nil
 }
+
+func (hub *ClientHub) GetAllUser() []*Client {
+	var client []*Client
+
+	hub.mux.Lock()
+	defer hub.mux.Unlock()
+
+	for _, c := range hub.clients {
+		client = append(client, c)
+	}
+
+	return client
+}
