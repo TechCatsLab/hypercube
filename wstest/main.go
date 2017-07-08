@@ -22,22 +22,23 @@
  * SOFTWARE.
  */
 
-/**
- * Created by HeChengJun on 12/04/2017.
- * Modify by SunAnxiang on 2017/07/06.
+/*
+ * Revision History:
+ *     Initial: 2017/04/12        He ChengJun
+ *      Modify: 2017/07/06        Sun Anxiang
  */
 
 package main
 
 import (
-	"os"
+	"encoding/json"
 	"log"
+	"math/rand"
+	"net/url"
+	"os"
+	"os/signal"
 	"sync"
 	"time"
-	"net/url"
-	"math/rand"
-	"os/signal"
-	"encoding/json"
 
 	"github.com/gorilla/websocket"
 
@@ -45,13 +46,13 @@ import (
 )
 
 const (
-	userCount		= 10
-	debugMsg		= false
-	Duration		= 600
-	Version			= 1
+	userCount = 10
+	debugMsg  = false
+	Duration  = 600
+	Version   = 1
 )
 
-var addrs 	string   = "10.0.0.116:7000"
+var addrs string = "10.0.0.116:7000"
 var userIDs []uint64 = []uint64{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
 
 func main() {
@@ -85,7 +86,7 @@ func dial(addr string) (*websocket.Conn, error) {
 }
 
 type UserAccess struct {
-	UserID	uint64
+	UserID uint64
 }
 
 func loginPackage(from uint64) []byte {
@@ -96,7 +97,7 @@ func loginPackage(from uint64) []byte {
 
 	msg := message.Message{
 		Version: Version,
-		Type: message.MessageTypeLogin,
+		Type:    message.MessageTypeLogin,
 		Content: byteMessage,
 	}
 	byteMsg, _ := json.Marshal(msg)
@@ -109,37 +110,37 @@ func loginPackage(from uint64) []byte {
 }
 
 type Message struct {
-	From message.User
-	To   message.User
-	Content string
+	From      message.User
+	To        message.User
+	Content   string
 	SendOrder int64
 }
 
 type Count struct {
 	counter int64
-	lock sync.Mutex
+	lock    sync.Mutex
 }
 
 var counter = Count{
 	counter: 0,
-	lock: sync.Mutex{},
+	lock:    sync.Mutex{},
 }
 
 func testPackage(from, to uint64, t time.Time) []byte {
 	counter.lock.Lock()
-	counter.counter ++
+	counter.counter++
 	messages := Message{
-		From:    message.User{UserID:"fdsjk"},
-		To:      message.User{UserID:"fdsjk"},
-		Content: t.String(),
+		From:      message.User{UserID: "fdsjk"},
+		To:        message.User{UserID: "fdsjk"},
+		Content:   t.String(),
 		SendOrder: counter.counter,
 	}
 	counter.lock.Unlock()
 	byteMessage, _ := json.Marshal(messages)
 
 	msg := message.Message{
-		Version:  Version,
-		Type: message.MessageTypePlainText,
+		Version: Version,
+		Type:    message.MessageTypePlainText,
 		Content: byteMessage,
 	}
 	byteMsg, _ := json.Marshal(msg)
@@ -159,7 +160,7 @@ func writeRoutine(c *websocket.Conn, addr string, from uint64) {
 	defer ticker.Stop()
 
 	// 退出计时
-    exitTimer := time.NewTimer(time.Second * time.Duration(Duration))
+	exitTimer := time.NewTimer(time.Second * time.Duration(Duration))
 	defer exitTimer.Stop()
 
 	for {
@@ -174,7 +175,7 @@ func writeRoutine(c *websocket.Conn, addr string, from uint64) {
 				log.Println("write:", err)
 				goto exit
 			}
-			msgCount ++
+			msgCount++
 		case <-exitTimer.C:
 			log.Println("exitTimer : go routine exit, from = ", from)
 			goto exit
@@ -185,7 +186,7 @@ exit:
 }
 
 func testRoutine(addr string, from uint64) {
-	log.Println("new routine, addr = ",addr ,"userID = ", from)
+	log.Println("new routine, addr = ", addr, "userID = ", from)
 
 	// 拨号
 	c, err := dial(addr)
@@ -207,13 +208,13 @@ func testRoutine(addr string, from uint64) {
 	go writeRoutine(c, addr, from)
 
 	// 读
-	exitTimer := time.NewTimer(time.Second * time.Duration(Duration + 10))
+	exitTimer := time.NewTimer(time.Second * time.Duration(Duration+10))
 	defer exitTimer.Stop()
 
 	var msgCount int32 = 0
 	for {
 		select {
-		case <- exitTimer.C :
+		case <-exitTimer.C:
 			goto exit
 		default:
 		}
@@ -227,10 +228,10 @@ func testRoutine(addr string, from uint64) {
 
 		msgCount++
 
-        if debugMsg {
-            log.Printf("to: %d, count: %d, recv: %s \n", from, msgCount, messages)
-        }
+		if debugMsg {
+			log.Printf("to: %d, count: %d, recv: %s \n", from, msgCount, messages)
+		}
 	}
 exit:
-    log.Printf("addr = %s recv %d messages, from = %d", addr, msgCount, from)
+	log.Printf("addr = %s recv %d messages, from = %d", addr, msgCount, from)
 }
