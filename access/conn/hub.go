@@ -39,8 +39,8 @@ import (
 
 // ClientHub represents a collection of client sessions.
 type ClientHub struct {
-	clients map[string]*Client
 	mux     sync.Mutex
+	clients map[string]*Client
 }
 
 // NewClientHub creates a client hub.
