@@ -31,6 +31,7 @@ package endpoint
 
 import (
 	"context"
+	"fmt"
 
 	"hypercube/access/config"
 	"hypercube/access/conn"
@@ -87,4 +88,9 @@ func (ep *Endpoint) Run() error {
 // Shutdown stops the access server.
 func (ep *Endpoint) Shutdown() {
 	close(ep.shutdown)
+}
+
+// Snapshot view the struct information of the program runtime.
+func (ep *Endpoint) Snapshot() string {
+	return fmt.Sprintf("%+v", ep)
 }
