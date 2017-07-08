@@ -40,24 +40,14 @@ type MessageQueue struct {
 	queue       chan *message.Message
 }
 
-func NewMessageQueue(buff ...int) *MessageQueue {
-	var buffsize int
-
-	if len(buff) > 0 {
-		buffsize = buff[0]
-	} else {
-		buffsize = config.GNodeConfig.QueueBuffer
-	}
+func NewMessageQueue() *MessageQueue {
+	buffsize := config.GNodeConfig.QueueBuffer
 
 	return &MessageQueue{
 		queue: make(chan *message.Message, buffsize),
 	}
 }
 
-func (m *MessageQueue) FetchMessage() *message.Message {
-	return <- m.queue
-}
-
-func (m *MessageQueue) PushMessage(mess *message.Message) {
-	m.queue <- mess
+func (m *MessageQueue) PushMessage(msg *message.Message) {
+	m.queue <- msg
 }

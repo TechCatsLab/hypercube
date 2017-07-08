@@ -85,6 +85,6 @@ func (hub *ClientHub) PushMessageToAll(message *message.Message) {
 	defer hub.mux.Unlock()
 
 	for _, c := range hub.clients {
-		c.session.Mq.PushMessage(message)
+		c.session.PushMessage(message)
 	}
 }

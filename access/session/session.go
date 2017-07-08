@@ -30,21 +30,26 @@
 package session
 
 import (
+	"hypercube/libs/message"
 	"github.com/gorilla/websocket"
 )
 
 // Session represents a client connection.
 type Session struct {
-	Mq *MessageQueue
-	Ws *websocket.Conn
+	mq *MessageQueue
+	ws *websocket.Conn
 }
 
 // NewSession creates a session.
 func NewSession(ws *websocket.Conn) *Session {
 	session := &Session{
-		Mq: NewMessageQueue(),
-		Ws: ws,
+		mq: NewMessageQueue(),
+		ws: ws,
 	}
 
 	return session
+}
+
+func (s *Session)PushMessage(msg *message.Message) {
+	s.mq.PushMessage(msg)
 }

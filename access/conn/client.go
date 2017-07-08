@@ -73,8 +73,6 @@ func (client *Client) Handle(message *mes.Message) error {
 		err = client.HandleUserMessage(message)
 	case mes.MessageTypePushPlainText:
 		err = client.HandlePushMessage(message)
-	case mes.MessageTypeLogin:
-		err = client.HandleLoginMessage(message)
 	case mes.MessageTypeLogout:
 		err = client.HandleLogoutMessage(message)
 	default:
@@ -107,7 +105,7 @@ func (client *Client) HandleUserMessage(message *mes.Message) error {
 		return err
 	}
 
-	to.session.Mq.PushMessage(message)
+	to.session.PushMessage(message)
 
 	return nil
 }
@@ -133,37 +131,16 @@ func (client *Client) HandlePushMessage(pmessage *mes.Message) error {
 				continue
 			}
 
-			to.session.Mq.PushMessage(pmessage)
+			to.session.PushMessage(pmessage)
 		}
 		return nil
 	}
 }
 
-func (client *Client)HandleLoginMessage(message *mes.Message) error {
-	var mess mes.User
-	user, err := message.Content.MarshalJSON()
-	if err != nil {
-		return err
-	}
-
-	err = json.Unmarshal(user, mess)
-	if err != nil {
-		return err
-	}
-
-	client.hub.Add(&mess, client)
-	prometheus.OnlineUserCounter.Add(1)
-	return nil
-}
-
 func (client *Client) HandleLogoutMessage(message *mes.Message) error {
 	var mess mes.User
-	user, err := message.Content.MarshalJSON()
-	if err != nil {
-		return err
-	}
 
-	err = json.Unmarshal(user, mess)
+	err := json.Unmarshal(message.Content, &mess)
 	if err != nil {
 		return err
 	}
