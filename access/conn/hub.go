@@ -45,7 +45,6 @@ type ClientHub struct {
 func NewClientHub() *ClientHub {
 	return &ClientHub{
 		clients: map[string]*Client{},
-		mux:     sync.Mutex{},
 	}
 }
 
@@ -54,7 +53,6 @@ func (hub *ClientHub) Add(user *message.User, client *Client) {
 	hub.mux.Lock()
 	defer hub.mux.Unlock()
 	if _, exists := hub.clients[user.UserID]; exists {
-		// Warning
 		log.Logger.Debug("user already login")
 	}
 	hub.clients[user.UserID] = client
@@ -65,12 +63,12 @@ func (hub *ClientHub) Remove(user *message.User, client *Client) {
 	hub.mux.Lock()
 	defer hub.mux.Unlock()
 	if _, exists := hub.clients[user.UserID]; !exists {
-		// Warning
 		log.Logger.Debug("user hasn't login")
 	}
 	delete(hub.clients, user.UserID)
 }
 
+// Get a client bu user
 func (hub *ClientHub) Get(user string) (*Client, bool) {
 	hub.mux.Lock()
 	defer hub.mux.Unlock()
@@ -87,4 +85,18 @@ func (hub *ClientHub) PushMessageToAll(message *message.Message) {
 	for _, c := range hub.clients {
 		c.session.PushMessage(message)
 	}
+}
+
+func (hub *ClientHub) Send(user *message.User, msg *message.Message) error {
+	client, exist := hub.Get(user.UserID)
+	if !exist {
+		// send to logic
+	}
+
+	err := client.Send(msg)
+	if err != nil {
+		log.Logger.Error("ClientHub Send Message Error: %v", err)
+	}
+
+	return nil
 }
