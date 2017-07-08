@@ -30,22 +30,23 @@
 package conn
 
 import (
-	"hypercube/access/session"
-	mes "hypercube/libs/message"
 	"encoding/json"
-	"hypercube/libs/metrics/prometheus"
+
+	"hypercube/access/session"
 	"hypercube/libs/log"
+	msg "hypercube/libs/message"
+	"hypercube/libs/metrics/prometheus"
 )
 
 // Client is a client connection.
 type Client struct {
-	user    *mes.User
+	user    *msg.User
 	hub     *ClientHub
 	session *session.Session
 }
 
 // NewClient creates a client.
-func NewClient(user *mes.User, hub *ClientHub, session *session.Session) *Client {
+func NewClient(user *msg.User, hub *ClientHub, session *session.Session) *Client {
 	client := &Client{
 		user:    user,
 		hub:     hub,
@@ -63,12 +64,12 @@ func (client *Client) UID() string {
 }
 
 // Handle incoming messages
-func (client *Client) Handle(message *mes.Message) error {
+func (client *Client) Handle(message *msg.Message) error {
 	var err error
 	switch message.Type {
-	case mes.MessageTypePushPlainText, mes.MessageTypePlainText:
+	case msg.MessageTypePushPlainText, msg.MessageTypePlainText:
 		client.Send(message)
-	case mes.MessageTypeLogout:
+	case msg.MessageTypeLogout:
 		err = client.HandleLogoutMessage(message)
 	default:
 		log.Logger.Debug("No message type match!")
@@ -82,8 +83,8 @@ func (client *Client) Handle(message *mes.Message) error {
 	return nil
 }
 
-func (client *Client) HandleLogoutMessage(message *mes.Message) error {
-	var mess mes.User
+func (client *Client) HandleLogoutMessage(message *msg.Message) error {
+	var mess msg.User
 
 	err := json.Unmarshal(message.Content, &mess)
 	if err != nil {
@@ -96,16 +97,16 @@ func (client *Client) HandleLogoutMessage(message *mes.Message) error {
 	return nil
 }
 
-func (client *Client) StartHandleMessage()  {
+func (client *Client) StartHandleMessage() {
 	client.session.StartMessageLoop()
 }
 
-func (client *Client) StopHandleMessage()  {
+func (client *Client) StopHandleMessage() {
 	client.session.Stop()
 }
 
 // Send messages from peers or push server
-func (client *Client) Send(msg *mes.Message) {
+func (client *Client) Send(msg *msg.Message) {
 	client.session.PushMessage(msg)
 }
 

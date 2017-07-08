@@ -54,9 +54,11 @@ func NewClientHub() *ClientHub {
 func (hub *ClientHub) Add(user *message.User, client *Client) {
 	hub.mux.Lock()
 	defer hub.mux.Unlock()
+
 	if _, exists := hub.clients[user.UserID]; exists {
 		log.Logger.Warn("user already login!")
 	}
+
 	hub.clients[user.UserID] = client
 }
 
@@ -64,9 +66,11 @@ func (hub *ClientHub) Add(user *message.User, client *Client) {
 func (hub *ClientHub) Remove(user *message.User, client *Client) {
 	hub.mux.Lock()
 	defer hub.mux.Unlock()
+
 	if _, exists := hub.clients[user.UserID]; !exists {
 		log.Logger.Warn("user hasn't login!")
 	}
+
 	delete(hub.clients, user.UserID)
 }
 
@@ -80,12 +84,12 @@ func (hub *ClientHub) Get(user string) (*Client, bool) {
 	return client, ok
 }
 
-func (hub *ClientHub) PushMessageToAll(message *message.Message) {
+func (hub *ClientHub) PushMessageToAll(msg *message.Message) {
 	hub.mux.Lock()
 	defer hub.mux.Unlock()
 
 	for _, c := range hub.clients {
-		c.session.PushMessage(message)
+		c.session.PushMessage(msg)
 	}
 }
 
@@ -102,14 +106,14 @@ func (hub *ClientHub) Send(user *message.User, msg *message.Message) error {
 }
 
 func (hub *ClientHub) GetAllUser() []*Client {
-	var client []*Client
+	var clients []*Client
 
 	hub.mux.Lock()
 	defer hub.mux.Unlock()
 
 	for _, c := range hub.clients {
-		client = append(client, c)
+		clients = append(clients, c)
 	}
 
-	return client
+	return clients
 }
