@@ -30,10 +30,11 @@
 package conn
 
 import (
-	"hypercube/libs/message"
+	"errors"
+
 	"hypercube/libs/log"
+	"hypercube/libs/message"
 	"sync"
-	"pkg/errors"
 )
 
 // ClientHub represents a collection of client sessions.
@@ -74,7 +75,7 @@ func (hub *ClientHub) Get(user string) (*Client, bool) {
 	hub.mux.Lock()
 	defer hub.mux.Unlock()
 
-	client, ok := hub.clients[user];
+	client, ok := hub.clients[user]
 
 	return client, ok
 }
