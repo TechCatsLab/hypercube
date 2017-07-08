@@ -58,7 +58,7 @@ func NewEndpoint(conf *config.NodeConfig) (*Endpoint, error) {
 		shutdown: make(chan struct{}),
 	}
 
-	ep.ws = NewHTTPServer(ep)
+	ep.ws = NewHTTPServer(ep, conf.QueueBuffer)
 
 	return ep, err
 }

@@ -53,7 +53,7 @@ type HTTPServer struct {
 }
 
 // NewHTTPServer create a http server.
-func NewHTTPServer(node *Endpoint) *HTTPServer {
+func NewHTTPServer(node *Endpoint, buffSize int) *HTTPServer {
 	server := &HTTPServer{
 		node:   node,
 		server: echo.New(),
@@ -73,12 +73,12 @@ func NewHTTPServer(node *Endpoint) *HTTPServer {
 	}
 	server.server.Use(middleware.JWTWithConfig(config))
 
-	server.server.GET("/join", server.serve())
+	server.server.GET("/join", server.serve(buffSize))
 
 	return server
 }
 
-func (server *HTTPServer) serve() echo.HandlerFunc {
+func (server *HTTPServer) serve(buffSize int) echo.HandlerFunc {
 	var (
 		upgrader *websocket.Upgrader
 	)
@@ -110,7 +110,7 @@ func (server *HTTPServer) serve() echo.HandlerFunc {
 		user := claim.(message.User)
 
 		
-		client := conn.NewClient(&user, server.node.clientHub(), session.NewSession(ws))
+		client := conn.NewClient(&user, server.node.clientHub(), session.NewSession(ws, buffSize))
 		server.node.clientHub().Add(&user, client)
 
 		for {

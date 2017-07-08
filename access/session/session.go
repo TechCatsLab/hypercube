@@ -41,9 +41,9 @@ type Session struct {
 }
 
 // NewSession creates a session.
-func NewSession(ws *websocket.Conn) *Session {
+func NewSession(ws *websocket.Conn, buffSize int) *Session {
 	session := &Session{
-		mq: NewMessageQueue(),
+		mq: NewMessageQueue(buffSize),
 		ws: ws,
 	}
 
