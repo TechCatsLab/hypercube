@@ -87,8 +87,8 @@ func (c *Clients) Call(serviceMethod string, args interface{}, reply interface{}
 }
 
 // Ping the rpc connect and reconnect when has an error.
-func (c *Clients) Ping(serviceMethod string) {
+func (c *Clients) Ping() {
 	for _, cli := range c.clients {
-		go cli.Ping(serviceMethod)
+		go cli.Ping()
 	}
 }

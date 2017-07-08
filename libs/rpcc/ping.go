@@ -24,10 +24,14 @@
 
 /*
  * Revision History:
- *     Initial: 2017/07/05        Feng Yifei
+ *     Initial: 2017/07/08        Feng Yifei
  */
 
 package rpcc
+
+const (
+	pingMethodName = "Ping"
+)
 
 // ReqKeepAlive - Keepalive request
 type ReqKeepAlive struct {
@@ -35,4 +39,9 @@ type ReqKeepAlive struct {
 
 // RespKeepAlive - Keepalive response
 type RespKeepAlive struct {
+}
+
+// KeepAlive is general rpc ping interface.
+type KeepAlive interface {
+	Ping(req *ReqKeepAlive, resp *RespKeepAlive) error
 }

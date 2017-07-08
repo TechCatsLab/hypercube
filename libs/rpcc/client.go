@@ -115,7 +115,7 @@ func (c *Client) Close() {
 }
 
 // Ping - Ping the rpc server or reconnect when has an error.
-func (c *Client) Ping(serviceMethod string) {
+func (c *Client) Ping() {
 	var (
 		arg   = ReqKeepAlive{}
 		reply = RespKeepAlive{}
@@ -130,7 +130,7 @@ func (c *Client) Ping(serviceMethod string) {
 		}
 
 		if c.Client != nil && c.err == nil {
-			if err = c.Call(serviceMethod, &arg, &reply); err != nil {
+			if err = c.Call(pingMethodName, &arg, &reply); err != nil {
 				c.err = err
 				if err != rpc.ErrShutdown {
 					c.Client.Close()
