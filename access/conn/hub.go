@@ -33,6 +33,7 @@ import (
 	"hypercube/libs/message"
 	"hypercube/libs/log"
 	"sync"
+	"pkg/errors"
 )
 
 // ClientHub represents a collection of client sessions.
@@ -53,7 +54,7 @@ func (hub *ClientHub) Add(user *message.User, client *Client) {
 	hub.mux.Lock()
 	defer hub.mux.Unlock()
 	if _, exists := hub.clients[user.UserID]; exists {
-		log.Logger.Debug("user already login")
+		log.Logger.Warn("user already login!")
 	}
 	hub.clients[user.UserID] = client
 }
@@ -63,7 +64,7 @@ func (hub *ClientHub) Remove(user *message.User, client *Client) {
 	hub.mux.Lock()
 	defer hub.mux.Unlock()
 	if _, exists := hub.clients[user.UserID]; !exists {
-		log.Logger.Debug("user hasn't login")
+		log.Logger.Warn("user hasn't login!")
 	}
 	delete(hub.clients, user.UserID)
 }
@@ -90,7 +91,8 @@ func (hub *ClientHub) PushMessageToAll(message *message.Message) {
 func (hub *ClientHub) Send(user *message.User, msg *message.Message) error {
 	client, exist := hub.Get(user.UserID)
 	if !exist {
-		// send to logic
+		log.Logger.Warn("user hasn't login!")
+		return errors.New("User Hasn't Login")
 	}
 
 	err := client.Send(msg)

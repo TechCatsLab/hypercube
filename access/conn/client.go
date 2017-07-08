@@ -69,6 +69,7 @@ func (client *Client) Handle(message *mes.Message) error {
 	var err error
 	switch message.Type {
 	case mes.MessageTypePlainText:
+	case mes.MessageTypePushPlainText:
 		err = client.HandleUserMessage(message)
 	case mes.MessageTypeLogout:
 		err = client.HandleLogoutMessage(message)
@@ -87,12 +88,15 @@ func (client *Client) Handle(message *mes.Message) error {
 func (client *Client) HandleUserMessage(message *mes.Message) error {
 	var (
 		mess mes.PlainText
+		push mes.PushPlainText
 		v    interface{}
 	)
 
 	switch message.Type {
 	case mes.MessageTypePlainText:
 		v = mess
+	case mes.MessageTypePushPlainText:
+		v = push
 
 	}
 
