@@ -68,8 +68,7 @@ func (client *Client) UID() string {
 func (client *Client) Handle(message *mes.Message) error {
 	var err error
 	switch message.Type {
-	case mes.MessageTypePlainText:
-	case mes.MessageTypePushPlainText:
+	case mes.MessageTypePushPlainText, mes.MessageTypePlainText:
 		client.Send(message)
 	case mes.MessageTypeLogout:
 		err = client.HandleLogoutMessage(message)
