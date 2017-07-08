@@ -33,7 +33,6 @@ import (
 	"os"
 	"syscall"
 
-	"hypercube/access/debug"
 	"hypercube/libs/interrupt"
 	"hypercube/libs/log"
 )
