@@ -39,16 +39,19 @@ type MessageQueue struct {
 	queue chan *message.Message
 }
 
+// NewMessageQueue New message queue.
 func NewMessageQueue(buff int) *MessageQueue {
 	return &MessageQueue{
 		queue: make(chan *message.Message, buff),
 	}
 }
 
+// PushMessage push message to queue.
 func (m *MessageQueue) PushMessage(msg *message.Message) {
 	m.queue <- msg
 }
 
+// FetchMessage fetch message from queue.
 func (m *MessageQueue) FetchMessage() <-chan *message.Message {
 	return m.queue
 }

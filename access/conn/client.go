@@ -101,11 +101,11 @@ func (client *Client) HandleLogoutMessage(message *mes.Message) error {
 }
 
 func (client *Client) StartHandleMessage()  {
-	client.session.StartHandleMessage()
+	client.session.StartMessageLoop()
 }
 
 func (client *Client) StopHandleMessage()  {
-	client.session.StopHandleMessage()
+	client.session.Stop()
 }
 
 // Send messages from peers or push server

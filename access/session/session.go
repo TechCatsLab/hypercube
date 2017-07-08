@@ -58,40 +58,48 @@ func NewSession(ws *websocket.Conn, user *message.User, sender sender.Sender, bu
 	return session
 }
 
+// PushMessage push message to queue.
 func (s *Session)PushMessage(msg *message.Message) {
 	s.mq.PushMessage(msg)
 }
 
-func (s *Session) StartHandleMessage() {
+// StartMessageLoop start to handle message loop.
+func (s *Session) StartMessageLoop() {
 	go func() {
 		select {
 		case msg := <-s.mq.FetchMessage():
-			var (
-				user *message.User
-				plainMsg message.PlainText
-				pushMsg  message.PushPlainText
-			)
-
-			switch msg.Type {
-			case message.MessageTypePlainText:
-				json.Unmarshal(msg.Content, &plainMsg)
-				user = &plainMsg.To
-			case message.MessageTypePushPlainText:
-				json.Unmarshal(msg.Content, &pushMsg)
-				user = &pushMsg.To
-			}
-
-			if user.UserID == s.user.UserID {
-				s.ws.WriteJSON(*msg)
-			} else {
-				s.sender.Send(user, msg)
-			}
+			s.HandleMessage(msg)
 		case <-s.shutdown:
 			return
 		}
 	}()
 }
 
-func (s *Session) StopHandleMessage() {
+// HandleMessage handle message method.
+func (s *Session) HandleMessage(msg *message.Message) {
+	var (
+		user *message.User
+		plainMsg message.PlainText
+		pushMsg  message.PushPlainText
+	)
+
+	switch msg.Type {
+	case message.MessageTypePlainText:
+		json.Unmarshal(msg.Content, &plainMsg)
+		user = &plainMsg.To
+	case message.MessageTypePushPlainText:
+		json.Unmarshal(msg.Content, &pushMsg)
+		user = &pushMsg.To
+	}
+
+	if user.UserID == s.user.UserID {
+		s.ws.WriteJSON(*msg)
+	} else {
+		s.sender.Send(user, msg)
+	}
+}
+
+// Stop stop handle message loop.
+func (s *Session) Stop() {
 	s.shutdown <- struct {}{}
 }
