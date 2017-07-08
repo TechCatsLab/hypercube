@@ -36,6 +36,7 @@ import (
 	"hypercube/access/config"
 	"hypercube/access/conn"
 	"hypercube/libs/log"
+	"hypercube/libs/message"
 )
 
 // Endpoint represents a access server.
@@ -66,6 +67,10 @@ func NewEndpoint(conf *config.NodeConfig) (*Endpoint, error) {
 
 func (ep *Endpoint) clientHub() *conn.ClientHub {
 	return ep.hub
+}
+
+func (ep *Endpoint) Send(user *message.User, msg *message.Message) {
+	ep.hub.Send(user, msg)
 }
 
 // Run starts the access server.

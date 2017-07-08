@@ -70,11 +70,11 @@ func (client *Client) Handle(message *mes.Message) error {
 	switch message.Type {
 	case mes.MessageTypePlainText:
 	case mes.MessageTypePushPlainText:
-		err = client.HandleUserMessage(message)
+		client.Send(message)
 	case mes.MessageTypeLogout:
 		err = client.HandleLogoutMessage(message)
 	default:
-
+		log.Logger.Debug("No message type match!")
 	}
 
 	if err != nil {
@@ -82,30 +82,6 @@ func (client *Client) Handle(message *mes.Message) error {
 
 		return err
 	}
-	return nil
-}
-
-func (client *Client) HandleUserMessage(message *mes.Message) error {
-	var (
-		mess mes.PlainText
-		push mes.PushPlainText
-		v    interface{}
-	)
-
-	switch message.Type {
-	case mes.MessageTypePlainText:
-		v = mess
-	case mes.MessageTypePushPlainText:
-		v = push
-
-	}
-
-	err := json.Unmarshal(message.Content, &v)
-	if err != nil {
-		return err
-	}
-
-	client.hub.Send(&mess.To, message)
 
 	return nil
 }
@@ -124,20 +100,17 @@ func (client *Client) HandleLogoutMessage(message *mes.Message) error {
 	return nil
 }
 
+func (client *Client) StartHandleMessage()  {
+	client.session.StartHandleMessage()
+}
+
+func (client *Client) StopHandleMessage()  {
+	client.session.StopHandleMessage()
+}
+
 // Send messages from peers or push server
-func (client *Client) Send(msg *mes.Message) error {
-	var mess mes.Message
-
-	err := json.Unmarshal(msg.Content, &mess.Content)
-	if err != nil {
-		log.Logger.Error("Client Send Unmarshal Message Error: %v", err)
-
-		return err
-	}
-
-	client.session.PushMessage(&mess)
-
-	return nil
+func (client *Client) Send(msg *mes.Message) {
+	client.session.PushMessage(msg)
 }
 
 // Close finish the client message loop.
