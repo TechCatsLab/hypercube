@@ -103,7 +103,7 @@ func (client *Client) HandleUserMessage(message *mes.Message) error {
 		return err
 	}
 
-	client.hub.Send(*mess.To, message)
+	client.hub.Send(&mess.To, message)
 
 	return nil
 }
@@ -151,16 +151,16 @@ func (client *Client) HandleLogoutMessage(message *mes.Message) error {
 
 // Send messages from peers or push server
 func (client *Client) Send(msg *mes.Message) error {
-	var mess mes.PlainText
+	var mess mes.Message
 
-	err := json.Unmarshal(msg.Content, &mess)
+	err := json.Unmarshal(msg.Content, &mess.Content)
 	if err != nil {
 		log.Logger.Error("Client Send Unmarshal Message Error: %v", err)
 
 		return err
 	}
 
-	client.session.PushMessage(mess)
+	client.session.PushMessage(&mess)
 
 	return nil
 }

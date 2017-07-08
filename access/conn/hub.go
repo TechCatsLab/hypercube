@@ -87,7 +87,7 @@ func (hub *ClientHub) PushMessageToAll(message *message.Message) {
 	}
 }
 
-func (hub *ClientHub) Send(user *message.User, msg *message.Message) {
+func (hub *ClientHub) Send(user *message.User, msg *message.Message) error {
 	client, exist := hub.Get(user.UserID)
 	if !exist {
 		// send to logic
