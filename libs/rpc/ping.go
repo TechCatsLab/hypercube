@@ -27,7 +27,7 @@
  *     Initial: 2017/07/08        Feng Yifei
  */
 
-package rpcc
+package rpc
 
 const (
 	pingMethodName = "Ping"

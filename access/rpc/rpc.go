@@ -28,3 +28,24 @@
  */
 
 package rpc
+
+import (
+	"hypercube/access/endpoint"
+	"hypercube/libs/message"
+	"hypercube/libs/rpc"
+)
+
+// AccessRPC provides push functions.
+type AccessRPC struct {
+	node *endpoint.Endpoint
+}
+
+// Ping is general rpc keepalive interface.
+func (access *AccessRPC) Ping(req *rpc.ReqKeepAlive, resp *rpc.RespKeepAlive) error {
+	return nil
+}
+
+// Push a message to a specific user.
+func (access *AccessRPC) Push(user *message.User) error {
+	return nil
+}

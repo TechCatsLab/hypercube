@@ -27,7 +27,7 @@
  *     Initial: 2017/07/06        Feng Yifei
  */
 
-package rpcc
+package rpc
 
 import (
 	"errors"
