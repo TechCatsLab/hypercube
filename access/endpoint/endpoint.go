@@ -31,7 +31,7 @@ package endpoint
 
 import (
 	"context"
-	"encoding/json"
+	"fmt"
 
 	"hypercube/access/config"
 	"hypercube/access/conn"
@@ -92,12 +92,5 @@ func (ep *Endpoint) Shutdown() {
 
 // Snapshot view the struct information of the program runtime.
 func (ep *Endpoint) Snapshot() string {
-	out, err := json.Marshal(ep)
-
-	if err != nil {
-		log.Logger.Error("endpoint.Snapshot returned error: %v", err)
-		return ""
-	}
-
-	return string(out)
+	return fmt.Sprintf("%+v", ep)
 }
