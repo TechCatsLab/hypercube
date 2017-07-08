@@ -31,6 +31,7 @@ package endpoint
 
 import (
 	"context"
+	"encoding/json"
 
 	"hypercube/access/config"
 	"hypercube/access/conn"
@@ -82,4 +83,16 @@ func (ep *Endpoint) Run() error {
 // Shutdown stops the access server.
 func (ep *Endpoint) Shutdown() {
 	close(ep.shutdown)
+}
+
+// Snapshot view the struct information of the program runtime.
+func (ep *Endpoint) Snapshot() string {
+	out, err := json.Marshal(ep)
+
+	if err != nil {
+		log.Logger.Error("endpoint.Snapshot returned error: %v", err)
+		return ""
+	}
+
+	return string(out)
 }
