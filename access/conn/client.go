@@ -32,7 +32,6 @@ package conn
 import (
 	"hypercube/access/session"
 	mes "hypercube/libs/message"
-	"errors"
 	"encoding/json"
 	"hypercube/libs/metrics/prometheus"
 	"hypercube/libs/log"
@@ -88,24 +87,23 @@ func (client *Client) Handle(message *mes.Message) error {
 }
 
 func (client *Client) HandleUserMessage(message *mes.Message) error {
-	var mess mes.PlainText
+	var (
+		mess mes.PlainText
+		v    interface{}
+	)
 
-	err := json.Unmarshal(message.Content, &mess)
+	switch message.Type {
+	case mes.MessageTypePlainText:
+		v = mess
+
+	}
+
+	err := json.Unmarshal(message.Content, &v)
 	if err != nil {
 		return err
 	}
 
-	if mess.To == *client.user {
-		return nil
-	}
-
-	to, ok := HubService.Get(mess.To.UserID)
-	if !ok {
-		err := errors.New("User not have session")
-		return err
-	}
-
-	to.session.PushMessage(message)
+	client.hub.Send(*mess.To, message)
 
 	return nil
 }
@@ -152,7 +150,18 @@ func (client *Client) HandleLogoutMessage(message *mes.Message) error {
 }
 
 // Send messages from peers or push server
-func (client *Client) Send() error {
+func (client *Client) Send(msg *mes.Message) error {
+	var mess mes.PlainText
+
+	err := json.Unmarshal(msg.Content, &mess)
+	if err != nil {
+		log.Logger.Error("Client Send Unmarshal Message Error: %v", err)
+
+		return err
+	}
+
+	client.session.PushMessage(mess)
+
 	return nil
 }
 

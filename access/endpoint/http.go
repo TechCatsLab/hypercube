@@ -103,9 +103,15 @@ func (server *HTTPServer) serve() echo.HandlerFunc {
 		}
 
 		claim := c.Get("user")
+		if claim == nil {
+			log.Logger.Error("Get Claim Error: %v", err)
+			return err
+		}
 		user := claim.(message.User)
+
 		
 		client := conn.NewClient(&user, server.node.clientHub(), session.NewSession(ws))
+		server.node.clientHub().Add(&user, client)
 
 		for {
 			if err = ws.ReadJSON(&msg); err != nil {
