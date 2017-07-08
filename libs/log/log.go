@@ -60,7 +60,12 @@ func (l *RecordLog) Fatal(v ...interface{}){
 	log.Fatal(v)
 }
 
-func (l *RecordLog) Info (format string, a ...interface{}) {
+func (l *RecordLog) Info(format string, a ...interface{}) {
 	info := fmt.Sprintf(format, a)
 	zapLog.Info(info, zap.Skip())
+}
+
+func (l *RecordLog) Warn(format string, a ...interface{}) {
+	warn := fmt.Sprintf(format, a)
+	zapLog.Warn(warn, zap.Skip())
 }
