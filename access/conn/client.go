@@ -85,14 +85,15 @@ func (client *Client) Handle(message *msg.Message) error {
 }
 
 func (client *Client) HandleLogoutMessage(message *msg.Message) error {
-	var mess msg.User
+	var user msg.User
 
-	err := json.Unmarshal(message.Content, &mess)
+	err := json.Unmarshal(message.Content, &user)
 	if err != nil {
 		return err
 	}
 
-	client.hub.Remove(&mess, client)
+	client.hub.Remove(&user, client)
+	client.Close()
 	prometheus.OnlineUserCounter.Add(-1)
 
 	return nil
@@ -102,10 +103,6 @@ func (client *Client) StartHandleMessage() {
 	client.session.StartMessageLoop()
 }
 
-func (client *Client) StopHandleMessage() {
-	client.session.Stop()
-}
-
 // Send messages from peers or push server
 func (client *Client) Send(msg *msg.Message) {
 	client.session.PushMessage(msg)
@@ -113,4 +110,5 @@ func (client *Client) Send(msg *msg.Message) {
 
 // Close finish the client message loop.
 func (client *Client) Close() {
+	client.session.Stop()
 }

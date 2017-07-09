@@ -107,5 +107,5 @@ func (s *Session) HandleMessage(msg *message.Message) {
 
 // Stop stop handle message loop.
 func (s *Session) Stop() {
-	s.shutdown <- struct {}{}
+	close(s.shutdown)
 }
