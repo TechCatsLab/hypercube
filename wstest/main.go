@@ -68,7 +68,7 @@ var MsgRcvChan = make(chan Message, 10)
 var msgSend, msgRsv Message
 
 var addrs string = "127.0.0.1:8080"
-var userIDs []uint64 = []uint64{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
+var userIDs []string = []string{"1", "2", "3", "4", "5", "6", "7", "8", "9", "10"}
 
 func main() {
 	interrupt := make(chan os.Signal, 1)
@@ -91,11 +91,11 @@ func main() {
 	}
 }
 
-func newRoutine(from uint64) {
+func newRoutine(from string) {
 	go testRoutine(addrs, from)
 }
 
-func randUserID() uint64 {
+func randUserID() string {
 	return userIDs[rand.Uint32()%userCount]
 }
 
@@ -112,10 +112,10 @@ func dial(addr string) (*websocket.Conn, error) {
 }
 
 type UserAccess struct {
-	UserID uint64
+	UserID string
 }
 
-func loginPackage(from uint64) []byte {
+func loginPackage(from string) []byte {
 	messages := UserAccess{
 		UserID: from,
 	}
@@ -135,10 +135,10 @@ func loginPackage(from uint64) []byte {
 	return byteMsg
 }
 
-func testPackage(from, to uint64, t time.Time) []byte {
+func testPackage(from, to string, t time.Time) []byte {
 	messages := Message{
-		From:    message.User{UserID: "fdsjk"},
-		To:      message.User{UserID: "fdsjk"},
+		From:    message.User{UserID: from},
+		To:      message.User{UserID: to},
 		Time:    t.String(),
 		Content: "test",
 	}
@@ -158,7 +158,7 @@ func testPackage(from, to uint64, t time.Time) []byte {
 	return byteMsg
 }
 
-func writeRoutine(c *websocket.Conn, addr string, from uint64) {
+func writeRoutine(c *websocket.Conn, addr string, from string) {
 	var msgCount int32 = 0
 
 	// 写入计时
@@ -198,7 +198,7 @@ exit:
 	log.Printf("send %d messages, addr %s, from %d \n", msgCount, addr, from)
 }
 
-func testRoutine(addr string, from uint64) {
+func testRoutine(addr string, from string) {
 	log.Println("new routine, addr = ", addr, "userID = ", from)
 
 	// 拨号
