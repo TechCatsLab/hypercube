@@ -30,10 +30,15 @@
 package session
 
 import (
+	"encoding/json"
+
+	"github.com/gorilla/websocket"
+
 	"hypercube/libs/message"
 	"hypercube/access/sender"
-	"github.com/gorilla/websocket"
-	"encoding/json"
+	"hypercube/libs/metrics/prometheus"
+
+
 )
 
 // Session represents a client connection.
@@ -94,6 +99,7 @@ func (s *Session) HandleMessage(msg *message.Message) {
 
 	if user.UserID == s.user.UserID {
 		s.ws.WriteJSON(*msg)
+		prometheus.SendMessageCounter.Add(1)
 	} else {
 		s.sender.Send(user, msg)
 	}

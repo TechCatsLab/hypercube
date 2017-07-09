@@ -42,6 +42,7 @@ import (
 	"hypercube/access/session"
 	"hypercube/libs/message"
 	"hypercube/libs/log"
+	"hypercube/libs/metrics/prometheus"
 
 	"github.com/dgrijalva/jwt-go"
 )
@@ -108,6 +109,7 @@ func (server *HTTPServer) serve() echo.HandlerFunc {
 			return err
 		}
 		user := claim.(message.User)
+		prometheus.OnlineUserCounter.Add(1)
 
 		client := conn.NewClient(&user, server.node.clientHub(), session.NewSession(ws, &user, server.node, server.node.Conf.QueueBuffer))
 		client.StartHandleMessage()

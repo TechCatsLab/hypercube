@@ -69,6 +69,7 @@ func (client *Client) Handle(message *msg.Message) error {
 	switch message.Type {
 	case msg.MessageTypePushPlainText, msg.MessageTypePlainText:
 		client.Send(message)
+		prometheus.ReceiveMessageCounter.Add(1)
 	case msg.MessageTypeLogout:
 		err = client.HandleLogoutMessage(message)
 	default:
