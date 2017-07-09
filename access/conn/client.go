@@ -69,7 +69,6 @@ func (client *Client) Handle(message *msg.Message) error {
 	switch message.Type {
 	case msg.MessageTypePushPlainText, msg.MessageTypePlainText:
 		client.Send(message)
-		prometheus.ReceiveMessageCounter.Add(1)
 	case msg.MessageTypeLogout:
 		err = client.HandleLogoutMessage(message)
 	default:
@@ -89,6 +88,7 @@ func (client *Client) HandleLogoutMessage(message *msg.Message) error {
 
 	err := json.Unmarshal(message.Content, &user)
 	if err != nil {
+		log.Logger.Error("HandleLogoutMessage Unmarshal Error: %+v", err)
 		return err
 	}
 

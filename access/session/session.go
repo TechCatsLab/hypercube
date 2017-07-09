@@ -37,8 +37,7 @@ import (
 	"hypercube/libs/message"
 	"hypercube/access/sender"
 	"hypercube/libs/metrics/prometheus"
-
-
+	"hypercube/libs/log"
 )
 
 // Session represents a client connection.
@@ -71,11 +70,13 @@ func (s *Session)PushMessage(msg *message.Message) {
 // StartMessageLoop start to handle message loop.
 func (s *Session) StartMessageLoop() {
 	go func() {
-		select {
-		case msg := <-s.mq.FetchMessage():
-			s.HandleMessage(msg)
-		case <-s.shutdown:
-			return
+		for {
+			select {
+			case msg := <-s.mq.FetchMessage():
+				s.HandleMessage(msg)
+			case <-s.shutdown:
+				return
+			}
 		}
 	}()
 }
@@ -95,10 +96,17 @@ func (s *Session) HandleMessage(msg *message.Message) {
 	case message.MessageTypePushPlainText:
 		json.Unmarshal(msg.Content, &pushMsg)
 		user = &pushMsg.To
+	default:
+		log.Logger.Warn("Unknown Type!")
+		return
 	}
 
 	if user.UserID == s.user.UserID {
-		s.ws.WriteJSON(*msg)
+		err := s.ws.WriteJSON(*msg)
+		if err != nil {
+			log.Logger.Error("WriteMessage Error: %+v", err)
+			s.PushMessage(msg)
+		}
 		prometheus.SendMessageCounter.Add(1)
 	} else {
 		s.sender.Send(user, msg)

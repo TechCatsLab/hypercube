@@ -48,10 +48,9 @@ type Endpoint struct {
 }
 
 // NewEndpoint create a new access point.
-func NewEndpoint(conf *config.NodeConfig) (*Endpoint, error) {
+func NewEndpoint(conf *config.NodeConfig) *Endpoint {
 	var (
 		ep  *Endpoint
-		err error
 	)
 
 	ep = &Endpoint{
@@ -62,7 +61,7 @@ func NewEndpoint(conf *config.NodeConfig) (*Endpoint, error) {
 
 	ep.ws = NewHTTPServer(ep)
 
-	return ep, err
+	return ep
 }
 
 func (ep *Endpoint) clientHub() *conn.ClientHub {

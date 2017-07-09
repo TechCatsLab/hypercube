@@ -93,10 +93,6 @@ func (server *HTTPServer) serve() echo.HandlerFunc {
 	}
 
 	return func(c echo.Context) error {
-		var (
-			msg message.Message
-		)
-
 		ws, err := upgrader.Upgrade(c.Response().Writer, c.Request(), nil)
 		if err != nil {
 			log.Logger.Error("Upgrade error!", err)
@@ -108,30 +104,46 @@ func (server *HTTPServer) serve() echo.HandlerFunc {
 			log.Logger.Error("Get Claim Error: %v", err)
 			return err
 		}
+
 		user := claim.(message.User)
 		prometheus.OnlineUserCounter.Add(1)
 
-		client := conn.NewClient(&user, server.node.clientHub(), session.NewSession(ws, &user, server.node, server.node.Conf.QueueBuffer))
-		client.StartHandleMessage()
-
-		server.node.clientHub().Add(&user, client)
-
-		defer func() {
-			client.Close()
-		}()
-
-		for {
-			if err = ws.ReadJSON(&msg); err != nil {
-				log.Logger.Error("ReadMessage Error: %v", err)
-			} else {
-				err = client.Handle(&msg)
-				if err != nil {
-					log.Logger.Error("Handle Message Error: %v", err)
-					return err
-				}
-			}
+		err = server.NewClient(ws, &user, server.node.clientHub(), session.NewSession(ws, &user, server.node, server.node.Conf.QueueBuffer))
+		if err != nil {
+			log.Logger.Error("HTTPServer NewClient Error: %+v", err)
 		}
 
 		return nil
+	}
+}
+
+func (server *HTTPServer) NewClient(ws *websocket.Conn,user *message.User, hub *conn.ClientHub, session *session.Session) error {
+	var (
+		msg message.Message
+		err error
+	)
+
+	client := conn.NewClient(user, server.node.clientHub(), session)
+	client.StartHandleMessage()
+
+	server.node.clientHub().Add(user, client)
+
+	defer func() {
+		client.Close()
+	}()
+
+	for {
+		if err = ws.ReadJSON(&msg); err != nil {
+			log.Logger.Error("ReadMessage Error: %v", err)
+			server.node.hub.Remove(user, client)
+			return err
+		} else {
+			prometheus.ReceiveMessageCounter.Add(1)
+			err = client.Handle(&msg)
+			if err != nil {
+				log.Logger.Error("Handle Message Error: %v", err)
+				return err
+			}
+		}
 	}
 }

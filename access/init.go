@@ -44,18 +44,11 @@ func init() {
 	initSignal()
 	HttpPprof()
 	initPrometheus()
-
 }
 
 func run() {
-	var (
-		err error
-	)
-
 	// Start a access endpoint.
-	if ep, err = endpoint.NewEndpoint(configuration); err != nil {
-		panic(err)
-	}
+	ep= endpoint.NewEndpoint(configuration)
 
 	ep.Run()
 
