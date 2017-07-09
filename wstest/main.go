@@ -25,7 +25,7 @@
 /*
  * Revision History:
  *     Initial: 2017/04/12        He ChengJun
- *      Modify: 2017/07/06        Sun Anxiang
+ *      Modify: 2017/07/09        Sun Anxiang
  */
 
 package main
@@ -34,17 +34,21 @@ import (
 	"encoding/json"
 	"log"
 	"math/rand"
+	"net/http"
 	"net/url"
 	"os"
+	"os/exec"
 	"os/signal"
-	"sync"
+	"strconv"
 	"time"
 
+	ui "github.com/gizak/termui"
 	"github.com/gorilla/websocket"
 
 	"hypercube/libs/message"
 )
 
+// websocket————————————————————————————————————————————————————————————————————————————
 const (
 	userCount = 10
 	debugMsg  = false
@@ -52,16 +56,34 @@ const (
 	Version   = 1
 )
 
-var addrs string = "10.0.0.116:7000"
+type Message struct {
+	From    message.User
+	To      message.User
+	Content string
+	Time    string
+}
+
+var MsgSendChan = make(chan Message, 10)
+var MsgRcvChan = make(chan Message, 10)
+var msgSend, msgRsv Message
+
+var addrs string = "127.0.0.1:8080"
 var userIDs []uint64 = []uint64{1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
 
 func main() {
 	interrupt := make(chan os.Signal, 1)
 	signal.Notify(interrupt, os.Interrupt)
 
+	go loop()
+
 	for i := 0; i < userCount; i++ {
 		newRoutine(userIDs[i])
 	}
+
+	cmdClear := exec.Command("clear")
+	cmdClear.Run()
+
+	draw()
 
 	select {
 	case <-interrupt:
@@ -80,7 +102,11 @@ func randUserID() uint64 {
 func dial(addr string) (*websocket.Conn, error) {
 	u := url.URL{Scheme: "ws", Host: addr, Path: "/join"}
 	log.Printf("connecting to %s", u.String())
-	c, _, err := websocket.DefaultDialer.Dial(u.String(), nil)
+
+	connectHeader := make(http.Header)
+	connectHeader.Set("Authorization", "Bearer "+"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbiI6IkpvbiBTbm93IiwidWlkIjoiamtkc2pmbGRzIn0.gn5gTeUd1fAON93KW1Gq7b5V-avm9dFlVtIfYQbVApg")
+
+	c, _, err := websocket.DefaultDialer.Dial(u.String(), connectHeader)
 
 	return c, err
 }
@@ -109,33 +135,13 @@ func loginPackage(from uint64) []byte {
 	return byteMsg
 }
 
-type Message struct {
-	From      message.User
-	To        message.User
-	Content   string
-	SendOrder int64
-}
-
-type Count struct {
-	counter int64
-	lock    sync.Mutex
-}
-
-var counter = Count{
-	counter: 0,
-	lock:    sync.Mutex{},
-}
-
 func testPackage(from, to uint64, t time.Time) []byte {
-	counter.lock.Lock()
-	counter.counter++
 	messages := Message{
-		From:      message.User{UserID: "fdsjk"},
-		To:        message.User{UserID: "fdsjk"},
-		Content:   t.String(),
-		SendOrder: counter.counter,
+		From:    message.User{UserID: "fdsjk"},
+		To:      message.User{UserID: "fdsjk"},
+		Time:    t.String(),
+		Content: "test",
 	}
-	counter.lock.Unlock()
 	byteMessage, _ := json.Marshal(messages)
 
 	msg := message.Message{
@@ -156,7 +162,7 @@ func writeRoutine(c *websocket.Conn, addr string, from uint64) {
 	var msgCount int32 = 0
 
 	// 写入计时
-	ticker := time.NewTicker(time.Microsecond * time.Duration(Duration))
+	ticker := time.NewTicker(time.Second)
 	defer ticker.Stop()
 
 	// 退出计时
@@ -175,6 +181,13 @@ func writeRoutine(c *websocket.Conn, addr string, from uint64) {
 				log.Println("write:", err)
 				goto exit
 			}
+
+			pkg, err := UnmarshalPkg(messages)
+			if err != nil {
+				return
+			}
+			MsgSendChan <- pkg
+
 			msgCount++
 		case <-exitTimer.C:
 			log.Println("exitTimer : go routine exit, from = ", from)
@@ -224,7 +237,12 @@ func testRoutine(addr string, from uint64) {
 			log.Println("read:", err)
 			goto exit
 		}
-		log.Println("info:", string(msg))
+
+		pkg, err := UnmarshalPkg(msg)
+		if err != nil {
+			return
+		}
+		MsgRcvChan <- pkg
 
 		msgCount++
 
@@ -234,4 +252,227 @@ func testRoutine(addr string, from uint64) {
 	}
 exit:
 	log.Printf("addr = %s recv %d messages, from = %d", addr, msgCount, from)
+}
+
+func UnmarshalPkg(pkg []byte) (Message, error) {
+	var pack message.Message
+	var kage Message
+
+	err := json.Unmarshal(pkg, &pack)
+	if err == nil {
+		err = json.Unmarshal(pack.Content, &kage)
+
+		if err == nil {
+			return kage, nil
+		}
+	}
+
+	return Message{}, err
+}
+
+// ui——————————————————————————————————————————————————————————————————————————————————————————————
+const colSpacing = 10
+
+var sendCount int64 = 0
+var rsvCount int64 = 0
+
+// per-column width. 0 == auto width
+var colWidths = []int{
+	10, // send or receive
+	5,  // from
+	5,  // to
+	0,  // time
+	0,  // content
+	10, // Count
+}
+
+type CompactHeader struct {
+	Header  *ui.Par
+	From    *ui.Par
+	To      *ui.Par
+	Time    *ui.Par
+	Content *ui.Par
+	Count   *ui.Par
+	pars    []*ui.Par
+	X, Y    int
+	Width   int
+	Height  int
+}
+
+func NewCompactHeader() *CompactHeader {
+	row := &CompactHeader{
+		Header:  NewHeaderPar(""),
+		From:    NewSimplePar("From"),
+		To:      NewSimplePar("To"),
+		Time:    NewSimplePar("Time"),
+		Content: NewSimplePar("Content"),
+		Count:   NewSimplePar("Count"),
+		X:       1,
+		Height:  3,
+	}
+
+	return row
+}
+
+func NewCompactSimple(s string) *CompactHeader {
+	row := &CompactHeader{
+		Header:  NewHeaderPar(s),
+		From:    NewSimplePar("-"),
+		To:      NewSimplePar("-"),
+		Time:    NewSimplePar("-"),
+		Content: NewSimplePar("-"),
+		Count:   NewSimplePar("—"),
+		X:       1,
+		Height:  3,
+	}
+
+	return row
+}
+
+func NewHeaderPar(s string) *ui.Par {
+	p := ui.NewPar(s)
+	p.Height = 2
+	p.Border = false
+
+	return p
+}
+
+func NewSimplePar(s string) *ui.Par {
+	p := ui.NewPar(s)
+	p.Height = 2
+	p.Border = false
+
+	return p
+}
+
+func (ch *CompactHeader) SetPars() {
+	ch.pars = append(ch.pars, ch.Header, ch.From, ch.To, ch.Time, ch.Content, ch.Count)
+}
+
+func (ch *CompactHeader) SetWidth(w int) {
+	x := ch.X
+	autoWidth := calcWidth(w)
+
+	for n, col := range ch.pars {
+		// set column to static width
+		if colWidths[n] != 0 {
+			col.SetX(x)
+			col.SetWidth(colWidths[n])
+			x += colWidths[n]
+			x += colSpacing
+			continue
+		}
+		col.SetX(x)
+		col.SetWidth(autoWidth)
+		x += autoWidth + colSpacing
+	}
+	ch.Width = w
+}
+
+func (ch *CompactHeader) SetY(y int) {
+	for _, p := range ch.pars {
+		p.SetY(y)
+	}
+	ch.Y = y
+}
+
+func (ch *CompactHeader) SetData(message Message) {
+	ch.From.Text = message.From.UserID
+	ch.To.Text = message.To.UserID
+	ch.Time.Text = message.Time
+	ch.Content.Text = message.Content
+}
+
+// Calculate per-column width, given total width
+func calcWidth(width int) int {
+	spacing := colSpacing * len(colWidths)
+
+	var staticCols int
+	for _, w := range colWidths {
+		width -= w
+		if w == 0 {
+			staticCols += 1
+		}
+	}
+
+	return (width - spacing) / staticCols
+}
+
+// Get package infomation
+func loop() {
+	for {
+		select {
+		case spkg := <-MsgSendChan:
+			msgSend = spkg
+			sendCount++
+		case rpkg := <-MsgRcvChan:
+			msgRsv = rpkg
+			rsvCount++
+		}
+	}
+}
+
+func draw() {
+	err := ui.Init()
+	if err != nil {
+		panic(err)
+	}
+	defer ui.Close()
+
+	header := NewCompactHeader()
+	header.SetPars()
+	header.SetWidth(200)
+	for _, x := range header.pars {
+		x.TextFgColor = ui.ColorBlack
+		ui.Render(x)
+	}
+
+	sender := NewCompactSimple("send:")
+	sender.SetPars()
+	sender.SetWidth(200)
+	sender.SetY(1)
+	sender.SetData(msgSend)
+	for _, y := range sender.pars {
+		y.TextFgColor = ui.ColorBlue
+		ui.Render(y)
+	}
+
+	receiver := NewCompactSimple("receive:")
+	receiver.SetPars()
+	receiver.SetWidth(200)
+	receiver.SetY(2)
+	receiver.SetData(msgRsv)
+	for _, z := range receiver.pars {
+		z.TextFgColor = ui.ColorGreen
+		ui.Render(z)
+	}
+
+	reDraw := func() {
+		sc := strconv.FormatInt(sendCount, 10)
+		sender.Count.Text = sc
+		rc := strconv.FormatInt(rsvCount, 10)
+		receiver.Count.Text = rc
+
+		sender.SetData(msgSend)
+		receiver.SetData(msgRsv)
+
+		for _, y := range sender.pars {
+			ui.Render(y)
+		}
+
+		for _, z := range receiver.pars {
+			ui.Render(z)
+		}
+	}
+
+	ui.Merge("/timer/10ms", ui.NewTimerCh(time.Millisecond*10))
+	ui.Handle("/timer/10ms", func(e ui.Event) {
+		reDraw()
+	})
+
+	ui.Handle("/sys/kbd/q", func(ui.Event) {
+		ui.StopLoop()
+	})
+
+	ui.Loop()
 }
