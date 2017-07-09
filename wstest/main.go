@@ -67,7 +67,7 @@ var MsgSendChan = make(chan Message, 10)
 var MsgRcvChan = make(chan Message, 10)
 var msgSend, msgRsv Message
 
-var addrs string = "127.0.0.1:8080"
+var addrs string = "127.0.0.1:7000"
 var userIDs []string = []string{"1", "2", "3", "4", "5", "6", "7", "8", "9", "10"}
 
 func main() {

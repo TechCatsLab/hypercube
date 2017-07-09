@@ -34,18 +34,18 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 )
 var (
-	OnlineUserCounter = NewCounterFrom(prometheus.CounterOpts{
+	OnlineUserCounter = prometheus.NewCounter(prometheus.CounterOpts{
 		Name: "onlineUser",
 		Help: "Number of onlineUser",
-	}, []string{"onlineUser"})
+	})
 
-	SendMessageCounter = NewCounterFrom(prometheus.CounterOpts{
+	SendMessageCounter = prometheus.NewCounter(prometheus.CounterOpts{
 		Name: "sendMessage",
 		Help: "Number of sendMessage",
-	}, []string{"sendMessage"})
+	})
 
-	ReceiveMessageCounter = NewCounterFrom(prometheus.CounterOpts{
+	ReceiveMessageCounter = prometheus.NewCounter(prometheus.CounterOpts{
 		Name: "resiveMessage",
 		Help: "Number of resiveMessage",
-	}, []string{"resiveMessage"})
+	})
 )
