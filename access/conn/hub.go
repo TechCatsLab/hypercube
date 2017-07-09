@@ -31,10 +31,10 @@ package conn
 
 import (
 	"errors"
+	"sync"
 
 	"hypercube/libs/log"
 	"hypercube/libs/message"
-	"sync"
 )
 
 // ClientHub represents a collection of client sessions.
