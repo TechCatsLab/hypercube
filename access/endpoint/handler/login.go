@@ -32,10 +32,10 @@ package handler
 import (
 	"net/http"
 
-	"hypercube/libs/message"
-
 	"github.com/dgrijalva/jwt-go"
 	"github.com/labstack/echo"
+
+	"hypercube/libs/message"
 )
 
 const (

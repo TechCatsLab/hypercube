@@ -40,16 +40,16 @@ import (
 
 // Client is a client connection.
 type Client struct {
-	user    *msg.User
 	hub     *ClientHub
+	user    *msg.User
 	session *session.Session
 }
 
 // NewClient creates a client.
 func NewClient(user *msg.User, hub *ClientHub, session *session.Session) *Client {
 	client := &Client{
-		user:    user,
 		hub:     hub,
+		user:    user,
 		session: session,
 	}
 

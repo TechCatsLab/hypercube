@@ -33,6 +33,7 @@ package endpoint
 import (
 	"net/http"
 
+	"github.com/dgrijalva/jwt-go"
 	"github.com/gorilla/websocket"
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
@@ -40,11 +41,9 @@ import (
 	"hypercube/access/conn"
 	"hypercube/access/endpoint/handler"
 	"hypercube/access/session"
-	"hypercube/libs/message"
 	"hypercube/libs/log"
+	"hypercube/libs/message"
 	"hypercube/libs/metrics/prometheus"
-
-	"github.com/dgrijalva/jwt-go"
 )
 
 // HTTPServer represents the http server accepts the client websocket connections.
@@ -117,7 +116,7 @@ func (server *HTTPServer) serve() echo.HandlerFunc {
 	}
 }
 
-func (server *HTTPServer) NewClient(ws *websocket.Conn,user *message.User, hub *conn.ClientHub, session *session.Session) error {
+func (server *HTTPServer) NewClient(ws *websocket.Conn, user *message.User, hub *conn.ClientHub, session *session.Session) error {
 	var (
 		msg message.Message
 		err error

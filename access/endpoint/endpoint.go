@@ -50,7 +50,7 @@ type Endpoint struct {
 // NewEndpoint create a new access point.
 func NewEndpoint(conf *config.NodeConfig) *Endpoint {
 	var (
-		ep  *Endpoint
+		ep *Endpoint
 	)
 
 	ep = &Endpoint{
