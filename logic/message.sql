@@ -7,6 +7,6 @@ CREATE TABLE IF NOT EXISTS message (
   target          INT         NOT NULL,
   type            INT         NOT NULL,
   issend          BOOL        DEFAULT FALSE,
-  content         SRTING(256),
+  content         STRING(256),
   created         TIMESTAMP   DEFAULT current_timestamp()
 );
