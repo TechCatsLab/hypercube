@@ -76,7 +76,7 @@ func main() {
 
 	go loop()
 
-	for i := 0; i < userCount; i++ {
+	for i := 0; i < 1; i++ {
 		newRoutine(userIDs[i])
 	}
 
@@ -104,7 +104,7 @@ func dial(addr string) (*websocket.Conn, error) {
 	log.Printf("connecting to %s", u.String())
 
 	connectHeader := make(http.Header)
-	connectHeader.Set("Authorization", "Bearer "+"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbiI6IkpvbiBTbm93IiwidWlkIjoiamtkc2pmbGRzIn0.gn5gTeUd1fAON93KW1Gq7b5V-avm9dFlVtIfYQbVApg")
+	connectHeader.Set("Authorization", "Bearer "+"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiJ5YW5nY2wifQ.PHKgDJohSHzyk66BVhySOqfZw83oZPGwoTr-liEx5t4")
 
 	c, _, err := websocket.DefaultDialer.Dial(u.String(), connectHeader)
 

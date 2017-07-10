@@ -103,8 +103,10 @@ func (server *HTTPServer) serve() echo.HandlerFunc {
 			log.Logger.Error("Get Claim Error: %v", err)
 			return err
 		}
-
-		user := claim.(message.User)
+		
+		user := message.User{
+			UserID: (claim.(*jwt.Token)).Raw,
+		}
 		prometheus.OnlineUserCounter.Add(1)
 
 		err = server.NewClient(ws, &user, server.node.clientHub(), session.NewSession(ws, &user, server.node, server.node.Conf.QueueBuffer))
