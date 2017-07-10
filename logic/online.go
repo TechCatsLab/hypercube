@@ -24,10 +24,7 @@
 
 /*
  * Revision History:
- *     Initial: 2017/04/04        Liu Jiachang
- *	    Modify: 2017/04/15 		  Yusan Kurban
- *			#66 修改常量名和结构名
- *
+ *     Initial: 2017/07/10        Yang Chenglong
  */
 
 package main
@@ -35,157 +32,63 @@ package main
 import (
 	"errors"
 	"fmt"
+	"sync"
 
 	"hypercube/libs/log"
-	"hypercube/message"
+	"hypercube/libs/message"
 )
 
-const (
-	addUser    = uint8(0)
-	removeUser = uint8(1)
-	queryUser  = uint8(2)
-)
+type Access struct {
+	ServerIp   string
+}
 
 var (
 	OnLineUserMag *OnlineUserManager
 
-	ParamErr = errors.New("Your input parametric error!")
+	ParamErr = errors.New("The Parametric error!")
 )
 
 func init() {
 	OnLineUserMag = &OnlineUserManager{
-		users: make(map[general.UserKey]*general.UsrInfo),
-		//access: make(map[string]mq.Requester),
-		req: make(chan interface{}),
-		rep: make(chan reply),
+		users: make(map[message.User]*Access),
 	}
-
-	OnLineUserMag.loop()
 }
 
 type OnlineUserManager struct {
-	users map[general.UserKey]*general.UsrInfo
-	//access map[string]mq.Requester
-	req chan interface{}
-	rep chan reply
+	mux     sync.Mutex
+	users   map[message.User]*Access
 }
 
-type userEntry struct {
-	UserID   general.UserKey
-	ServerIP string
-	Type     uint8
-}
+func (this *OnlineUserManager) Add (user *message.User, serverIP *Access) error {
+	if serverIP != "" && user.UserID != "" {
+		this.mux.Lock()
+		defer this.mux.Unlock()
 
-type reply struct {
-	ServerIP string
-	Err      error
-}
-
-func (this *OnlineUserManager) Add(user *general.UserLogin) error {
-	log.Logger.Debug(*user)
-
-	if user.ServerIP != "" && user.UserID.Token != "" && user.UserID.UserID == 0 {
-		usrb := userEntry{user.UserID, user.ServerIP, addUser}
-
-		this.req <- &usrb
-		replier := <-this.rep
-
-		return replier.Err
-	}
-
-	return ParamErr
-}
-
-func (this *OnlineUserManager) Remove(user general.UserKey) error {
-	if user.Token != "" && user.UserID == 0 {
-		user := userEntry{user, "", removeUser}
-
-		this.req <- &user
-		replier := <-this.rep
-
-		return replier.Err
-	}
-
-	return ParamErr
-}
-
-func (this *OnlineUserManager) Query(uid general.UserKey) (string, error) {
-	log.Logger.Debug(uid)
-	if uid.Token != "" {
-		user := userEntry{uid, "", queryUser}
-
-		this.req <- &user
-		replier := <-this.rep
-
-		return replier.ServerIP, replier.Err
-	}
-
-	return "", ParamErr
-}
-
-func (this *OnlineUserManager) AddAccess(access *general.Access) error {
-	if *access.ServerIp != "" && *access.Subject != "" {
-		this.req <- access
-		replier := <-this.rep
-
-		return replier.Err
-	}
-
-	return ParamErr
-}
-
-func (this *OnlineUserManager) loop() {
-	go func() {
-		for {
-			replier := reply{
-				ServerIP: "",
-				Err:      nil,
-			}
-			request := <-this.req
-
-			if user, ok := request.(*userEntry); ok {
-				switch {
-				case user.Type == addUser:
-					userLogic := general.UsrInfo{UserID: user.UserID, ServerIP: user.ServerIP}
-					this.users[user.UserID] = &userLogic
-
-					this.rep <- replier
-				case user.Type == removeUser:
-					if _, ok := this.users[user.UserID]; ok {
-						delete(this.users, user.UserID)
-
-						this.rep <- replier
-					} else {
-						replier.Err = ParamErr
-						this.rep <- replier
-					}
-				case user.Type == queryUser:
-					if usrInfo, ok := this.users[user.UserID]; ok {
-						replier.ServerIP = usrInfo.ServerIP
-
-						this.rep <- replier
-					} else {
-						replier.Err = ParamErr
-						this.rep <- replier
-					}
-				}
-			}
-
-			if access, ok := request.(*general.Access); ok {
-				req := createAccessRPC(access.Subject)
-				if req != nil {
-					this.access[*access.ServerIp] = req
-
-					this.rep <- replier
-				} else {
-					replier.Err = ParamErr
-					this.rep <- replier
-				}
-			}
+		if _, exists := this.users[user]; exists {
+			log.Logger.Warn("user already login!")
 		}
-	}()
+
+		this.users[user] = serverIP
+	}
+
+	return ParamErr
+}
+
+func (this *OnlineUserManager) Remove (serverIP *Access, user *message.User) error {
+	if *serverIP != "" && user.UserID != "" {
+		this.mux.Lock()
+		defer this.mux.Unlock()
+
+		if _, exists := this.users[user]; !exists {
+			log.Logger.Warn("user hasn't login!")
+		}
+
+		delete(serverIP, user)
+	}
+
+	return ParamErr
 }
 
 func (this *OnlineUserManager) PrintDebugInfo() {
-	log.Logger.Debug(fmt.Sprintf("Online user manager:(%+v, %+v)", this.users, this.access))
+	log.Logger.Debug(fmt.Sprintf("Online user manager:(%+v, %+v)", this.users))
 }

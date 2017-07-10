@@ -32,67 +32,7 @@ package main
 
 import (
 	"hypercube/libs/log"
-	"hypercube/message"
-	"hypercube/message"
 )
-
-func userLoginRequestHandler(req interface{}) interface{} {
-	var (
-		login       *general.UserLogin
-		reply       *general.Reply
-	)
-
-	login = req.(*general.UserLogin)
-
-	log.Logger.Debug("userLoginRequestHandler userID:", login.UserID)
-
-	err := OnLineUserMag.Add(login)
-
-	if err != nil {
-		log.Logger.Error("userLoginRequestHandler-->login err:", err)
-
-		reply = &general.Reply{
-			Code: types.ErrLogin,
-		}
-	} else {
-		reply = &general.Reply{
-			Code: types.ErrSucceed,
-		}
-	}
-
-	err = userSendMessageHandler(login.UserID)
-	if err != nil {
-		log.Logger.Error("userLoginRequestHandler-->userSendMessageHandler:", err)
-	}
-
-	return reply
-}
-
-func userLogoutRequestHandler(req interface{}) interface{} {
-	var (
-		reply        *general.Reply
-		logout       *general.UserLogout
-	)
-
-	logout = req.(*general.UserLogout)
-	log.Logger.Debug("userLogoutRequestHandler userID:", logout.UserID)
-
-	err := OnLineUserMag.Remove(logout.UserID)
-
-	if err != nil {
-		log.Logger.Error("userLogoutRequestHandler--> err logout:", err)
-
-		reply = &general.Reply{
-			Code: types.ErrLogout,
-		}
-	} else {
-		reply = &general.Reply{
-			Code: types.ErrSucceed,
-		}
-	}
-
-	return reply
-}
 
 func MessageHandler(req interface{}) interface{} {
 	var (
