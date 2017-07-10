@@ -76,12 +76,11 @@ func (ep *Endpoint) Send(user *message.User, msg *message.Message) {
 func (ep *Endpoint) Run() error {
 	log.Logger.Info("run %v", ep.ws.server.Start(ep.Conf.Addrs))
 
-	for {
-		select {
-		case <-ep.shutdown:
-			return ep.ws.server.Server.Shutdown(context.Background())
-		}
+	select {
+	case <-ep.shutdown:
+		return ep.ws.server.Server.Shutdown(context.Background())
 	}
+
 }
 
 // Shutdown stops the access server.
