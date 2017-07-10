@@ -38,6 +38,11 @@ import (
 	"hypercube/libs/message"
 )
 
+const (
+	Success int = 1
+	Failed int = 0
+)
+
 type Access struct {
 	ServerIp   string
 }
@@ -59,8 +64,13 @@ type OnlineUserManager struct {
 	users   map[message.User]*Access
 }
 
-func (this *OnlineUserManager) Add (user *message.User, serverIP *Access) error {
-	if serverIP != "" && user.UserID != "" {
+type UserEntry struct {
+	UserID      message.User
+	ServerIP  Access
+}
+
+func (this *OnlineUserManager) Add (user UserEntry, reply *int) error {
+	if user.ServerIP != "" && user.UserID != "" {
 		this.mux.Lock()
 		defer this.mux.Unlock()
 
@@ -68,14 +78,16 @@ func (this *OnlineUserManager) Add (user *message.User, serverIP *Access) error 
 			log.Logger.Warn("user already login!")
 		}
 
-		this.users[user] = serverIP
+		this.users[user] = user.ServerIP
+		*reply = Success
 	}
+	*reply = Failed
 
 	return ParamErr
 }
 
-func (this *OnlineUserManager) Remove (serverIP *Access, user *message.User) error {
-	if *serverIP != "" && user.UserID != "" {
+func (this *OnlineUserManager) Remove (user UserEntry, reply *int) error {
+	if *user.ServerIP != "" && user.UserID != "" {
 		this.mux.Lock()
 		defer this.mux.Unlock()
 
@@ -83,10 +95,21 @@ func (this *OnlineUserManager) Remove (serverIP *Access, user *message.User) err
 			log.Logger.Warn("user hasn't login!")
 		}
 
-		delete(serverIP, user)
+		delete(user.ServerIP, user)
+		*reply = Success
 	}
+	*reply = Failed
 
 	return ParamErr
+}
+
+func (this *OnlineUserManager) Query (user message.User)(string, bool){
+	this.mux.Lock()
+	defer this.mux.Unlock()
+
+	serverIP, ok := this.users[user]
+
+	return serverIP, ok
 }
 
 func (this *OnlineUserManager) PrintDebugInfo() {
