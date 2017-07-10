@@ -61,17 +61,16 @@ func NewHTTPServer(node *Endpoint) *HTTPServer {
 
 	server.server.Use(middleware.Logger())
 	server.server.Use(middleware.Recover())
-	server.server.Use(handler.LoginMiddleWare)
-	server.server.Use(middleware.CORSWithConfig(middleware.CORSConfig{
-		AllowOrigins: node.Conf.CorsHosts,
-		AllowMethods: []string{echo.GET, echo.POST},
-	}))
-
 	config := middleware.JWTConfig{
 		Claims:     jwt.MapClaims{},
 		SigningKey: []byte(node.Conf.SecretKey),
 	}
 	server.server.Use(middleware.JWTWithConfig(config))
+	//server.server.Use(handler.LoginMiddleWare)
+	server.server.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+		AllowOrigins: node.Conf.CorsHosts,
+		AllowMethods: []string{echo.GET, echo.POST},
+	}))
 
 	server.server.GET("/join", server.serve())
 
@@ -103,10 +102,11 @@ func (server *HTTPServer) serve() echo.HandlerFunc {
 			log.Logger.Error("Get Claim Error: %v", err)
 			return err
 		}
-		
+
 		user := message.User{
-			UserID: (claim.(*jwt.Token)).Raw,
+			UserID: handler.GetUser(claim.(*jwt.Token)),
 		}
+
 		prometheus.OnlineUserCounter.Add(1)
 
 		err = server.NewClient(ws, &user, server.node.clientHub(), session.NewSession(ws, &user, server.node, server.node.Conf.QueueBuffer))

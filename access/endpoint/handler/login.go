@@ -30,10 +30,7 @@
 package handler
 
 import (
-	"net/http"
-
 	"github.com/dgrijalva/jwt-go"
-	"github.com/labstack/echo"
 
 	"hypercube/libs/message"
 )
@@ -43,28 +40,11 @@ const (
 	BearerSize = 7
 )
 
-func GetUser(token *jwt.Token) (interface{}, error) {
+func GetUser(token *jwt.Token) (string) {
 	var u message.User
 
 	claims := token.Claims.(jwt.MapClaims)
 	u.UserID = claims["uid"].(string)
 
-	return u, nil
-}
-
-func LoginMiddleWare(next echo.HandlerFunc) echo.HandlerFunc {
-	return func(c echo.Context) error {
-		token := c.Request().Header["Authorization"]
-
-		t := token[TokenIndex][BearerSize:]
-
-		u, err := jwt.Parse(t, GetUser)
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, "Token Parse Err")
-		}
-
-		c.Set("user", u.Claims)
-
-		return next(c)
-	}
+	return u.UserID
 }
