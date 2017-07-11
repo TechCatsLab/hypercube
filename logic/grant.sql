@@ -1,3 +1,0 @@
-CREATE USER core_acc WITH PASSWORD 'pKJgW81xvbrY0';
-
-GRANT SELECT, INSERT, UPDATE ON TABLE core.message TO core_acc;
