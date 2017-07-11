@@ -66,19 +66,19 @@ type OnlineUserManager struct {
 
 type UserEntry struct {
 	UserID      message.User
-	ServerIP  Access
+	ServerIP    Access
 }
 
-func (this *OnlineUserManager) Add (user UserEntry, reply *int) error {
-	if user.ServerIP != "" && user.UserID != "" {
+func (this *OnlineUserManager) Add(user UserEntry, reply *int) error {
+	if user.ServerIP.ServerIp != "" && user.UserID.UserID != "" {
 		this.mux.Lock()
 		defer this.mux.Unlock()
 
-		if _, exists := this.users[user]; exists {
+		if _, exists := this.users[user.UserID]; exists {
 			log.Logger.Warn("user already login!")
 		}
 
-		this.users[user] = user.ServerIP
+		this.users[user.UserID] = &user.ServerIP
 		*reply = Success
 	}
 	*reply = Failed
@@ -86,16 +86,16 @@ func (this *OnlineUserManager) Add (user UserEntry, reply *int) error {
 	return ParamErr
 }
 
-func (this *OnlineUserManager) Remove (user UserEntry, reply *int) error {
-	if *user.ServerIP != "" && user.UserID != "" {
+func (this *OnlineUserManager) Remove(user UserEntry, reply *int) error {
+	if user.ServerIP.ServerIp != "" && user.UserID.UserID != "" {
 		this.mux.Lock()
 		defer this.mux.Unlock()
 
-		if _, exists := this.users[user]; !exists {
+		if _, exists := this.users[user.UserID]; !exists {
 			log.Logger.Warn("user hasn't login!")
 		}
 
-		delete(user.ServerIP, user)
+		delete(this.users, user.UserID)
 		*reply = Success
 	}
 	*reply = Failed
@@ -103,13 +103,13 @@ func (this *OnlineUserManager) Remove (user UserEntry, reply *int) error {
 	return ParamErr
 }
 
-func (this *OnlineUserManager) Query (user message.User)(string, bool){
+func (this *OnlineUserManager) Query(user message.User)(string, bool){
 	this.mux.Lock()
 	defer this.mux.Unlock()
 
 	serverIP, ok := this.users[user]
 
-	return serverIP, ok
+	return serverIP.ServerIp, ok
 }
 
 func (this *OnlineUserManager) PrintDebugInfo() {
