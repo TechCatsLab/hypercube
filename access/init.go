@@ -33,6 +33,7 @@ package main
 import (
 	"hypercube/access/config"
 	"hypercube/access/endpoint"
+	"hypercube/access/rpc"
 )
 
 var (
@@ -44,6 +45,7 @@ func init() {
 	initSignal()
 	HttpPprof()
 	initPrometheus()
+	rpc.InitRPCServer()
 }
 
 func run() {

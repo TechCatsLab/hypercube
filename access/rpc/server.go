@@ -24,42 +24,35 @@
 
 /*
  * Revision History:
- *     Initial: 2017/07/05        Feng Yifei
+ *     Initial: 2017/07/11        Jia Chenhui
  */
 
 package rpc
 
 import (
-	"hypercube/access/endpoint"
-	"hypercube/libs/message"
-	"hypercube/libs/rpc"
+	"net"
+	"net/rpc"
+
+	"hypercube/access/config"
+	"hypercube/libs/log"
 )
 
-// AccessRPC provides push functions.
-type AccessRPC struct {
-	node *endpoint.Endpoint
-}
+var (
+	configuration = config.Load()
+)
 
-// Args represent a RPC argument
-type Args struct {
-	message.User
-	message.Message
-}
+func InitRPCServer() error {
+	newServer := rpc.NewServer()
+	newServer.Register(new(AccessRPC))
 
-// Ping is general rpc keepalive interface.
-func (access *AccessRPC) Ping(req *rpc.ReqKeepAlive, resp *rpc.RespKeepAlive) error {
-	return nil
-}
+	listener, err := net.Listen("tcp", configuration.Addrs)
+	if err != nil {
+		log.Logger.Error("ResolveTCPAddr returned error: %v", err)
+		return err
+	}
 
-// Push a message to a specific user.
-func (access *AccessRPC) Push(user *message.User) error {
-	return nil
-}
-
-// Send send a message to a specific user.
-func (access *AccessRPC) Send(args *Args, reply *bool) error {
-	access.node.Send(&args.User, &args.Message)
-	*reply = true
+	go newServer.Accept(listener)
+	rpc.HandleHTTP()
 
 	return nil
 }

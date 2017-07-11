@@ -24,42 +24,47 @@
 
 /*
  * Revision History:
- *     Initial: 2017/07/05        Feng Yifei
+ *     Initial: 2017/07/11        Jia Chenhui
  */
 
-package rpc
+package main
 
 import (
-	"hypercube/access/endpoint"
+	"errors"
+
+	"hypercube/access/config"
+	server "hypercube/access/rpc"
+	"hypercube/libs/log"
 	"hypercube/libs/message"
 	"hypercube/libs/rpc"
 )
 
-// AccessRPC provides push functions.
-type AccessRPC struct {
-	node *endpoint.Endpoint
-}
+var (
+	configuration = config.Load()
+)
 
-// Args represent a RPC argument
-type Args struct {
-	message.User
-	message.Message
-}
+func Send(user message.User, msg message.Message) error {
+	var (
+		args  server.Args
+		ok bool
+	)
+	op := rpc.Options{
+		Proto: "tcp",
+		Addr:  configuration.Addrs,
+	}
 
-// Ping is general rpc keepalive interface.
-func (access *AccessRPC) Ping(req *rpc.ReqKeepAlive, resp *rpc.RespKeepAlive) error {
-	return nil
-}
+	client := rpc.Dial(op)
+	defer client.Close()
 
-// Push a message to a specific user.
-func (access *AccessRPC) Push(user *message.User) error {
-	return nil
-}
+	err := client.Call("AccessRPC.Send", &args, &ok)
+	if err != nil {
+		log.Logger.Error("RPC Call returned error: %v", err)
+		return err
+	}
 
-// Send send a message to a specific user.
-func (access *AccessRPC) Send(args *Args, reply *bool) error {
-	access.node.Send(&args.User, &args.Message)
-	*reply = true
+	if !ok {
+		return errors.New("logic send message failed")
+	}
 
 	return nil
 }
