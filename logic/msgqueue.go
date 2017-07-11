@@ -29,13 +29,24 @@
 
 package main
 
-import "hypercube/libs/message"
+import (
+	"hypercube/libs/message"
+	"net/rpc"
+)
 
-var Queue = make(chan message.Message, 100)
+type MessageManager int
 
-type MessageManage int
+var Queue chan message.Message
 
-func (m *MessageManage) Add(msg message.Message, reply *bool) error {
+func init() {
+	Queue = make(chan message.Message, 100)
+
+	msgManager := new(MessageManager)
+	rpc.Register(msgManager)
+	rpc.HandleHTTP()
+}
+
+func (m *MessageManager) Add(msg message.Message, reply *bool) error {
 	Queue <- msg
 	*reply = true
 
