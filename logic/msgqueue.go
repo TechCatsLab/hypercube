@@ -29,53 +29,15 @@
 
 package main
 
-import (
-	"errors"
-	"encoding/json"
+import "hypercube/libs/message"
 
-	"hypercube/libs/message"
-)
-
-var (
-	TypeErr      = errors.New("Can't decode message type!")
-
-	OnlineQueue  = make(chan message.Message, 100)
-	OfflineQueue = make(chan message.Message, 100)
-)
+var Queue = make(chan message.Message, 100)
 
 type MessageManage int
 
 func (m *MessageManage) Add(msg message.Message, reply *bool) error {
-	user, err := decode(msg)
-	if err != nil {
-		return err
-	}
-
-	_, flag := OnLineUserMag.Query(user)
-	if !flag {
-		OfflineQueue <- msg
-	} else {
-		OnlineQueue <- msg
-	}
-	*reply = flag
+	Queue <- msg
+	*reply = true
 
 	return nil
-}
-
-func decode(msg message.Message) (message.User, error) {
-	var plainUser 	  message.PlainText
-	var pushPlainUser message.PushPlainText
-
-	switch msg.Type {
-	case message.MessageTypePlainText:
-		err := json.Unmarshal(msg.Content, &plainUser)
-
-		return plainUser.To, err
-	case message.MessageTypePushPlainText:
-		err := json.Unmarshal(msg.Content, &pushPlainUser)
-
-		return pushPlainUser.To, err
-	default:
-		return nil, TypeErr
-	}
 }
