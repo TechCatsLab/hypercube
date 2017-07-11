@@ -96,7 +96,7 @@ func HandlePlainText(msg *message.Message) {
 	conn, err := cockroach.DbConnPool.GetConnection()
 	if err != nil {
 		log.Logger.Error("Get cockroach connect error:", err)
-		Queue <- msg
+		Queue <- *msg
 
 		return
 	}
@@ -105,19 +105,19 @@ func HandlePlainText(msg *message.Message) {
 	db := conn.(*gorm.DB).Exec("SET DATABASE = message")
 
 	dbmsg := model.Message{
-		Source:     content.From,
-		Target:     content.To,
+		Source:     content.From.UserID,
+		Target:     content.To.UserID,
 		Type:       msg.Type,
 		IsSend:     false,
 		Content:    content.Content,
 		Created:    time.Now(),
 	}
 
-	err = db.Create(&dbmsg).Error()
+	err = db.Create(&dbmsg).Error
 
 	if err != nil {
 		log.Logger.Error("Insert into message error:", err)
-		Queue <- msg
+		Queue <- *msg
 
 		return
 	}
