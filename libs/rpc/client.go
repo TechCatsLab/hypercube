@@ -68,7 +68,8 @@ type Client struct {
 func Dial(options Options) *Client {
 	c := new(Client)
 	c.options = options
-	c.dial()
+	c.err = c.dial()
+
 	return c
 }
 
@@ -102,6 +103,7 @@ func (c *Client) Call(serviceMethod string, args interface{}, reply interface{})
 	case <-time.After(callTimeout):
 		err = ErrRPCTimeout
 	}
+
 	return err
 }
 
