@@ -32,6 +32,7 @@ package main
 import (
 	"errors"
 	"fmt"
+	"net/rpc"
 	"sync"
 
 	"hypercube/libs/log"
@@ -40,11 +41,11 @@ import (
 
 const (
 	Success int = 1
-	Failed int = 0
+	Failed  int = 0
 )
 
 type Access struct {
-	ServerIp   string
+	ServerIp string
 }
 
 var (
@@ -57,16 +58,19 @@ func init() {
 	OnLineUserMag = &OnlineUserManager{
 		users: make(map[message.User]*Access),
 	}
+
+	rpc.Register(OnLineUserMag)
+	rpc.HandleHTTP()
 }
 
 type OnlineUserManager struct {
-	mux     sync.Mutex
-	users   map[message.User]*Access
+	mux   sync.Mutex
+	users map[message.User]*Access
 }
 
 type UserEntry struct {
-	UserID      message.User
-	ServerIP    Access
+	UserID   message.User
+	ServerIP Access
 }
 
 func (this *OnlineUserManager) Add(user UserEntry, reply *int) error {
@@ -103,7 +107,7 @@ func (this *OnlineUserManager) Remove(user UserEntry, reply *int) error {
 	return ParamErr
 }
 
-func (this *OnlineUserManager) Query(user message.User)(string, bool){
+func (this *OnlineUserManager) Query(user message.User) (string, bool) {
 	this.mux.Lock()
 	defer this.mux.Unlock()
 
@@ -113,5 +117,5 @@ func (this *OnlineUserManager) Query(user message.User)(string, bool){
 }
 
 func (this *OnlineUserManager) PrintDebugInfo() {
-	log.Logger.Debug(fmt.Sprintf("Online user manager:(%+v, %+v)", this.users))
+	log.Logger.Debug(fmt.Sprintf("Online user manager: %+v", this.users))
 }
