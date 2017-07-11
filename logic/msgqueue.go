@@ -55,6 +55,8 @@ func init() {
 	msgManager := new(MessageManager)
 	rpc.Register(msgManager)
 	rpc.HandleHTTP()
+
+	QueueStart()
 }
 
 func (m *MessageManager) Add(msg message.Message, reply *bool) error {
@@ -80,8 +82,9 @@ func QueueStart() {
 func HandleMessage(msg *message.Message){
 	switch msg.Type {
 	case message.MessageTypePlainText:
-	case message.MessageTypeLogin:
-	case message.MessageTypeLogout:
+		HandlePlainText(msg)
+	default:
+		log.Logger.Debug("Not recognized message type!")
 	}
 }
 
