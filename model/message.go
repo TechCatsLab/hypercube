@@ -28,3 +28,17 @@
  */
 
 package message
+
+import (
+	"time"
+)
+
+type Message struct {
+	Messageid		int64		`jsql:"auto_increment;primary_key;"`
+	Source    	    string		`gorm:"not null"`
+	Target		    string
+	Type            uint16
+	IsSend          bool
+	Content         string
+	Created         time.Time
+}

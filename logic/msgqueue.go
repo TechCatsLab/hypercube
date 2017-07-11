@@ -31,15 +31,26 @@ package main
 
 import (
 	"hypercube/libs/message"
+	"hypercube/orm/cockroach"
+	"hypercube/libs/log"
+	model "hypercube/model"
+
 	"net/rpc"
+	"github.com/jinzhu/gorm"
+	"encoding/json"
+	"time"
 )
 
 type MessageManager int
 
-var Queue chan message.Message
+var (
+	Queue       chan message.Message
+	Shutdown    chan struct{}
+)
 
 func init() {
 	Queue = make(chan message.Message, 100)
+	Shutdown = make(chan struct{})
 
 	msgManager := new(MessageManager)
 	rpc.Register(msgManager)
@@ -51,4 +62,60 @@ func (m *MessageManager) Add(msg message.Message, reply *bool) error {
 	*reply = true
 
 	return nil
+}
+
+func QueueStart() {
+	go func() {
+		for {
+			select {
+			case msg := <-Queue:
+				HandleMessage(&msg)
+			case <-Shutdown:
+				return
+			}
+		}
+	}()
+}
+
+func HandleMessage(msg *message.Message){
+	switch msg.Type {
+	case message.MessageTypePlainText:
+	case message.MessageTypeLogin:
+	case message.MessageTypeLogout:
+	}
+}
+
+func HandlePlainText(msg *message.Message) {
+	var content message.PlainText
+
+	json.Unmarshal(msg.Content, &content)
+
+	conn, err := cockroach.DbConnPool.GetConnection()
+	if err != nil {
+		log.Logger.Error("Get cockroach connect error:", err)
+		Queue <- msg
+
+		return
+	}
+	defer cockroach.DbConnPool.ReleaseConnection(conn)
+
+	db := conn.(*gorm.DB).Exec("SET DATABASE = message")
+
+	dbmsg := model.Message{
+		Source:     content.From,
+		Target:     content.To,
+		Type:       msg.Type,
+		IsSend:     false,
+		Content:    content.Content,
+		Created:    time.Now(),
+	}
+
+	err = db.Create(&dbmsg).Error()
+
+	if err != nil {
+		log.Logger.Error("Insert into message error:", err)
+		Queue <- msg
+
+		return
+	}
 }

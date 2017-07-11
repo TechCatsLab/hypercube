@@ -42,11 +42,15 @@ import (
 )
 
 const (
+	dbUrl = "postgresql://core_acc:pKJgW81xvbrY0@10.0.0.253:26267/core?sslmode=disable"
+	dbPoolSize = 20
+
 	poolMaxSize = 200
 	dialect = "postgres"
 )
 
 var (
+	DbConnPool		*Pool
 	ErrNoConnection = errors.New("CockroachDB Connection expired")
 )
 
@@ -54,6 +58,14 @@ type Pool struct {
 	lock		sync.Mutex
 	pool		*ring.Ring
 	size		int				// 实际长度
+}
+
+func init() {
+	DbConnPool = NewPool(dbUrl, dbPoolSize)
+
+	if DbConnPool == nil {
+		panic("Cockroach DB connection error")
+	}
 }
 
 func NewPool(db string, size int) *Pool {
