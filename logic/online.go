@@ -32,7 +32,6 @@ package main
 import (
 	"errors"
 	"fmt"
-	"net/rpc"
 	"sync"
 
 	"hypercube/libs/log"
@@ -45,13 +44,10 @@ var (
 	ParamErr = errors.New("The Parametric error!")
 )
 
-func init() {
+func initOnline() {
 	OnLineUserMag = &UserManager{
 		users: make(map[message.User]*message.Access),
 	}
-
-	rpc.Register(OnLineUserMag)
-	rpc.HandleHTTP()
 }
 
 type UserManager struct {

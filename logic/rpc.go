@@ -43,7 +43,7 @@ var (
 	clients *rpc.Clients
 )
 
-func init() {
+func initRPC() {
 	for _, addr := range configuration.AccessAddrs {
 		op := rpc.Options{
 			Proto: "tcp",

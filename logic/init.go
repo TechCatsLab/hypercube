@@ -24,12 +24,26 @@
 
 /*
  * Revision History:
- *     Initial: 2017/04/04        Feng Yifei
+ *     Initial: 2017/07/12        Yang Chenglong
  */
 
 package main
 
-func main() {
-	run()
-	sigHandler.Wait()
+import (
+	"hypercube/libs/log"
+)
+
+func init() {
+	readConfiguration()
+	initQueue()
+	initOnline()
+	initSignal()
+	initRPC()
+}
+
+func run() {
+	err := initServer()
+	if err != nil {
+		log.Logger.Error("initServer Error %+v", err)
+	}
 }

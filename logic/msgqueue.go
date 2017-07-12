@@ -31,7 +31,6 @@ package main
 
 import (
 	"encoding/json"
-	"net/rpc"
 	"time"
 
 	"github.com/jinzhu/gorm"
@@ -48,15 +47,14 @@ type MessageManager int
 var (
 	Queue    chan *message.Message
 	Shutdown chan struct{}
+	msgManager *MessageManager
 )
 
-func init() {
+func initQueue() {
 	Queue = make(chan *message.Message, 100)
 	Shutdown = make(chan struct{})
 
-	msgManager := new(MessageManager)
-	rpc.Register(msgManager)
-	rpc.HandleHTTP()
+	msgManager = new(MessageManager)
 
 	QueueStart()
 }

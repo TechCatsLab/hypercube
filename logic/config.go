@@ -44,10 +44,6 @@ type LogicLayerConfig struct {
 
 var configuration *LogicLayerConfig
 
-func init() {
-	readConfiguration()
-}
-
 // 初始化配置
 func readConfiguration() {
 	viper.AddConfigPath("./")

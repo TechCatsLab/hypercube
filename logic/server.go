@@ -24,12 +24,33 @@
 
 /*
  * Revision History:
- *     Initial: 2017/04/04        Feng Yifei
+ *     Initial: 2017/07/12        Yang Chenglong
  */
 
 package main
 
-func main() {
-	run()
-	sigHandler.Wait()
+import (
+	"net"
+	"net/rpc"
+
+	"hypercube/libs/log"
+)
+
+var RPCServer *rpc.Server
+
+func initServer() error {
+	RPCServer = rpc.NewServer()
+	RPCServer.Register(msgManager)
+	RPCServer.Register(OnLineUserMag)
+
+	listener, err := net.Listen("tcp", configuration.Addrs)
+	if err != nil {
+		log.Logger.Error("net.Listen tcp :0: %v", err)
+		return err
+	}
+
+	log.Logger.Debug("Server Run On: ", configuration.Addrs)
+	go RPCServer.Accept(listener)
+
+	return nil
 }

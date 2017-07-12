@@ -40,7 +40,7 @@ var (
 	sigHandler *interrupt.Handler
 )
 
-func init() {
+func initSignal() {
 	sigHandler = interrupt.New(finalHandler, func(){})
 	log.Logger.Debug("Interrupt handler initialized")
 }
