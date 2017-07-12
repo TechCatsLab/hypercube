@@ -34,8 +34,8 @@ import (
 
 	// TODO: glide install this package
 	"github.com/jinzhu/gorm"
-	
-	"hypercube/orm/cockroach"
+
+	"hypercube/orm"
 )
 
 type Message struct {
@@ -48,22 +48,31 @@ type Message struct {
 	Created         time.Time
 }
 
-func (msg *Message) GetOffLineMessage(userid string)([]Message, error) {
+func (msg *Message) GetOffLineMessage(conn orm.Connection, userid string)([]Message, error) {
 	var all []Message
-
-	conn, err := cockroach.DbConnPool.GetConnection()
-	if err != nil {
-		return all, err
-	}
-	defer cockroach.DbConnPool.ReleaseConnection(conn)
 
 	db := conn.(*gorm.DB).Exec("SET DATABASE = core")
 
-	err = db.Where("target=? AND issend=?", userid, false).Find(&all).Error
+	err := db.Where("target=? AND issend=?", userid, false).Find(&all).Error
 
 	if err != nil {
 		return all, err
 	}
 
 	return all, nil
+}
+
+func (msg *Message) ModifyMessageStatus(conn orm.Connection, msgid int64) error {
+	var message Message
+
+	db := conn.(*gorm.DB).Exec("SET DATABASE = core")
+
+	updater := map[string]interface{}{"issend": true}
+	err := db.Model(&message).Where("messageid=? AND issend=?", msgid, true).Update(updater).Limit(1).Error
+
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
