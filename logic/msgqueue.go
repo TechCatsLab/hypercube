@@ -84,19 +84,22 @@ func QueueStart() {
 func HandleMessage(msg *message.Message) {
 	switch msg.Type {
 	case message.MessageTypePlainText:
-		TransmitMsg(msg)
+		flag := TransmitMsg(msg)
+
+		HandlePlainText(msg, flag)
 	default:
 		log.Logger.Debug("Not recognized message type!")
 	}
 }
 
-func TransmitMsg(msg *message.Message) error {
+func TransmitMsg(msg *message.Message) bool {
 	var plainUser message.PlainText
 
 	err := json.Unmarshal(msg.Content, &plainUser)
 	if err != nil {
 		log.Logger.Error("TransmitMsg Unmarshal Error %+v", err)
-		return err
+
+		return false
 	}
 
 	serveIp, flag := OnLineUserMag.Query(plainUser.To)
@@ -109,12 +112,12 @@ func TransmitMsg(msg *message.Message) error {
 		err := Send(plainUser.To, *msg, op)
 		if err != nil {
 			log.Logger.Error("TransmitMsg Send Error %+v", err)
-			return err
+
+			return false
 		}
 	}
-	HandlePlainText(msg, flag)
 
-	return nil
+	return flag
 }
 
 func HandlePlainText(msg *message.Message, isSend bool) {
