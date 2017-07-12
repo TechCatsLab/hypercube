@@ -40,6 +40,7 @@ import (
 
 var (
 	options []rpc.Options
+	Clients  *rpc.Clients
 )
 
 func init() {
@@ -51,6 +52,8 @@ func init() {
 
 		options = append(options, op)
 	}
+
+	Clients = rpc.Dials(options)
 }
 
 // Send calls the function of the access layer remotely, send a message to a specific user.

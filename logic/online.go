@@ -44,10 +44,6 @@ const (
 	Failed  int = 0
 )
 
-type Access struct {
-	ServerIp string
-}
-
 var (
 	OnLineUserMag *OnlineUserManager
 
@@ -56,7 +52,7 @@ var (
 
 func init() {
 	OnLineUserMag = &OnlineUserManager{
-		users: make(map[message.User]*Access),
+		users: make(map[message.User]*message.Access),
 	}
 
 	rpc.Register(OnLineUserMag)
@@ -65,15 +61,10 @@ func init() {
 
 type OnlineUserManager struct {
 	mux   sync.Mutex
-	users map[message.User]*Access
+	users map[message.User]*message.Access
 }
 
-type UserEntry struct {
-	UserID   message.User
-	ServerIP Access
-}
-
-func (this *OnlineUserManager) Add(user UserEntry, reply *int) error {
+func (this *OnlineUserManager) Add(user message.UserEntry, reply *int) error {
 	if user.ServerIP.ServerIp != "" && user.UserID.UserID != "" {
 		this.mux.Lock()
 		defer this.mux.Unlock()
@@ -90,7 +81,7 @@ func (this *OnlineUserManager) Add(user UserEntry, reply *int) error {
 	return ParamErr
 }
 
-func (this *OnlineUserManager) Remove(user UserEntry, reply *int) error {
+func (this *OnlineUserManager) Remove(user message.UserEntry, reply *int) error {
 	if user.ServerIP.ServerIp != "" && user.UserID.UserID != "" {
 		this.mux.Lock()
 		defer this.mux.Unlock()

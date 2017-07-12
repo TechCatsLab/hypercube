@@ -33,3 +33,12 @@ package message
 type User struct {
 	UserID string `json:"uid"      form:"uid"     query:"uid"`
 }
+
+type Access struct {
+	ServerIp string
+}
+
+type UserEntry struct {
+	UserID    User
+	ServerIP  Access
+}

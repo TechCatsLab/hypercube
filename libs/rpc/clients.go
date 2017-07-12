@@ -65,6 +65,19 @@ func (c *Clients) get() (*Client, error) {
 	return nil, ErrRPCNoClientAvailable
 }
 
+func (c *Clients) Get(add string) (*Client, error) {
+	for {
+		c, err := c.get()
+		if err != nil {
+			return nil, err
+		} else if c.options.Addr == add {
+			return c, nil
+		}
+
+		continue
+	}
+}
+
 // Available checks if exists a available client.
 func (c *Clients) Available() error {
 	_, err := c.get()
