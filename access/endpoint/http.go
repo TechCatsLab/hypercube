@@ -66,7 +66,6 @@ func NewHTTPServer(node *Endpoint) *HTTPServer {
 		SigningKey: []byte(node.Conf.SecretKey),
 	}
 	server.server.Use(middleware.JWTWithConfig(config))
-	//server.server.Use(handler.LoginMiddleWare)
 	server.server.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowOrigins: node.Conf.CorsHosts,
 		AllowMethods: []string{echo.GET, echo.POST},

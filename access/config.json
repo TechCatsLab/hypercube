@@ -6,12 +6,6 @@
     "writeBufferSize": 4096
   },
 
-  "nats": {
-    "urls": "nats://10.0.0.254:4223",
-    "apiChannel": "logic.hypercube.s8e.io",
-    "subject": "access.hypercube.s8e.io1"
-  },
-
   "monitor": {
     "pprofAddrs": "localhost:6060",
     "prometheusPort": ":9200"

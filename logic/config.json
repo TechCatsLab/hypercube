@@ -1,21 +1,10 @@
 {
   "accessAddrs": ["127.0.0.1:7000"],
-  "nats": {
-    "urls": "nats://10.0.0.254:4223",
-    "apiChannel": "logic.hypercube.s8e.io"
-  },
+
+  "serverAddrs": "127.0.0.1:7006",
 
   "monitor": {
     "pprofAddrs": "localhost:6060",
     "prometheusPort": ":9400"
-  },
-
-  "natss": {
-    "urls": "nats://10.0.0.253:4222",
-    "clientID": "clientid",
-    "clusterID" : "test-cluster",
-    "subject" : "chatmessage",
-    "durable" : "chatmessage",
-    "timeout" : 100
   }
 }
