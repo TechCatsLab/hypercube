@@ -65,12 +65,12 @@ func (c *Clients) get() (*Client, error) {
 	return nil, ErrRPCNoClientAvailable
 }
 
-func (c *Clients) Get(add string) (*Client, error) {
+func (c *Clients) Get(addr string) (*Client, error) {
 	for {
 		c, err := c.get()
 		if err != nil {
 			return nil, err
-		} else if c.options.Addr == add {
+		} else if c.options.Addr == addr {
 			return c, nil
 		}
 
