@@ -30,26 +30,28 @@
 package main
 
 import (
+	"net/rpc"
+	"encoding/json"
+	"time"
+
+	"github.com/jinzhu/gorm"
+
 	"hypercube/libs/message"
 	"hypercube/orm/cockroach"
 	"hypercube/libs/log"
+	rp "hypercube/libs/rpc"
 	model "hypercube/model"
-
-	"net/rpc"
-	"github.com/jinzhu/gorm"
-	"encoding/json"
-	"time"
 )
 
 type MessageManager int
 
 var (
-	Queue       chan message.Message
+	Queue       chan *message.Message
 	Shutdown    chan struct{}
 )
 
 func init() {
-	Queue = make(chan message.Message, 100)
+	Queue = make(chan *message.Message, 100)
 	Shutdown = make(chan struct{})
 
 	msgManager := new(MessageManager)
@@ -59,7 +61,7 @@ func init() {
 	QueueStart()
 }
 
-func (m *MessageManager) Add(msg message.Message, reply *bool) error {
+func (m *MessageManager) Add(msg *message.Message, reply *bool) error {
 	Queue <- msg
 	*reply = true
 
@@ -71,7 +73,7 @@ func QueueStart() {
 		for {
 			select {
 			case msg := <-Queue:
-				HandleMessage(&msg)
+				HandleMessage(msg)
 			case <-Shutdown:
 				return
 			}
@@ -79,16 +81,38 @@ func QueueStart() {
 	}()
 }
 
-func HandleMessage(msg *message.Message){
+func HandleMessage(msg *message.Message) {
 	switch msg.Type {
 	case message.MessageTypePlainText:
-		HandlePlainText(msg)
+		TransmitMsg(msg)
 	default:
 		log.Logger.Debug("Not recognized message type!")
 	}
 }
 
-func HandlePlainText(msg *message.Message) {
+func TransmitMsg(msg *message.Message) error{
+	var plainUser message.PlainText
+
+	err := json.Unmarshal(msg.Content, &plainUser)
+	if err != nil {
+		return err
+	}
+
+	serveIp, flag := OnLineUserMag.Query(plainUser.To)
+	if flag {
+		op := rp.Options{
+			Proto: "tcp",
+			Addr:  serveIp,
+		}
+
+		Send(plainUser.To, *msg, op)
+	}
+	HandlePlainText(msg, flag)
+
+	return nil
+}
+
+func HandlePlainText(msg *message.Message, isSend bool) {
 	var content message.PlainText
 
 	json.Unmarshal(msg.Content, &content)
@@ -96,7 +120,7 @@ func HandlePlainText(msg *message.Message) {
 	conn, err := cockroach.DbConnPool.GetConnection()
 	if err != nil {
 		log.Logger.Error("Get cockroach connect error:", err)
-		Queue <- *msg
+		Queue <- msg
 
 		return
 	}
@@ -108,7 +132,7 @@ func HandlePlainText(msg *message.Message) {
 		Source:     content.From.UserID,
 		Target:     content.To.UserID,
 		Type:       msg.Type,
-		IsSend:     false,
+		IsSend:     isSend,
 		Content:    content.Content,
 		Created:    time.Now(),
 	}
@@ -117,7 +141,7 @@ func HandlePlainText(msg *message.Message) {
 
 	if err != nil {
 		log.Logger.Error("Insert into message error:", err)
-		Queue <- *msg
+		Queue <- msg
 
 		return
 	}
