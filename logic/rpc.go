@@ -40,7 +40,7 @@ import (
 
 var (
 	options []rpc.Options
-	Clients  *rpc.Clients
+	clients *rpc.Clients
 )
 
 func init() {
@@ -53,7 +53,7 @@ func init() {
 		options = append(options, op)
 	}
 
-	Clients = rpc.Dials(options)
+	clients = rpc.Dials(options)
 }
 
 // Send calls the function of the access layer remotely, send a message to a specific user.
@@ -68,18 +68,28 @@ func Send(user message.User, msg message.Message, op rpc.Options) error {
 		Message: msg,
 	}
 
-	client := rpc.Dial(op)
-	defer client.Close()
+	client, err := clients.Get(op.Addr)
+	if err != nil {
+		log.Logger.Error("Clients.Get returned error: %+v.", err)
 
-	err := client.Call("AccessRPC.Send", &args, &ok)
+		return err
+	}
+
+	err = client.Call("AccessRPC.Send", &args, &ok)
 	if err != nil {
 		log.Logger.Error("RPC Call returned error: %v", err)
+		client.Close()
+
 		return err
 	}
 
 	if !ok {
+		client.Close()
+
 		return errors.New("logic send message failed")
 	}
+
+	client.Close()
 
 	return nil
 }
