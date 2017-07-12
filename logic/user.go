@@ -41,6 +41,11 @@ import (
 	db "hypercube/model"
 )
 
+const (
+	Success int = 1
+	Failed  int = 0
+)
+
 func (this *UserManager) LoginHandle(user message.UserEntry, reply *int) error {
 	err := this.Add(user)
 	if err != nil {
@@ -94,3 +99,14 @@ Mess:
 	return nil
 }
 
+func (this *UserManager) LogoutHandle(user message.UserEntry, reply *int) error {
+	err := this.Remove(user)
+	if err != nil {
+		log.Logger.Error("LogoutHandle Error %+v", err)
+		*reply = Failed
+		return err
+	}
+
+	*reply = Success
+	return nil
+}
