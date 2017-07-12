@@ -105,7 +105,10 @@ func TransmitMsg(msg *message.Message) error {
 			Addr:  serveIp,
 		}
 
-		Send(plainUser.To, *msg, op)
+		err := Send(plainUser.To, *msg, op)
+		if err != nil {
+			return err
+		}
 	}
 	HandlePlainText(msg, flag)
 
