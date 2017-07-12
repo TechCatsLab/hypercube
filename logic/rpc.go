@@ -43,10 +43,11 @@ var (
 	configuration = config.Load()
 )
 
+// Send calls the function of the access layer remotely, send a message to a specific user.
 func Send(user message.User, msg message.Message) error {
 	var (
-		args  server.Args
-		ok bool
+		args server.Args
+		ok   bool
 	)
 	op := rpc.Options{
 		Proto: "tcp",

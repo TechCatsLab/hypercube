@@ -45,12 +45,12 @@ func init() {
 	initSignal()
 	HttpPprof()
 	initPrometheus()
-	rpc.InitRPCServer()
+	rpc.InitServer()
 }
 
 func run() {
 	// Start a access endpoint.
-	ep= endpoint.NewEndpoint(configuration)
+	ep = endpoint.NewEndpoint(configuration)
 
 	ep.Run()
 

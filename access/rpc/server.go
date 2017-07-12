@@ -30,29 +30,12 @@
 package rpc
 
 import (
-	"net"
 	"net/rpc"
-
-	"hypercube/access/config"
-	"hypercube/libs/log"
 )
 
-var (
-	configuration = config.Load()
-)
-
-func InitRPCServer() error {
+// InitServer initialize the RPC server.
+func InitServer() {
 	newServer := rpc.NewServer()
 	newServer.Register(new(AccessRPC))
-
-	listener, err := net.Listen("tcp", configuration.Addrs)
-	if err != nil {
-		log.Logger.Error("ResolveTCPAddr returned error: %v", err)
-		return err
-	}
-
-	go newServer.Accept(listener)
 	rpc.HandleHTTP()
-
-	return nil
 }
