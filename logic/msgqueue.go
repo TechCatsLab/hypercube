@@ -30,24 +30,24 @@
 package main
 
 import (
-	"net/rpc"
 	"encoding/json"
+	"net/rpc"
 	"time"
 
 	"github.com/jinzhu/gorm"
 
-	"hypercube/libs/message"
-	"hypercube/orm/cockroach"
 	"hypercube/libs/log"
+	"hypercube/libs/message"
 	rp "hypercube/libs/rpc"
 	model "hypercube/model"
+	"hypercube/orm/cockroach"
 )
 
 type MessageManager int
 
 var (
-	Queue       chan *message.Message
-	Shutdown    chan struct{}
+	Queue    chan *message.Message
+	Shutdown chan struct{}
 )
 
 func init() {
@@ -90,7 +90,7 @@ func HandleMessage(msg *message.Message) {
 	}
 }
 
-func TransmitMsg(msg *message.Message) error{
+func TransmitMsg(msg *message.Message) error {
 	var plainUser message.PlainText
 
 	err := json.Unmarshal(msg.Content, &plainUser)
@@ -129,12 +129,12 @@ func HandlePlainText(msg *message.Message, isSend bool) {
 	db := conn.(*gorm.DB).Exec("SET DATABASE = message")
 
 	dbmsg := model.Message{
-		Source:     content.From.UserID,
-		Target:     content.To.UserID,
-		Type:       msg.Type,
-		IsSend:     isSend,
-		Content:    content.Content,
-		Created:    time.Now(),
+		Source:  content.From.UserID,
+		Target:  content.To.UserID,
+		Type:    msg.Type,
+		IsSend:  isSend,
+		Content: content.Content,
+		Created: time.Now(),
 	}
 
 	err = db.Create(&dbmsg).Error
