@@ -95,6 +95,7 @@ func TransmitMsg(msg *message.Message) error {
 
 	err := json.Unmarshal(msg.Content, &plainUser)
 	if err != nil {
+		log.Logger.Error("TransmitMsg Unmarshal Error %+v", err)
 		return err
 	}
 
@@ -107,6 +108,7 @@ func TransmitMsg(msg *message.Message) error {
 
 		err := Send(plainUser.To, *msg, op)
 		if err != nil {
+			log.Logger.Error("TransmitMsg Send Error %+v", err)
 			return err
 		}
 	}
@@ -135,6 +137,7 @@ func HandlePlainText(msg *message.Message, isSend bool) {
 		Source:  content.From.UserID,
 		Target:  content.To.UserID,
 		Type:    msg.Type,
+		Version: msg.Version,
 		IsSend:  isSend,
 		Content: content.Content,
 		Created: time.Now(),

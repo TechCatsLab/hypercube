@@ -38,17 +38,23 @@ import (
 	"hypercube/orm"
 )
 
+type MessageProvider struct {
+}
+
+var MessageService *MessageProvider
+
 type Message struct {
 	Messageid		int64		`jsql:"auto_increment;primary_key;"`
 	Source    	    string		`gorm:"not null"`
 	Target		    string
+	Version         uint16
 	Type            uint16
 	IsSend          bool		`gorm:"column:issend"`
 	Content         string
 	Created         time.Time
 }
 
-func (msg *Message) GetOffLineMessage(conn orm.Connection, userid string)([]Message, error) {
+func (msg *MessageProvider) GetOffLineMessage(conn orm.Connection, userid string)([]Message, error) {
 	var all []Message
 
 	db := conn.(*gorm.DB).Exec("SET DATABASE = core")
@@ -62,7 +68,7 @@ func (msg *Message) GetOffLineMessage(conn orm.Connection, userid string)([]Mess
 	return all, nil
 }
 
-func (msg *Message) ModifyMessageStatus(conn orm.Connection, msgid int64) error {
+func (msg *MessageProvider) ModifyMessageStatus(conn orm.Connection, msgid int64) error {
 	var message Message
 
 	db := conn.(*gorm.DB).Exec("SET DATABASE = core")

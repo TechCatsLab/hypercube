@@ -39,19 +39,14 @@ import (
 	"hypercube/libs/message"
 )
 
-const (
-	Success int = 1
-	Failed  int = 0
-)
-
 var (
-	OnLineUserMag *OnlineUserManager
+	OnLineUserMag *UserManager
 
 	ParamErr = errors.New("The Parametric error!")
 )
 
 func init() {
-	OnLineUserMag = &OnlineUserManager{
+	OnLineUserMag = &UserManager{
 		users: make(map[message.User]*message.Access),
 	}
 
@@ -59,12 +54,12 @@ func init() {
 	rpc.HandleHTTP()
 }
 
-type OnlineUserManager struct {
+type UserManager struct {
 	mux   sync.Mutex
 	users map[message.User]*message.Access
 }
 
-func (this *OnlineUserManager) Add(user message.UserEntry, reply *int) error {
+func (this *UserManager) Add(user message.UserEntry) error {
 	if user.ServerIP.ServerIp != "" && user.UserID.UserID != "" {
 		this.mux.Lock()
 		defer this.mux.Unlock()
@@ -74,14 +69,12 @@ func (this *OnlineUserManager) Add(user message.UserEntry, reply *int) error {
 		}
 
 		this.users[user.UserID] = &user.ServerIP
-		*reply = Success
 	}
-	*reply = Failed
 
 	return ParamErr
 }
 
-func (this *OnlineUserManager) Remove(user message.UserEntry, reply *int) error {
+func (this *UserManager) Remove(user message.UserEntry) error {
 	if user.ServerIP.ServerIp != "" && user.UserID.UserID != "" {
 		this.mux.Lock()
 		defer this.mux.Unlock()
@@ -91,14 +84,12 @@ func (this *OnlineUserManager) Remove(user message.UserEntry, reply *int) error 
 		}
 
 		delete(this.users, user.UserID)
-		*reply = Success
 	}
-	*reply = Failed
 
 	return ParamErr
 }
 
-func (this *OnlineUserManager) Query(user message.User) (string, bool) {
+func (this *UserManager) Query(user message.User) (string, bool) {
 	this.mux.Lock()
 	defer this.mux.Unlock()
 
@@ -107,6 +98,6 @@ func (this *OnlineUserManager) Query(user message.User) (string, bool) {
 	return serverIP.ServerIp, ok
 }
 
-func (this *OnlineUserManager) PrintDebugInfo() {
+func (this *UserManager) PrintDebugInfo() {
 	log.Logger.Debug(fmt.Sprintf("Online user manager: %+v", this.users))
 }

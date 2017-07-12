@@ -31,92 +31,66 @@
 package main
 
 import (
+	"encoding/json"
+
+	"github.com/jinzhu/gorm"
+
 	"hypercube/libs/log"
+	"hypercube/libs/message"
+	"hypercube/orm/cockroach"
+	db "hypercube/model"
 )
 
-func MessageHandler(req interface{}) interface{} {
-	var (
-		msg          *general.Message
-		reply        *general.Reply
-	)
-
-	msg = req.(*general.Message)
-	log.Logger.Debug("userToUserMsgHandler:", *msg)
-
-	accessip, err := OnLineUserMag.Query(msg.To)
-
+func (this *UserManager) LoginHandle(user message.UserEntry, reply *int) error {
+	err := this.Add(user)
 	if err != nil {
-		addHistMessage(msg.To, msg)
-
-		log.Logger.Error("MessageHandler-->OnLineUserMag.Query():", err)
-
-		reply = &general.Reply{
-			Code: types.ErrUserQuery,
-		}
-
-		return reply
-	}
-
-	if req, ok := OnLineUserMag.access[accessip]; ok {
-		err = req.SendMessage(msg)
-
-		if err != nil {
-			log.Logger.Error("MessageHandler-->SendMessage:", err)
-
-			reply = &general.Reply{
-				Code: types.ErrSendToAccess,
-			}
-		} else {
-			log.Logger.Debug("SendMessage Succeed")
-			reply = &general.Reply{
-				Code: types.ErrSucceed,
-			}
-		}
-	} else {
-		reply = &general.Reply{
-			Code: types.ErrFindAccess,
-		}
-	}
-
-	return reply
-}
-
-func AccessConnectHandler(req interface{}) interface{} {
-	var (
-		access          *general.Access
-		reply           *general.Reply
-	)
-
-	access = req.(*general.Access)
-	log.Logger.Debug("userToUserMsgHandler:", access)
-
-	err := OnLineUserMag.AddAccess(access)
-
-	if err != nil {
-		log.Logger.Error("AccessConnectHandler-->AddAccess:", err)
-
-		reply = &general.Reply{
-			Code: types.ErrAddAccess,
-		}
-	}
-
-	return reply
-}
-
-func AccessHeartHandler(req interface{}) interface{} {
-	var (
-		heart          *general.Proto
-		reply          *general.Reply
-	)
-
-	heart = req.(*general.Proto)
-
-	if _, err := heart.VerCheck(); err != types.ErrSucceed {
-		log.Logger.Error("keepAliveRequestHandler vercheck:", err)
+		log.Logger.Error("LoginHandle Add Error %+v: .", err)
 		return err
 	}
 
-	log.Logger.Debug("a heartbeat from access which versions is:", heart.Ver)
+	conn, err := cockroach.DbConnPool.GetConnection()
+	if err != nil {
+		log.Logger.Error("Get cockroach connect error:", err)
+		return err
+	}
+	defer cockroach.DbConnPool.ReleaseConnection(conn)
 
-	return reply
+	mes, err := db.MessageService.GetOffLineMessage(conn, user.UserID.UserID)
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			log.Logger.Debug("")
+			goto Mess
+		}
+
+		log.Logger.Error("GetOffLineMessage Error %+v", err)
+		return err
+	}
+Mess:
+	for _, msg := range mes {
+		switch msg.Type {
+		case message.MessageTypePlainText:
+			content := message.PlainText{
+				From:    message.User{UserID:msg.Source},
+				To:      message.User{UserID:msg.Target},
+				Content: msg.Content,
+			}
+
+			text, err := json.Marshal(content)
+			if err != nil {
+				log.Logger.Error("OffLineMessage Marshal Error %+v", err)
+				return err
+			}
+
+			mesg := &message.Message{
+				Type:       msg.Type,
+				Version:    msg.Version,
+				Content:    text,
+			}
+
+			TransmitMsg(mesg)
+		}
+	}
+
+	return nil
 }
+
