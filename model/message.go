@@ -31,6 +31,11 @@ package message
 
 import (
 	"time"
+
+	// TODO: glide install this package
+	"github.com/jinzhu/gorm"
+	
+	"hypercube/orm/cockroach"
 )
 
 type Message struct {
@@ -38,7 +43,27 @@ type Message struct {
 	Source    	    string		`gorm:"not null"`
 	Target		    string
 	Type            uint16
-	IsSend          bool
+	IsSend          bool		`gorm:"column:issend"`
 	Content         string
 	Created         time.Time
+}
+
+func (msg *Message) GetOffLineMessage(userid string)([]Message, error) {
+	var all []Message
+
+	conn, err := cockroach.DbConnPool.GetConnection()
+	if err != nil {
+		return all, err
+	}
+	defer cockroach.DbConnPool.ReleaseConnection(conn)
+
+	db := conn.(*gorm.DB).Exec("SET DATABASE = core")
+
+	err = db.Where("target=? AND issend=?", userid, false).Find(&all).Error
+
+	if err != nil {
+		return all, err
+	}
+
+	return all, nil
 }
