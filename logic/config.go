@@ -30,24 +30,30 @@
 package main
 
 import (
-	"hypercube/libs/log"
 	"github.com/spf13/viper"
+	"hypercube/libs/log"
 )
-
 
 // 配置文件结构
 type LogicLayerConfig struct {
-	NatsUrl             string
-	ApiChannel          string
-	PprofAddrs          string
-	PrometheusPort      string
-	NatssUrl			string
-	NatssClientID		string
-	NatssClusterID		string
-	NatssSubject		string
-	NatssDurable		string
-	NatssTimeout		int
-	NatssQGroup			string
+	AccessAddrs    []string
+	NatsUrl        string
+	ApiChannel     string
+	PprofAddrs     string
+	PrometheusPort string
+	NatssUrl       string
+	NatssClientID  string
+	NatssClusterID string
+	NatssSubject   string
+	NatssDurable   string
+	NatssTimeout   int
+	NatssQGroup    string
+}
+
+var configuration *LogicLayerConfig
+
+func init() {
+	readConfiguration()
 }
 
 // 初始化配置
@@ -56,22 +62,22 @@ func readConfiguration() {
 	viper.SetConfigName("config")
 
 	if err := viper.ReadInConfig(); err != nil {
-		logger.Error("Read configuration file with error:", err)
+		log.Logger.Error("Read configuration file with error:", err)
 		panic(err)
 	}
 
 	configuration = &LogicLayerConfig{
-		NatsUrl:               viper.GetString("nats.urls"),
-		ApiChannel:            viper.GetString("nats.apiChannel"),
-		PprofAddrs:            viper.GetString("monitor.pprofAddrs"),
-		PrometheusPort:        viper.GetString("monitor.prometheusPort"),
-		NatssUrl:      		   viper.GetString("natss.urls"),
-		NatssClientID:         viper.GetString("natss.clientID"),
-		NatssClusterID:        viper.GetString("natss.clusterID"),
-		NatssSubject:		   viper.GetString("natss.subject"),
-		NatssDurable:          viper.GetString("natss.durable"),
-		NatssTimeout:          viper.GetInt("natss.timeout"),
-		NatssQGroup:		   viper.GetString("natss.qgroup"),
+		AccessAddrs:    viper.GetStringSlice("accessAddrs"),
+		NatsUrl:        viper.GetString("nats.urls"),
+		ApiChannel:     viper.GetString("nats.apiChannel"),
+		PprofAddrs:     viper.GetString("monitor.pprofAddrs"),
+		PrometheusPort: viper.GetString("monitor.prometheusPort"),
+		NatssUrl:       viper.GetString("natss.urls"),
+		NatssClientID:  viper.GetString("natss.clientID"),
+		NatssClusterID: viper.GetString("natss.clusterID"),
+		NatssSubject:   viper.GetString("natss.subject"),
+		NatssDurable:   viper.GetString("natss.durable"),
+		NatssTimeout:   viper.GetInt("natss.timeout"),
+		NatssQGroup:    viper.GetString("natss.qgroup"),
 	}
 }
-

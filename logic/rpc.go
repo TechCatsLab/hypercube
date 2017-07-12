@@ -32,7 +32,6 @@ package main
 import (
 	"errors"
 
-	"hypercube/access/config"
 	server "hypercube/access/rpc"
 	"hypercube/libs/log"
 	"hypercube/libs/message"
@@ -40,18 +39,30 @@ import (
 )
 
 var (
-	configuration = config.Load()
+	options []rpc.Options
 )
 
+func init() {
+	for _, addr := range configuration.AccessAddrs {
+		op := rpc.Options{
+			Proto: "tcp",
+			Addr:  addr,
+		}
+
+		options = append(options, op)
+	}
+}
+
 // Send calls the function of the access layer remotely, send a message to a specific user.
-func Send(user message.User, msg message.Message) error {
+func Send(user message.User, msg message.Message, op rpc.Options) error {
 	var (
 		args server.Args
 		ok   bool
 	)
-	op := rpc.Options{
-		Proto: "tcp",
-		Addr:  configuration.Addrs,
+
+	args = server.Args{
+		User:    user,
+		Message: msg,
 	}
 
 	client := rpc.Dial(op)

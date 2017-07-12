@@ -1,4 +1,5 @@
 {
+  "accessAddrs": ["127.0.0.1:7000"],
   "nats": {
     "urls": "nats://10.0.0.254:4223",
     "apiChannel": "logic.hypercube.s8e.io"
