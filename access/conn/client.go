@@ -74,7 +74,7 @@ func (client *Client) Handle(message *msg.Message) error {
 	)
 	switch message.Type {
 	case msg.MessageTypePushPlainText, msg.MessageTypePlainText:
-		rpc.RpcClient.Client.Go("MessageManager.Add", message, &ok)
+		rpc.RpcClient.Call("MessageManager.Add", message, &ok)
 	case msg.MessageTypeLogout:
 		err = client.HandleLogoutMessage(message)
 	default:
@@ -95,7 +95,7 @@ func (client *Client) HandleLogoutMessage(message *msg.Message) error {
 
 	err := json.Unmarshal(message.Content, &user)
 	if err != nil {
-		log.Logger.Error("HandleLogoutMessage Unmarshal Error: %+v", err)
+		log.Logger.Error("HandleLogoutMessage Unmarshal Error: %v", err)
 		return err
 	}
 

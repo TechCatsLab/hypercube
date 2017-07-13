@@ -29,9 +29,6 @@
 
 package main
 
-import (
-)
-
 func init() {
 	readConfiguration()
 	initQueue()

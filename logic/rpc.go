@@ -69,7 +69,7 @@ func Send(user message.User, msg message.Message, op rpc.Options) error {
 
 	client, err := clients.Get(op.Addr)
 	if err != nil {
-		log.Logger.Error("Clients.Get returned error: %+v.", err)
+		log.Logger.Error("Clients.Get returned error: %v.", err)
 
 		return err
 	}

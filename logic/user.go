@@ -57,6 +57,7 @@ func (this *UserHandler) LoginHandler(user message.UserEntry, reply *int) error 
 	err := onLineUserMag.Add(user)
 	if err != nil {
 		log.Logger.Error("LoginHandle Add Error %+v: ", err)
+
 		*reply = message.ReplyFailed
 		return err
 	}
@@ -81,7 +82,7 @@ func OfflineMessageHandler(user message.UserEntry) error {
 			goto Mess
 		}
 
-		log.Logger.Error("GetOffLineMessage Error %+v", err)
+		log.Logger.Error("GetOffLineMessage Error %v", err)
 		return err
 	}
 	Mess:
@@ -96,7 +97,7 @@ func OfflineMessageHandler(user message.UserEntry) error {
 
 			text, err := json.Marshal(content)
 			if err != nil {
-				log.Logger.Error("OffLineMessage Marshal Error %+v", err)
+				log.Logger.Error("OffLineMessage Marshal Error %v", err)
 				return err
 			}
 
@@ -116,7 +117,7 @@ func OfflineMessageHandler(user message.UserEntry) error {
 func (this *UserHandler) LogoutHandle(user message.UserEntry, reply *int) error {
 	err := onLineUserMag.Remove(user)
 	if err != nil {
-		log.Logger.Error("LogoutHandle Error %+v", err)
+		log.Logger.Error("LogoutHandle Error %v", err)
 		*reply = message.ReplyFailed
 		return err
 	}
