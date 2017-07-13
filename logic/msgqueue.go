@@ -100,7 +100,7 @@ func TransmitMsg(msg *message.Message) bool {
 		return false
 	}
 
-	serveIp, flag := OnLineUserMag.Query(plainUser.To)
+	serveIp, flag := onLineUserMag.Query(plainUser.To)
 	if flag {
 		op := rp.Options{
 			Proto: "tcp",

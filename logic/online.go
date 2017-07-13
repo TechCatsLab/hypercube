@@ -39,13 +39,13 @@ import (
 )
 
 var (
-	OnLineUserMag *UserManager
+	onLineUserMag *UserManager
 
 	ParamErr = errors.New("The Parametric error!")
 )
 
 func initOnline() {
-	OnLineUserMag = &UserManager{
+	onLineUserMag = &UserManager{
 		users: make(map[message.User]*message.Access),
 	}
 }

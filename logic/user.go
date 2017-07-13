@@ -46,8 +46,13 @@ const (
 	Failed  int = 0
 )
 
-func (this *UserManager) LoginHandle(user message.UserEntry, reply *int) error {
-	err := this.Add(user)
+type UserHandler struct {
+}
+
+var userHandler = &UserHandler{}
+
+func (this *UserHandler) LoginHandle(user message.UserEntry, reply *int) error {
+	err := onLineUserMag.Add(user)
 	if err != nil {
 		log.Logger.Error("LoginHandle Add Error %+v: .", err)
 		return err
@@ -99,8 +104,8 @@ Mess:
 	return nil
 }
 
-func (this *UserManager) LogoutHandle(user message.UserEntry, reply *int) error {
-	err := this.Remove(user)
+func (this *UserHandler) LogoutHandle(user message.UserEntry, reply *int) error {
+	err := onLineUserMag.Remove(user)
 	if err != nil {
 		log.Logger.Error("LogoutHandle Error %+v", err)
 		*reply = Failed

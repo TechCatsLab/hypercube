@@ -41,7 +41,7 @@ var RPCServer *rpc.Server
 func initServer() error {
 	RPCServer = rpc.NewServer()
 	RPCServer.Register(msgManager)
-	RPCServer.Register(OnLineUserMag)
+	RPCServer.Register(userHandler)
 
 	listener, err := net.Listen("tcp", configuration.Addrs)
 	if err != nil {
