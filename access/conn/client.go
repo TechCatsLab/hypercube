@@ -37,6 +37,8 @@ import (
 	"hypercube/libs/log"
 	msg "hypercube/libs/message"
 	"hypercube/libs/metrics/prometheus"
+	"hypercube/access/rpc"
+	"hypercube/access/config"
 )
 
 // Client is a client connection.
@@ -89,6 +91,7 @@ func (client *Client) Handle(message *msg.Message) error {
 
 func (client *Client) HandleLogoutMessage(message *msg.Message) error {
 	var user msg.User
+	var reply *int
 
 	err := json.Unmarshal(message.Content, &user)
 	if err != nil {
@@ -99,6 +102,16 @@ func (client *Client) HandleLogoutMessage(message *msg.Message) error {
 	client.hub.Remove(&user, client)
 	client.Close()
 	prometheus.OnlineUserCounter.Add(-1)
+
+	userEntry := msg.UserEntry{
+		UserID:   user,
+		ServerIP: msg.Access{ServerIp:config.GNodeConfig.Addrs},
+	}
+	err = rpc.RpcClient.Call("UserHandler.LogoutHandle", userEntry, reply)
+	if err != nil {
+		log.Logger.Error("UserHandler.LogoutHandle Error: %v", err)
+		return err
+	}
 
 	return nil
 }
