@@ -34,7 +34,6 @@ import (
 	"net"
 	"net/rpc"
 	"time"
-	"hypercube/libs/log"
 )
 
 const (

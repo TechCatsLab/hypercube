@@ -57,7 +57,7 @@ func (access *AccessRPC) Ping(req *rpc.ReqKeepAlive, resp *rpc.RespKeepAlive) er
 }
 
 // Push a message to a specific user.
-func (access *AccessRPC) Push(user *message.User) error {
+func Push(user *message.User) error {
 	return nil
 }
 

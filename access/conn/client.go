@@ -37,7 +37,6 @@ import (
 	"hypercube/libs/log"
 	msg "hypercube/libs/message"
 	"hypercube/libs/metrics/prometheus"
-	"hypercube/access/rpc"
 	"hypercube/access/config"
 )
 
