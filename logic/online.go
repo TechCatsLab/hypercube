@@ -65,6 +65,7 @@ func (this *UserManager) Add(user message.UserEntry) error {
 		}
 
 		this.users[user.UserID] = &user.ServerIP
+		return nil
 	}
 
 	return ParamErr
@@ -80,6 +81,7 @@ func (this *UserManager) Remove(user message.UserEntry) error {
 		}
 
 		delete(this.users, user.UserID)
+		return nil
 	}
 
 	return ParamErr

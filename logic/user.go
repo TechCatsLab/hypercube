@@ -56,7 +56,7 @@ func init()  {
 func (this *UserHandler) LoginHandler(user message.UserEntry, reply *int) error {
 	err := onLineUserMag.Add(user)
 	if err != nil {
-		log.Logger.Error("LoginHandle Add Error %+v: .", err)
+		log.Logger.Error("LoginHandle Add Error %+v: ", err)
 		*reply = message.ReplyFailed
 		return err
 	}

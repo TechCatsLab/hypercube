@@ -104,7 +104,7 @@ func dial(addr string) (*websocket.Conn, error) {
 	log.Printf("connecting to %s", u.String())
 
 	connectHeader := make(http.Header)
-	connectHeader.Set("Authorization", "Bearer "+"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE0OTk5MjQ3MjQsInVpZCI6ImpvbiJ9.Y7qvT2J-LJ4-eBt1Ma2sIGjiiHMBzSpD3av6Ucbug5M")
+	connectHeader.Set("Authorization", "Bearer "+"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1aWQiOiIxIn0.csvtKWbINxS2NOWbqq9uS1Q_GUVWa8I7oTZj2rxIdFU")
 
 	c, _, err := websocket.DefaultDialer.Dial(u.String(), connectHeader)
 
