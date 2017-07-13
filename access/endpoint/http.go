@@ -44,6 +44,7 @@ import (
 	"hypercube/libs/log"
 	"hypercube/libs/message"
 	"hypercube/libs/metrics/prometheus"
+	"hypercube/access/rpc"
 )
 
 // HTTPServer represents the http server accepts the client websocket connections.
@@ -106,8 +107,6 @@ func (server *HTTPServer) serve() echo.HandlerFunc {
 			UserID: handler.GetUser(claim.(*jwt.Token)),
 		}
 
-		prometheus.OnlineUserCounter.Add(1)
-
 		err = server.NewClient(ws, &user, server.node.clientHub(), session.NewSession(ws, &user, server.node, server.node.Conf.QueueBuffer))
 		if err != nil {
 			log.Logger.Error("HTTPServer NewClient Error: %+v", err)
@@ -121,12 +120,25 @@ func (server *HTTPServer) NewClient(ws *websocket.Conn, user *message.User, hub 
 	var (
 		msg message.Message
 		err error
+		reply  *int
+		userEntry  message.UserEntry
 	)
 
 	client := conn.NewClient(user, server.node.clientHub(), session)
 	client.StartHandleMessage()
 
 	server.node.clientHub().Add(user, client)
+	prometheus.OnlineUserCounter.Add(1)
+
+	userEntry = message.UserEntry{
+		UserID:   *user,
+		ServerIP: message.Access{ServerIp:server.node.Conf.Addrs},
+	}
+	err = rpc.RpcClient.Call("UserHandler.LoginHandler", userEntry, reply)
+	if err != nil {
+		log.Logger.Error("UserHandler.LoginHandler Error: %v", err)
+		return err
+	}
 
 	defer func() {
 		server.node.hub.Remove(user, client)

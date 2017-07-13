@@ -41,23 +41,33 @@ import (
 	db "hypercube/model"
 )
 
-const (
-	Success int = 1
-	Failed  int = 0
-)
-
 type UserHandler struct {
 }
 
-var userHandler = &UserHandler{}
+type OfflineMessage chan message.UserEntry
 
-func (this *UserHandler) LoginHandle(user message.UserEntry, reply *int) error {
+var userHandler *UserHandler
+var offline OfflineMessage
+
+func init()  {
+	userHandler = &UserHandler{}
+	offline = make(chan message.UserEntry)
+}
+
+func (this *UserHandler) LoginHandler(user message.UserEntry, reply *int) error {
 	err := onLineUserMag.Add(user)
 	if err != nil {
 		log.Logger.Error("LoginHandle Add Error %+v: .", err)
+		*reply = message.ReplyFailed
 		return err
 	}
 
+	offline <- user
+	*reply = message.ReplySucceed
+	return nil
+}
+
+func OfflineMessageHandler(user message.UserEntry) error {
 	conn, err := cockroach.DbConnPool.GetConnection()
 	if err != nil {
 		log.Logger.Error("Get cockroach connect error:", err)
@@ -75,7 +85,7 @@ func (this *UserHandler) LoginHandle(user message.UserEntry, reply *int) error {
 		log.Logger.Error("GetOffLineMessage Error %+v", err)
 		return err
 	}
-Mess:
+	Mess:
 	for _, msg := range mes {
 		switch msg.Type {
 		case message.MessageTypePlainText:
@@ -108,10 +118,10 @@ func (this *UserHandler) LogoutHandle(user message.UserEntry, reply *int) error 
 	err := onLineUserMag.Remove(user)
 	if err != nil {
 		log.Logger.Error("LogoutHandle Error %+v", err)
-		*reply = Failed
+		*reply = message.ReplyFailed
 		return err
 	}
 
-	*reply = Success
+	*reply = message.ReplySucceed
 	return nil
 }

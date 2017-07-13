@@ -72,6 +72,8 @@ func QueueStart() {
 			select {
 			case msg := <-Queue:
 				HandleMessage(msg)
+			case user := <- offline:
+				OfflineMessageHandler(user)
 			case <-Shutdown:
 				return
 			}

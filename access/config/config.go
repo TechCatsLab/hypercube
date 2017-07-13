@@ -40,6 +40,7 @@ var GNodeConfig *NodeConfig
 // NodeConfig is used to config the access endpoint
 type NodeConfig struct {
 	Addrs             string
+	LogicAddrs        string
 	WSReadBufferSize  int
 	WSWriteBufferSize int
 	PprofAddrs        string
@@ -66,6 +67,7 @@ func Load() *NodeConfig {
 
 	GNodeConfig = &NodeConfig{
 		Addrs:             viper.GetString("addrs"),
+		LogicAddrs:        viper.GetString("127.0.0.1:7006"),
 		WSReadBufferSize:  viper.GetInt("websocket.readBufferSize"),
 		WSWriteBufferSize: viper.GetInt("websocket.writeBufferSize"),
 		PprofAddrs:        viper.GetString("monitor.pprofAddrs"),

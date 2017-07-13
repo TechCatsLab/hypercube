@@ -1,6 +1,8 @@
 {
   "addrs": "127.0.0.1:7000",
 
+  "logicAddrs": "127.0.0.1:7006",
+
   "websocket": {
     "readBufferSize": 4096,
     "writeBufferSize": 4096

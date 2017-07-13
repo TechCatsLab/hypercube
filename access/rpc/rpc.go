@@ -30,20 +30,25 @@
 package rpc
 
 import (
-	"hypercube/access/endpoint"
 	"hypercube/libs/message"
 	"hypercube/libs/rpc"
+	"hypercube/access/config"
+	"hypercube/access/sender"
 )
+
+var RpcClient *rpc.Client
+
+func InitRPC() {
+	op := rpc.Options{
+		Proto:  "tcp",
+		Addr:   config.GNodeConfig.LogicAddrs,
+	}
+	RpcClient = rpc.Dial(op)
+}
 
 // AccessRPC provides push functions.
 type AccessRPC struct {
-	node *endpoint.Endpoint
-}
-
-// Args represent a RPC argument
-type Args struct {
-	message.User
-	message.Message
+	node sender.Sender
 }
 
 // Ping is general rpc keepalive interface.
@@ -57,7 +62,7 @@ func (access *AccessRPC) Push(user *message.User) error {
 }
 
 // Send send a message to a specific user.
-func (access *AccessRPC) Send(args *Args, reply *bool) error {
+func (access *AccessRPC) Send(args *message.Args, reply *bool) error {
 	access.node.Send(&args.User, &args.Message)
 	*reply = true
 

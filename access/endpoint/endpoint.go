@@ -80,7 +80,6 @@ func (ep *Endpoint) Run() error {
 	case <-ep.shutdown:
 		return ep.ws.server.Server.Shutdown(context.Background())
 	}
-
 }
 
 // Shutdown stops the access server.

@@ -49,9 +49,9 @@ const (
 	// MessageTypePushPlainText - Push plain text message
 	MessageTypePushPlainText = 0x0300
 
-	// PushToAll - Push plain text to all
-	PushToAll = 0x0301
+	// ReplySucceed - Represent a succeed RPC call
+	ReplySucceed = 0x10001
 
-	// PushToPart - Push plain text to selected users
-	PushToPart = 0x0302
+	// ReplyFailed - Represent a failed RPC call
+	ReplyFailed = 0x10002
 )

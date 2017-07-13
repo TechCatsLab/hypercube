@@ -46,6 +46,7 @@ func init() {
 	HttpPprof()
 	initPrometheus()
 	rpc.InitServer()
+	rpc.InitRPC()
 }
 
 func run() {

@@ -32,7 +32,6 @@ package main
 import (
 	"errors"
 
-	server "hypercube/access/rpc"
 	"hypercube/libs/log"
 	"hypercube/libs/message"
 	"hypercube/libs/rpc"
@@ -59,11 +58,11 @@ func initRPC() {
 // Send calls the function of the access layer remotely, send a message to a specific user.
 func Send(user message.User, msg message.Message, op rpc.Options) error {
 	var (
-		args server.Args
+		args message.Args
 		ok   bool
 	)
 
-	args = server.Args{
+	args = message.Args{
 		User:    user,
 		Message: msg,
 	}
