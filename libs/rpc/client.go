@@ -34,6 +34,7 @@ import (
 	"net"
 	"net/rpc"
 	"time"
+	"hypercube/libs/log"
 )
 
 const (
@@ -141,6 +142,7 @@ func (c *Client) Ping() {
 		} else {
 			if err = c.dial(); err == nil {
 				c.err = nil
+				log.Logger.Debug("ping message: %v", c.options.Addr)
 			}
 		}
 		time.Sleep(pingDuration)

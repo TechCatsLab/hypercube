@@ -24,8 +24,7 @@
 
 /*
  * Revision History:
- *     Initial: 2017/04/04        Feng Yifei
- *     Modify:  2017/06/07        Yang Chenglong  添加AccessHeartHandler
+ *     Initial: 2017/07/13        Yang Chenglong
  */
 
 package main

@@ -66,8 +66,8 @@ func Load() *NodeConfig {
 	}
 
 	GNodeConfig = &NodeConfig{
-		Addrs:             viper.GetString("addrs"),
-		LogicAddrs:        viper.GetString("127.0.0.1:7006"),
+		Addrs:             viper.GetString("accessAddrs"),
+		LogicAddrs:        viper.GetString("logicAddrs"),
 		WSReadBufferSize:  viper.GetInt("websocket.readBufferSize"),
 		WSWriteBufferSize: viper.GetInt("websocket.writeBufferSize"),
 		PprofAddrs:        viper.GetString("monitor.pprofAddrs"),

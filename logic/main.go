@@ -30,6 +30,8 @@
 package main
 
 func main() {
-	run()
+	go clients.Ping()
+	initServer()
+
 	sigHandler.Wait()
 }

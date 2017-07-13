@@ -30,7 +30,6 @@
 package main
 
 import (
-	"hypercube/libs/log"
 )
 
 func init() {
@@ -39,11 +38,4 @@ func init() {
 	initOnline()
 	initSignal()
 	initRPC()
-}
-
-func run() {
-	err := initServer()
-	if err != nil {
-		log.Logger.Error("initServer Error %+v", err)
-	}
 }
