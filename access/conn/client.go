@@ -32,6 +32,7 @@ package conn
 import (
 	"encoding/json"
 
+	"hypercube/access/rpc"
 	"hypercube/access/session"
 	"hypercube/libs/log"
 	msg "hypercube/libs/message"
@@ -65,10 +66,13 @@ func (client *Client) UID() string {
 
 // Handle incoming messages
 func (client *Client) Handle(message *msg.Message) error {
-	var err error
+	var (
+		ok  bool
+		err error
+	)
 	switch message.Type {
 	case msg.MessageTypePushPlainText, msg.MessageTypePlainText:
-		client.Send(message)
+		rpc.RpcClient.Client.Go("MessageManager.Add", message, &ok)
 	case msg.MessageTypeLogout:
 		err = client.HandleLogoutMessage(message)
 	default:
