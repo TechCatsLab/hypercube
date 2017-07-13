@@ -104,7 +104,7 @@ func (s *Session) HandleMessage(msg *message.Message) {
 	if user.UserID == s.user.UserID {
 		err := s.ws.WriteJSON(*msg)
 		if err != nil {
-			log.Logger.Error("WriteMessage Error: %+v", err)
+			log.Logger.Error("WriteMessage Error: %v", err)
 			s.PushMessage(msg)
 		}
 		prometheus.SendMessageCounter.Add(1)

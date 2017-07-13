@@ -38,15 +38,15 @@ import (
 	"hypercube/libs/log"
 	"hypercube/libs/message"
 	rp "hypercube/libs/rpc"
-	model "hypercube/model"
+	mod "hypercube/model"
 	"hypercube/orm/cockroach"
 )
 
 type MessageManager int
 
 var (
-	Queue    chan *message.Message
-	Shutdown chan struct{}
+	Queue      chan *message.Message
+	Shutdown   chan struct{}
 	msgManager *MessageManager
 )
 
@@ -72,7 +72,7 @@ func QueueStart() {
 			select {
 			case msg := <-Queue:
 				HandleMessage(msg)
-			case user := <- offline:
+			case user := <-offline:
 				OfflineMessageHandler(user)
 			case <-Shutdown:
 				return
@@ -97,7 +97,7 @@ func TransmitMsg(msg *message.Message) bool {
 
 	err := json.Unmarshal(msg.Content, &plainUser)
 	if err != nil {
-		log.Logger.Error("TransmitMsg Unmarshal Error %+v", err)
+		log.Logger.Error("TransmitMsg Unmarshal Error %v", err)
 
 		return false
 	}
@@ -111,7 +111,7 @@ func TransmitMsg(msg *message.Message) bool {
 
 		err := Send(plainUser.To, *msg, op)
 		if err != nil {
-			log.Logger.Error("TransmitMsg Send Error %+v", err)
+			log.Logger.Error("TransmitMsg Send Error %v", err)
 
 			return false
 		}
@@ -136,7 +136,7 @@ func HandlePlainText(msg *message.Message, isSend bool) {
 
 	db := conn.(*gorm.DB).Exec("SET DATABASE = message")
 
-	dbmsg := model.Message{
+	dbmsg := mod.Message{
 		Source:  content.From.UserID,
 		Target:  content.To.UserID,
 		Type:    msg.Type,

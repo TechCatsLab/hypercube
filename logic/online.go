@@ -95,5 +95,5 @@ func (this *UserManager) Query(user message.User) (string, bool) {
 }
 
 func (this *UserManager) PrintDebugInfo() {
-	log.Logger.Debug(fmt.Sprintf("Online user manager: %+v", this.users))
+	log.Logger.Debug(fmt.Sprintf("Online user manager: %v", this.users))
 }
