@@ -32,12 +32,12 @@ package conn
 import (
 	"encoding/json"
 
+	"hypercube/access/config"
 	"hypercube/access/rpc"
 	"hypercube/access/session"
 	"hypercube/libs/log"
 	msg "hypercube/libs/message"
 	"hypercube/libs/metrics/prometheus"
-	"hypercube/access/config"
 )
 
 // Client is a client connection.
@@ -71,9 +71,10 @@ func (client *Client) Handle(message *msg.Message) error {
 		ok  bool
 		err error
 	)
+
 	switch message.Type {
 	case msg.MessageTypePushPlainText, msg.MessageTypePlainText:
-		rpc.RpcClient.Call("MessageManager.Add", message, &ok)
+		err = rpc.RpcClient.Call("MessageManager.Add", message, &ok)
 	case msg.MessageTypeLogout:
 		err = client.HandleLogoutMessage(message)
 	default:
@@ -104,7 +105,7 @@ func (client *Client) HandleLogoutMessage(message *msg.Message) error {
 
 	userEntry := msg.UserEntry{
 		UserID:   user,
-		ServerIP: msg.Access{ServerIp:config.GNodeConfig.Addrs},
+		ServerIP: msg.Access{ServerIp: config.GNodeConfig.Addrs},
 	}
 	err = rpc.RpcClient.Call("UserHandler.LogoutHandle", userEntry, reply)
 	if err != nil {
