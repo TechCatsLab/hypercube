@@ -22,3 +22,5 @@ import:
   version: ^3.0.0
 - package: github.com/gizak/termui
   version: v2.2.0
+- package: github.com/jinzhu/gorm
+  version: v1.0

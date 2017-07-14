@@ -1,5 +1,5 @@
-hash: 2909caada1fb6759f49ddf008202ca217bd58f858a85207fb4c172e4906894e9
-updated: 2017-07-06T19:46:24.710210607+08:00
+hash: 17aac9c5138bd412d97eee8a0dc50adee2ba3363914745de5d11ab2368f0cc4d
+updated: 2017-07-14T20:08:41.439193818+08:00
 imports:
 - name: github.com/beorn7/perks
   version: 4c0e84591b9aa9e6dcfdf3e020114cd81f89d5f9
@@ -12,7 +12,7 @@ imports:
 - name: github.com/gizak/termui
   version: 24acd523c756fd9728824cdfac66aad9d8982fb7
 - name: github.com/golang/protobuf
-  version: 6a1fa9404c0aebf36c879bc50152edcc953910d2
+  version: 0a4f71a498b7c4812f64969510bcb4eca251e33a
   subpackages:
   - proto
 - name: github.com/gorilla/websocket
@@ -28,29 +28,50 @@ imports:
   - json/parser
   - json/scanner
   - json/token
+- name: github.com/jinzhu/gorm
+  version: 5174cc5c242a728b435ea2be8a2f7f998e15429b
+  subpackages:
+  - dialects/postgres
+- name: github.com/jinzhu/inflection
+  version: 1c35d901db3da928c72a72d8458480cc9ade058f
 - name: github.com/labstack/echo
   version: 935a60782cbbc55110e7bd4b33120e4567cbee43
   subpackages:
   - middleware
 - name: github.com/labstack/gommon
-  version: 1121fd3e243c202482226a7afe4dcd07ffc4139a
+  version: 779b8a8b9850a97acba6a3fe20feb628c39e17c1
   subpackages:
   - bytes
   - color
   - log
   - random
+- name: github.com/lib/pq
+  version: dd1fe2071026ce53f36a39112e645b4d4f5793a4
+  subpackages:
+  - hstore
+  - oid
 - name: github.com/magiconair/properties
-  version: 51463bfca2576e06c62a8504b5c0f06d61312647
+  version: be5ece7dd465ab0765a9682137865547526d1dfb
+- name: github.com/maruel/panicparse
+  version: ae43f192cef2add653fe1481a3070ed00a4a6981
+  subpackages:
+  - stack
 - name: github.com/mattn/go-colorable
-  version: 941b50ebc6efddf4c41c8e4537a5f68a4e686b24
+  version: 3fa8c76f9daed4067e4a806fb7e4dc86455c6d6a
 - name: github.com/mattn/go-isatty
   version: fc9e8d8ef48496124e79ae0df75490096eccf6fe
+- name: github.com/mattn/go-runewidth
+  version: 97311d9f7767e3d6f422ea06661bc2c7a19e8a5d
 - name: github.com/matttproud/golang_protobuf_extensions
   version: c12348ce28de40eed0136aa2b644d0ee0650e56c
   subpackages:
   - pbutil
+- name: github.com/mitchellh/go-wordwrap
+  version: ad45545899c7b13c020ea92b2072220eefad42b8
 - name: github.com/mitchellh/mapstructure
   version: d0303fe809921458f417bcf828397a65db30a7e4
+- name: github.com/nsf/termbox-go
+  version: 4ed959e0540971545eddb8c75514973d670cf739
 - name: github.com/pelletier/go-toml
   version: 69d355db5304c0f7f809a2edc054553e7142f016
 - name: github.com/prometheus/client_golang
@@ -63,7 +84,7 @@ imports:
   subpackages:
   - go
 - name: github.com/prometheus/common
-  version: 0866df4b85a18d652b6965be022d007cdf076822
+  version: 3e6a7635bac6573d43f49f97b47eb9bda195dba8
   subpackages:
   - expfmt
   - internal/bitbucket.org/ww/goautoneg
@@ -89,11 +110,11 @@ imports:
 - name: github.com/valyala/fasttemplate
   version: dcecefd839c4193db0d35b88ec65b4c12d360ab0
 - name: go.uber.org/atomic
-  version: 0506d69f5564c56e25797bf7183c28921d4c6360
+  version: 4e336646b2ef9fc6e47be8e21594178f98e5ebcf
 - name: go.uber.org/multierr
   version: 3c4937480c32f4c13a875a1829af76c98ca3d40a
 - name: go.uber.org/zap
-  version: 632ab30b6b6a94138278b0240ad61ed29f498589
+  version: dadca013650a921313c28fa51e4e89e84e3e252d
   subpackages:
   - buffer
   - internal/bufferpool
@@ -101,19 +122,19 @@ imports:
   - internal/exit
   - zapcore
 - name: golang.org/x/crypto
-  version: d625dfd80595a76324dea1452ceb9cfbcaee8e3e
+  version: dd85ac7e6a88fc6ca420478e934de5f1a42dd3c6
   subpackages:
   - acme
   - acme/autocert
 - name: golang.org/x/sys
-  version: 6faef541c73732f438fb660a212750a9ba9f9362
+  version: abf9c25f54453410d0c6668e519582a9e1115027
   subpackages:
   - unix
 - name: golang.org/x/text
-  version: 2bf8f2a19ec09c670e931282edfe6567f6be21c9
+  version: 836efe42bb4aa16aaa17b9c155d8813d336ed720
   subpackages:
   - transform
   - unicode/norm
 - name: gopkg.in/yaml.v2
-  version: cd8b52f8269e0feb286dfeef29f8fe4d5b397e0b
+  version: 3b4ad1db5b2a649883ff3782f5f9f6fb52be71af
 testImports: []
