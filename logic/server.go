@@ -46,6 +46,7 @@ func initServer() error {
 	listener, err := net.Listen("tcp", configuration.Addrs)
 	if err != nil {
 		log.Logger.Error("net.Listen tcp :0: %v", err)
+		ShutDown()
 		return err
 	}
 

@@ -84,7 +84,7 @@ func OfflineMessageHandler(user message.UserEntry) error {
 		log.Logger.Error("GetOffLineMessage Error %v", err)
 		return err
 	}
-	Mess:
+Mess:
 	for _, msg := range mes {
 		switch msg.Type {
 		case message.MessageTypePlainText:

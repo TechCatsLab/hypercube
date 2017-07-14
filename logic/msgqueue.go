@@ -75,6 +75,8 @@ func QueueStart() {
 			case user := <-offline:
 				OfflineMessageHandler(user)
 			case <-Shutdown:
+				close(Queue)
+				close(offline)
 				return
 			}
 		}
@@ -154,4 +156,8 @@ func HandlePlainText(msg *message.Message, isSend bool) {
 
 		return
 	}
+}
+
+func ShutDown() {
+	Shutdown <- struct {}{}
 }
