@@ -31,9 +31,6 @@
 package message
 
 const (
-	// MessageTypeLogin - Login
-	MessageTypeLogin = 0x0001
-
 	// MessageTypeLogout - Logout
 	MessageTypeLogout = 0x0002
 
@@ -42,6 +39,9 @@ const (
 
 	// MessageTypePlainText - Plain text message
 	MessageTypePlainText = 0x0100
+
+	// MessageTypeEmotion - Emotion text message
+	MessageTypeEmotion = 0x0101
 
 	// MessageTypeGroupPlainText - Group plain text message
 	MessageTypeGroupPlainText = 0x0200

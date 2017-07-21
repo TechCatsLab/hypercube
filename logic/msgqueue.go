@@ -85,7 +85,7 @@ func QueueStart() {
 
 func HandleMessage(msg *message.Message) {
 	switch msg.Type {
-	case message.MessageTypePlainText:
+	case message.MessageTypePlainText, message.MessageTypeEmotion:
 		flag := TransmitMsg(msg)
 
 		HandlePlainText(msg, flag)

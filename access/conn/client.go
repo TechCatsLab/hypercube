@@ -73,7 +73,7 @@ func (client *Client) Handle(message *msg.Message) error {
 	)
 
 	switch message.Type {
-	case msg.MessageTypePushPlainText, msg.MessageTypePlainText:
+	case msg.MessageTypePushPlainText, msg.MessageTypePlainText, msg.MessageTypeEmotion:
 		err = rpc.RpcClient.Call("MessageManager.Add", message, &ok)
 	case msg.MessageTypeLogout:
 		err = client.HandleLogoutMessage(message)
