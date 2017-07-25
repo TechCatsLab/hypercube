@@ -96,7 +96,7 @@ func (hub *ClientHub) PushMessageToAll(msg *message.Message) {
 func (hub *ClientHub) Send(user *message.User, msg *message.Message) error {
 	client, exist := hub.Get(user.UserID)
 	if !exist {
-		log.Logger.Warn("user hasn't login!")
+		log.Logger.Debug("user hasn't login!")
 		return errors.New("User Hasn't Login")
 	}
 

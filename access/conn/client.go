@@ -56,6 +56,7 @@ func NewClient(user *msg.User, hub *ClientHub, session *session.Session) *Client
 	}
 
 	hub.Add(user, client)
+	prometheus.OnlineUserCounter.Add(1)
 
 	return client
 }

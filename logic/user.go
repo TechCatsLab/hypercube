@@ -62,6 +62,7 @@ func (this *UserHandler) LoginHandler(user message.UserEntry, reply *int) error 
 	}
 
 	offline <- user
+	onLineUserMag.PrintDebugInfo()
 	*reply = message.ReplySucceed
 	return nil
 }
@@ -121,6 +122,7 @@ func (this *UserHandler) LogoutHandle(user message.UserEntry, reply *int) error 
 		return err
 	}
 
+	onLineUserMag.PrintDebugInfo()
 	*reply = message.ReplySucceed
 	return nil
 }

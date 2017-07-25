@@ -1,7 +1,7 @@
 {
-  "accessAddrs": "127.0.0.1:7000",
+  "accessAddrs": "10.0.0.116:7000",
 
-  "logicAddrs": "127.0.0.1:7006",
+  "logicAddrs": "10.0.0.116:7006",
 
   "websocket": {
     "readBufferSize": 4096,

@@ -110,6 +110,12 @@ func (server *HTTPServer) serve() echo.HandlerFunc {
 			UserID: handler.GetUser(claim.(*jwt.Token)),
 		}
 
+		_, exist := server.node.clientHub().Get(user.UserID)
+		if exist != false {
+			log.Logger.Warn("user already login!")
+			return nil
+		}
+
 		err = server.NewClient(ws, &user, server.node.clientHub(), session.NewSession(ws, &user, server.node, server.node.Conf.QueueBuffer))
 		if err != nil {
 			log.Logger.Error("HTTPServer NewClient Error: %v", err)
@@ -129,9 +135,7 @@ func (server *HTTPServer) NewClient(ws *websocket.Conn, user *message.User, hub 
 
 	client := conn.NewClient(user, server.node.clientHub(), session)
 	client.StartHandleMessage()
-
-	server.node.clientHub().Add(user, client)
-	prometheus.OnlineUserCounter.Add(1)
+	log.Logger.Info("Endpoint info: ", server.node.Snapshot())
 
 	userEntry = message.UserEntry{
 		UserID:   *user,
@@ -144,7 +148,15 @@ func (server *HTTPServer) NewClient(ws *websocket.Conn, user *message.User, hub 
 	}
 
 	defer func() {
-		server.node.hub.Remove(user, client)
+		server.node.clientHub().Remove(user, client)
+		prometheus.OnlineUserCounter.Add(-1)
+		log.Logger.Info("Endpoint info: ", server.node.Snapshot())
+
+		err = rpc.RpcClient.Call("UserHandler.LogoutHandle", userEntry, reply)
+		if err != nil {
+			log.Logger.Error("UserHandler.LogoutHandle Error: %v", err)
+		}
+
 		client.Close()
 	}()
 
