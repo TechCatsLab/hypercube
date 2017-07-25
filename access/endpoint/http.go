@@ -62,11 +62,14 @@ func NewHTTPServer(node *Endpoint) *HTTPServer {
 
 	server.server.Use(middleware.Logger())
 	server.server.Use(middleware.Recover())
+
 	config := middleware.JWTConfig{
 		Claims:     jwt.MapClaims{},
+		TokenLookup: "query:" + echo.HeaderAuthorization,
 		SigningKey: []byte(node.Conf.SecretKey),
 	}
 	server.server.Use(middleware.JWTWithConfig(config))
+
 	server.server.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowOrigins: node.Conf.CorsHosts,
 		AllowMethods: []string{echo.GET, echo.POST},
