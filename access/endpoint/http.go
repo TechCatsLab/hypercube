@@ -40,11 +40,11 @@ import (
 
 	"hypercube/access/conn"
 	"hypercube/access/endpoint/handler"
+	"hypercube/access/rpc"
 	"hypercube/access/session"
 	"hypercube/libs/log"
 	"hypercube/libs/message"
 	"hypercube/libs/metrics/prometheus"
-	"hypercube/access/rpc"
 )
 
 // HTTPServer represents the http server accepts the client websocket connections.
@@ -61,12 +61,12 @@ func NewHTTPServer(node *Endpoint) *HTTPServer {
 	}
 
 	server.server.Use(middleware.Logger())
-	server.server.Use(middleware.Recover())
+	//server.server.Use(middleware.Recover())
 
 	config := middleware.JWTConfig{
-		Claims:     jwt.MapClaims{},
+		Claims:      jwt.MapClaims{},
 		TokenLookup: "query:" + echo.HeaderAuthorization,
-		SigningKey: []byte(node.Conf.SecretKey),
+		SigningKey:  []byte(node.Conf.SecretKey),
 	}
 	server.server.Use(middleware.JWTWithConfig(config))
 
@@ -110,12 +110,6 @@ func (server *HTTPServer) serve() echo.HandlerFunc {
 			UserID: handler.GetUser(claim.(*jwt.Token)),
 		}
 
-		_, exist := server.node.clientHub().Get(user.UserID)
-		if exist != false {
-			log.Logger.Warn("user already login!")
-			return nil
-		}
-
 		err = server.NewClient(ws, &user, server.node.clientHub(), session.NewSession(ws, &user, server.node, server.node.Conf.QueueBuffer))
 		if err != nil {
 			log.Logger.Error("HTTPServer NewClient Error: %v", err)
@@ -127,21 +121,24 @@ func (server *HTTPServer) serve() echo.HandlerFunc {
 
 func (server *HTTPServer) NewClient(ws *websocket.Conn, user *message.User, hub *conn.ClientHub, session *session.Session) error {
 	var (
-		msg message.Message
-		err error
-		reply  *int
-		userEntry  message.UserEntry
+		msg       message.Message
+		err       error
+		reply     int
+		userEntry message.UserEntry
 	)
 
 	client := conn.NewClient(user, server.node.clientHub(), session)
 	client.StartHandleMessage()
+
 	log.Logger.Info("Endpoint info: ", server.node.Snapshot())
 
 	userEntry = message.UserEntry{
 		UserID:   *user,
-		ServerIP: message.Access{ServerIp:server.node.Conf.Addrs},
+		ServerIP: message.Access{ServerIp: server.node.Conf.Addrs},
 	}
-	err = rpc.RpcClient.Call("UserHandler.LoginHandler", userEntry, reply)
+
+	RpcClient, _ := rpc.RpcClients.Get(server.node.Conf.LogicAddrs)
+	err = RpcClient.Call("UserHandler.LoginHandler", userEntry, &reply)
 	if err != nil {
 		log.Logger.Error("UserHandler.LoginHandler Error: %v", err)
 		return err
@@ -152,7 +149,8 @@ func (server *HTTPServer) NewClient(ws *websocket.Conn, user *message.User, hub 
 		prometheus.OnlineUserCounter.Add(-1)
 		log.Logger.Info("Endpoint info: ", server.node.Snapshot())
 
-		err = rpc.RpcClient.Call("UserHandler.LogoutHandle", userEntry, reply)
+		RpcClient, _ := rpc.RpcClients.Get(server.node.Conf.LogicAddrs)
+		err = RpcClient.Call("UserHandler.LogoutHandle", userEntry, &reply)
 		if err != nil {
 			log.Logger.Error("UserHandler.LogoutHandle Error: %v", err)
 		}

@@ -30,20 +30,28 @@
 package rpc
 
 import (
-	"hypercube/libs/message"
-	"hypercube/libs/rpc"
 	"hypercube/access/config"
 	"hypercube/access/sender"
+	"hypercube/libs/message"
+	"hypercube/libs/rpc"
 )
 
-var RpcClient *rpc.Client
+var RpcClients *rpc.Clients
+
+const RPCNumber = 10
 
 func InitRPC() {
 	op := rpc.Options{
-		Proto:  "tcp",
-		Addr:   config.GNodeConfig.LogicAddrs,
+		Proto: "tcp",
+		Addr:  config.GNodeConfig.LogicAddrs,
 	}
-	RpcClient = rpc.Dial(op)
+	options := make([]rpc.Options, RPCNumber)
+
+	for i := 0; i < RPCNumber; i++ {
+		options = append(options, op)
+	}
+
+	RpcClients = rpc.Dials(options)
 }
 
 // AccessRPC provides push functions.

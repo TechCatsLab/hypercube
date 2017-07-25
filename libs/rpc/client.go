@@ -34,11 +34,10 @@ import (
 	"net"
 	"net/rpc"
 	"time"
-	"hypercube/libs/log"
 )
 
 const (
-	dialTimeout  = 5 * time.Second
+	dialTimeout  = 10 * time.Second
 	callTimeout  = 3 * time.Second
 	pingDuration = 1 * time.Second
 )
@@ -123,7 +122,6 @@ func (c *Client) Ping() {
 		arg   = ReqKeepAlive{}
 		reply = RespKeepAlive{}
 		err   error
-		count int32
 	)
 
 	for {
@@ -143,10 +141,6 @@ func (c *Client) Ping() {
 		} else {
 			if err = c.dial(); err == nil {
 				c.err = nil
-				count ++
-				if count % 5 == 0 {
-					log.Logger.Debug("ping : ", c.options.Addr)
-				}
 			}
 		}
 		time.Sleep(pingDuration)

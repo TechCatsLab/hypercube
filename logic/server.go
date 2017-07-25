@@ -53,5 +53,6 @@ func initServer() error {
 	log.Logger.Debug("Server Run On: ", configuration.Addrs)
 	go RPCServer.Accept(listener)
 
+	RPCServer.HandleHTTP("/foo", "/bar")
 	return nil
 }
