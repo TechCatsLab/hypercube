@@ -61,7 +61,7 @@ func NewHTTPServer(node *Endpoint) *HTTPServer {
 	}
 
 	server.server.Use(middleware.Logger())
-	//server.server.Use(middleware.Recover())
+	server.server.Use(middleware.Recover())
 
 	config := middleware.JWTConfig{
 		Claims:      jwt.MapClaims{},
@@ -110,6 +110,12 @@ func (server *HTTPServer) serve() echo.HandlerFunc {
 			UserID: handler.GetUser(claim.(*jwt.Token)),
 		}
 
+		_, exist := server.node.clientHub().Get(user.UserID)
+		if exist != false {
+			log.Logger.Debug("user already login!")
+			return nil
+		}
+
 		err = server.NewClient(ws, &user, server.node.clientHub(), session.NewSession(ws, &user, server.node, server.node.Conf.QueueBuffer))
 		if err != nil {
 			log.Logger.Error("HTTPServer NewClient Error: %v", err)
@@ -138,11 +144,19 @@ func (server *HTTPServer) NewClient(ws *websocket.Conn, user *message.User, hub 
 	}
 
 	RpcClient, _ := rpc.RpcClients.Get(server.node.Conf.LogicAddrs)
+	if err != nil {
+		log.Logger.Error("Get RpcClients Error: %v", err)
+		return err
+
+	}
 	err = RpcClient.Call("UserHandler.LoginHandler", userEntry, &reply)
 	if err != nil {
 		log.Logger.Error("UserHandler.LoginHandler Error: %v", err)
 		return err
 	}
+
+	hub.Add(user, client)
+	prometheus.OnlineUserCounter.Add(1)
 
 	defer func() {
 		server.node.clientHub().Remove(user, client)
@@ -164,6 +178,7 @@ func (server *HTTPServer) NewClient(ws *websocket.Conn, user *message.User, hub 
 			return err
 		} else {
 			prometheus.ReceiveMessageCounter.Add(1)
+			log.Logger.Debug("ReadJSON msg", msg)
 			err = client.Handle(&msg)
 			if err != nil {
 				log.Logger.Error("Handle Message Error: %v", err)
