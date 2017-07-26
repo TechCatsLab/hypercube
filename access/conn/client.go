@@ -53,8 +53,6 @@ func NewClient(user *msg.User, hub *ClientHub, session *session.Session) *Client
 		session: session,
 	}
 
-	hub.Add(user, client)
-
 	return client
 }
 
@@ -66,8 +64,9 @@ func (client *Client) UID() string {
 // Handle incoming messages
 func (client *Client) Handle(message *msg.Message) error {
 	var err error
+
 	switch message.Type {
-	case msg.MessageTypePushPlainText, msg.MessageTypePlainText:
+	case msg.MessageTypePushPlainText, msg.MessageTypePlainText, msg.MessageTypeEmotion:
 		client.Send(message)
 	case msg.MessageTypeLogout:
 		err = client.HandleLogoutMessage(message)

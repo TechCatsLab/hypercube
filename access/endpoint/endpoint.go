@@ -90,5 +90,5 @@ func (ep *Endpoint) Shutdown() {
 
 // Snapshot view the struct information of the program runtime.
 func (ep *Endpoint) Snapshot() string {
-	return fmt.Sprintf("%+v", ep)
+	return fmt.Sprintf("%+v", ep.clientHub())
 }

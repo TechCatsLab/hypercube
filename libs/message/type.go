@@ -43,6 +43,9 @@ const (
 	// MessageTypePlainText - Plain text message
 	MessageTypePlainText = 0x0100
 
+	// MessageTypeEmotion - Emotion text message
+	MessageTypeEmotion = 0x0101
+
 	// MessageTypeGroupPlainText - Group plain text message
 	MessageTypeGroupPlainText = 0x0200
 

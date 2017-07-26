@@ -62,11 +62,13 @@ func NewHTTPServer(node *Endpoint) *HTTPServer {
 	server.server.Use(middleware.Logger())
 	server.server.Use(middleware.Recover())
 	config := middleware.JWTConfig{
-		Claims:     jwt.MapClaims{},
-		SigningKey: []byte(node.Conf.SecretKey),
+		Claims:      jwt.MapClaims{},
+		TokenLookup: "query:" + echo.HeaderAuthorization,
+		SigningKey:  []byte(node.Conf.SecretKey),
 	}
 	server.server.Use(middleware.JWTWithConfig(config))
-	//server.server.Use(handler.LoginMiddleWare)
+
+
 	server.server.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowOrigins: node.Conf.CorsHosts,
 		AllowMethods: []string{echo.GET, echo.POST},
@@ -107,7 +109,11 @@ func (server *HTTPServer) serve() echo.HandlerFunc {
 			UserID: handler.GetUser(claim.(*jwt.Token)),
 		}
 
-		prometheus.OnlineUserCounter.Add(1)
+		_, exist := server.node.clientHub().Get(user.UserID)
+		if exist != false {
+			log.Logger.Debug("user already login!")
+			return nil
+		}
 
 		err = server.NewClient(ws, &user, server.node.clientHub(), session.NewSession(ws, &user, server.node, server.node.Conf.QueueBuffer))
 		if err != nil {
@@ -128,6 +134,9 @@ func (server *HTTPServer) NewClient(ws *websocket.Conn, user *message.User, hub 
 	client.StartHandleMessage()
 
 	server.node.clientHub().Add(user, client)
+	prometheus.OnlineUserCounter.Add(1)
+
+	log.Logger.Debug(server.node.Snapshot())
 
 	defer func() {
 		server.node.hub.Remove(user, client)
@@ -137,9 +146,11 @@ func (server *HTTPServer) NewClient(ws *websocket.Conn, user *message.User, hub 
 	for {
 		if err = ws.ReadJSON(&msg); err != nil {
 			log.Logger.Error("ReadMessage Error: %v", err)
-			return err
+			//return err
 		} else {
+
 			prometheus.ReceiveMessageCounter.Add(1)
+
 			err = client.Handle(&msg)
 			if err != nil {
 				log.Logger.Error("Handle Message Error: %v", err)

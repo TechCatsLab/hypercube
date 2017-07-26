@@ -1,5 +1,5 @@
 {
-  "addrs": "127.0.0.1:7000",
+  "addrs": "10.0.0.116:7000",
 
   "websocket": {
     "readBufferSize": 4096,
