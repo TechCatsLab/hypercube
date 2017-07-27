@@ -1,15 +1,9 @@
 {
-  "addrs": "10.0.0.116:7000",
+  "addrs": "192.168.43.211:7000",
 
   "websocket": {
     "readBufferSize": 4096,
     "writeBufferSize": 4096
-  },
-
-  "nats": {
-    "urls": "nats://10.0.0.254:4223",
-    "apiChannel": "logic.hypercube.s8e.io",
-    "subject": "access.hypercube.s8e.io1"
   },
 
   "monitor": {
@@ -29,6 +23,5 @@
     "secretkey": "PXL0we7gqrgskjnPwiXXwVeXY4pFGvcnq4zImdN1L4"
   },
 
-  "accessHeartRate": 10,
   "queueBuffer": 100
 }

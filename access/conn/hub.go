@@ -67,8 +67,9 @@ func (hub *ClientHub) Remove(user *message.User, client *Client) {
 	hub.mux.Lock()
 	defer hub.mux.Unlock()
 
-	if _, exists := hub.clients[user.UserID]; !exists {
+	if _, exist := hub.Get(user.UserID); !exist {
 		log.Logger.Warn("user hasn't login!")
+		return
 	}
 
 	delete(hub.clients, user.UserID)

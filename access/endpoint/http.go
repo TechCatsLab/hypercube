@@ -138,22 +138,19 @@ func (server *HTTPServer) NewClient(ws *websocket.Conn, user *message.User, hub 
 
 	log.Logger.Debug(server.node.Snapshot())
 
-	defer func() {
-		server.node.hub.Remove(user, client)
-		client.Close()
-	}()
-
 	for {
 		if err = ws.ReadJSON(&msg); err != nil {
 			log.Logger.Error("ReadMessage Error: %v", err)
-			//return err
+			server.node.hub.Remove(user, client)
+			client.Close()
+			return err
 		} else {
-
 			prometheus.ReceiveMessageCounter.Add(1)
-
 			err = client.Handle(&msg)
 			if err != nil {
 				log.Logger.Error("Handle Message Error: %v", err)
+				server.node.hub.Remove(user, client)
+				client.Close()
 				return err
 			}
 		}
