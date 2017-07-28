@@ -35,7 +35,6 @@ import (
 	"hypercube/access/session"
 	"hypercube/libs/log"
 	msg "hypercube/libs/message"
-	"hypercube/libs/metrics/prometheus"
 )
 
 // Client is a client connection.
@@ -91,9 +90,10 @@ func (client *Client) HandleLogoutMessage(message *msg.Message) error {
 		return err
 	}
 
+	log.Logger.Debug("HandleLogoutMessage User ", user)
 	client.hub.Remove(&user, client)
+
 	client.Close()
-	prometheus.OnlineUserCounter.Add(-1)
 
 	return nil
 }

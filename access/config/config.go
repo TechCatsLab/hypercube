@@ -44,13 +44,8 @@ type NodeConfig struct {
 	WSWriteBufferSize int
 	PprofAddrs        string
 	PrometheusPort    string
-	Address           string
-	RedisAddress      string
-	SessionSecret     string
-	SessionName       string
 	CorsHosts         []string
 	SecretKey         string
-	AccessHeartRate   int
 	QueueBuffer       int
 }
 
@@ -70,13 +65,8 @@ func Load() *NodeConfig {
 		WSWriteBufferSize: viper.GetInt("websocket.writeBufferSize"),
 		PprofAddrs:        viper.GetString("monitor.pprofAddrs"),
 		PrometheusPort:    viper.GetString("monitor.prometheusPort"),
-		Address:           viper.GetString("server.address"),
-		RedisAddress:      viper.GetString("middleware.session.address"),
-		SessionSecret:     viper.GetString("middleware.session.secret"),
-		SessionName:       viper.GetString("middleware.session.name"),
 		CorsHosts:         viper.GetStringSlice("middleware.cors.hosts"),
 		SecretKey:         viper.GetString("middleware.secretkey"),
-		AccessHeartRate:   viper.GetInt("accessHeartRate"),
 		QueueBuffer:       viper.GetInt("queueBuffer"),
 	}
 

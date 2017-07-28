@@ -95,6 +95,7 @@ func (s *Session) HandleMessage(msg *message.Message) {
 
 		log.Logger.Debug("HandleMessage ", plainMsg)
 		user = &plainMsg.To
+		log.Logger.Debug("HandleMessage  type", plainMsg.From.UserID)
 	case message.MessageTypePushPlainText:
 		json.Unmarshal(msg.Content, &pushMsg)
 		user = &pushMsg.To

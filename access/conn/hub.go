@@ -32,6 +32,8 @@ package conn
 import (
 	"errors"
 	"sync"
+	"strconv"
+	"strings"
 
 	"hypercube/libs/log"
 	"hypercube/libs/message"
@@ -46,7 +48,7 @@ type ClientHub struct {
 // NewClientHub creates a client hub.
 func NewClientHub() *ClientHub {
 	return &ClientHub{
-		clients: map[string]*Client{},
+		clients: make(map[string]*Client),
 	}
 }
 
@@ -55,11 +57,13 @@ func (hub *ClientHub) Add(user *message.User, client *Client) {
 	hub.mux.Lock()
 	defer hub.mux.Unlock()
 
-	if _, exists := hub.clients[user.UserID]; exists {
+	userID := strings.Trim(user.UserID, "\"")
+
+	if _, exists := hub.clients[userID]; exists {
 		log.Logger.Warn("user already login!")
 	}
 
-	hub.clients[user.UserID] = client
+	hub.clients[userID] = client
 }
 
 // Remove a client connection
@@ -67,12 +71,15 @@ func (hub *ClientHub) Remove(user *message.User, client *Client) {
 	hub.mux.Lock()
 	defer hub.mux.Unlock()
 
-	if _, exist := hub.Get(user.UserID); !exist {
+	userID := strings.Trim(user.UserID, "\"")
+
+	if _, exist := hub.clients[userID]; !exist {
 		log.Logger.Warn("user hasn't login!")
 		return
 	}
 
-	delete(hub.clients, user.UserID)
+	delete(hub.clients, userID)
+	return
 }
 
 // Get a client bu user
@@ -80,9 +87,17 @@ func (hub *ClientHub) Get(user string) (*Client, bool) {
 	hub.mux.Lock()
 	defer hub.mux.Unlock()
 
-	client, ok := hub.clients[user]
+	user = strings.Trim(user, "\"")
 
-	return client, ok
+	for userid, _ := range hub.clients {
+		u, _ := strconv.ParseInt(user, 10, 64)
+		i, _ := strconv.ParseInt(userid, 10, 64)
+		if u == i {
+			return hub.clients[userid], true
+		}
+	}
+
+	return nil, false
 }
 
 func (hub *ClientHub) PushMessageToAll(msg *message.Message) {
