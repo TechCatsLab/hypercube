@@ -90,7 +90,7 @@ func (s *Session) HandleMessage(msg *message.Message) {
 	)
 
 	switch msg.Type {
-	case message.MessageTypePlainText:
+	case message.MessageTypePlainText, message.MessageTypeEmotion:
 		json.Unmarshal(msg.Content, &plainMsg)
 		user = &plainMsg.To
 	case message.MessageTypePushPlainText:

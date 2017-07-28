@@ -42,28 +42,21 @@ import (
 	"hypercube/orm/cockroach"
 )
 
-type MessageManager int
+type OfflineMessage chan message.UserEntry
 
 var (
 	Queue      chan *message.Message
 	Shutdown   chan struct{}
-	msgManager *MessageManager
+    offline    OfflineMessage
 )
 
 func initQueue() {
 	Queue = make(chan *message.Message, 100)
 	Shutdown = make(chan struct{})
 
-	msgManager = new(MessageManager)
+	offline = make(chan message.UserEntry)
 
 	QueueStart()
-}
-
-func (m *MessageManager) Add(msg *message.Message, reply *bool) error {
-	Queue <- msg
-	*reply = true
-
-	return nil
 }
 
 func QueueStart() {

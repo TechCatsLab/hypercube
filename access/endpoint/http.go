@@ -110,12 +110,6 @@ func (server *HTTPServer) serve() echo.HandlerFunc {
 			UserID: handler.GetUser(claim.(*jwt.Token)),
 		}
 
-		_, exist := server.node.clientHub().Get(user.UserID)
-		if exist != false {
-			log.Logger.Debug("user already login!")
-			return nil
-		}
-
 		err = server.NewClient(ws, &user, server.node.clientHub(), session.NewSession(ws, &user, server.node, server.node.Conf.QueueBuffer))
 		if err != nil {
 			log.Logger.Error("HTTPServer NewClient Error: %v", err)
