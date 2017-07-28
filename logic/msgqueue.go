@@ -38,8 +38,8 @@ import (
 	"hypercube/libs/log"
 	"hypercube/libs/message"
 	rp "hypercube/libs/rpc"
-	mod "hypercube/model"
 	"hypercube/orm/cockroach"
+	db "hypercube/model"
 )
 
 type OfflineMessage chan message.UserEntry
@@ -75,6 +75,54 @@ func QueueStart() {
 		}
 	}()
 }
+
+func OfflineMessageHandler(user message.UserEntry) error {
+	conn, err := cockroach.DbConnPool.GetConnection()
+	if err != nil {
+		log.Logger.Error("Get cockroach connect error:", err)
+		return err
+	}
+	defer cockroach.DbConnPool.ReleaseConnection(conn)
+
+	mes, err := db.MessageService.GetOffLineMessage(conn, user.UserID.UserID)
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			log.Logger.Debug("")
+			goto Mess
+		}
+
+		log.Logger.Error("GetOffLineMessage Error %v", err)
+		return err
+	}
+	Mess:
+	for _, msg := range mes {
+		switch msg.Type {
+		case message.MessageTypePlainText:
+			content := message.PlainText{
+				From:    message.User{UserID:msg.Source},
+				To:      message.User{UserID:msg.Target},
+				Content: msg.Content,
+			}
+
+			text, err := json.Marshal(content)
+			if err != nil {
+				log.Logger.Error("OffLineMessage Marshal Error %v", err)
+				return err
+			}
+
+			mesg := &message.Message{
+				Type:       msg.Type,
+				Version:    msg.Version,
+				Content:    text,
+			}
+
+			TransmitMsg(mesg)
+		}
+	}
+
+	return nil
+}
+
 
 func HandleMessage(msg *message.Message) {
 	switch msg.Type {
@@ -129,9 +177,9 @@ func HandlePlainText(msg *message.Message, isSend bool) {
 	}
 	defer cockroach.DbConnPool.ReleaseConnection(conn)
 
-	db := conn.(*gorm.DB).Exec("SET DATABASE = message")
+	dbs := conn.(*gorm.DB).Exec("SET DATABASE = message")
 
-	dbmsg := mod.Message{
+	dbmsg := db.Message{
 		Source:  content.From.UserID,
 		Target:  content.To.UserID,
 		Type:    msg.Type,
@@ -141,7 +189,7 @@ func HandlePlainText(msg *message.Message, isSend bool) {
 		Created: time.Now(),
 	}
 
-	err = db.Create(&dbmsg).Error
+	err = dbs.Create(&dbmsg).Error
 
 	if err != nil {
 		log.Logger.Error("Insert into message error:", err)

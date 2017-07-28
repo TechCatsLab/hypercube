@@ -52,7 +52,7 @@ func init() {
 func run() {
 	// Start a access endpoint.
 	ep = endpoint.NewEndpoint(configuration)
-	go rpc.RpcClients.Ping("LogicRPC.Ping")
+	go rpc.RpcClients.Ping()
 
 	ep.Run()
 

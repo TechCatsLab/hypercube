@@ -137,15 +137,16 @@ func (server *HTTPServer) NewClient(ws *websocket.Conn, user *message.User, hub 
 		ServerIP: message.Access{ServerIp: server.node.Conf.Addrs},
 	}
 
-	RpcClient, _ := rpc.RpcClients.Get(server.node.Conf.LogicAddrs)
-	if err != nil {
+	RpcClient, err := rpc.RpcClients.Get(server.node.Conf.LogicAddrs)
+	if err != nil || RpcClient == nil {
 		log.Logger.Error("Get RpcClients Error: %v", err)
 		return err
 
 	}
-	err = RpcClient.Call("UserHandler.LoginHandler", userEntry, &reply)
+
+	err = RpcClient.Call("LogicRPC.LoginHandler", userEntry, &reply)
 	if err != nil {
-		log.Logger.Error("UserHandler.LoginHandler Error: %v", err)
+		log.Logger.Error("LogicRPC.LoginHandler Error: %v", err)
 		return err
 	}
 
@@ -158,9 +159,9 @@ func (server *HTTPServer) NewClient(ws *websocket.Conn, user *message.User, hub 
 		log.Logger.Info("Endpoint info: ", server.node.Snapshot())
 
 		RpcClient, _ := rpc.RpcClients.Get(server.node.Conf.LogicAddrs)
-		err = RpcClient.Call("UserHandler.LogoutHandle", userEntry, &reply)
+		err = RpcClient.Call("LogicRPC.LogoutHandle", userEntry, &reply)
 		if err != nil {
-			log.Logger.Error("UserHandler.LogoutHandle Error: %v", err)
+			log.Logger.Error("LogicRPC.LogoutHandle Error: %v", err)
 		}
 
 		client.Close()

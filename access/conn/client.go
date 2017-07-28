@@ -73,15 +73,16 @@ func (client *Client) Handle(message *msg.Message) error {
 	switch message.Type {
 	case msg.MessageTypePushPlainText, msg.MessageTypePlainText, msg.MessageTypeEmotion:
 		log.Logger.Debug("Handle msg", message)
+
 		RpcClient, err := rpc.RpcClients.Get(config.GNodeConfig.LogicAddrs)
 		if err != nil {
 			log.Logger.Error("Handle Get RpcClients Error: %v", err)
 			return err
-
 		}
-		err = RpcClient.Call("MessageManager.Add", message, &ok)
+
+		err = RpcClient.Call("LogicRPC.Add", message, &ok)
 		if err != nil {
-			log.Logger.Error("Call MessageManager Add Error: %v", err)
+			log.Logger.Error("Call LogicRPC Add Error: %v", err)
 			return err
 		}
 	case msg.MessageTypeLogout:
@@ -123,9 +124,9 @@ func (client *Client) HandleLogoutMessage(message *msg.Message) error {
 		return err
 
 	}
-	err = RpcClient.Call("UserHandler.LogoutHandle", userEntry, &reply)
+	err = RpcClient.Call("LogicRPC.LogoutHandle", userEntry, &reply)
 	if err != nil {
-		log.Logger.Error("UserHandler.LogoutHandle Error: %v", err)
+		log.Logger.Error("LogicRPC.LogoutHandle Error: %v", err)
 		return err
 	}
 

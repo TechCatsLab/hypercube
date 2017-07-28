@@ -30,7 +30,6 @@
 package main
 
 import (
-	"net"
 	"net/rpc"
 	"errors"
 
@@ -39,25 +38,10 @@ import (
 	"hypercube/libs/message"
 )
 
-var RPCServer *rpc.Server
-
-func initServer() error {
-	RPCServer = rpc.NewServer()
-	RPCServer.Register(logic)
-
-
-	listener, err := net.Listen("tcp", configuration.Addrs)
-	if err != nil {
-		log.Logger.Error("net.Listen tcp :0: %v", err)
-		ShutDown()
-		return err
-	}
-
-	log.Logger.Debug("Server Run On: ", configuration.Addrs)
-	go RPCServer.Accept(listener)
-
-	RPCServer.HandleHTTP("/foo", "/bar")
-	return nil
+func initServer()  {
+	newServer := rpc.NewServer()
+	newServer.Register(logic)
+	rpc.HandleHTTP()
 }
 
 func Send(user message.User, msg message.Message, op rp.Options) error {

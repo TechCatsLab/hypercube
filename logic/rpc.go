@@ -33,16 +33,10 @@ import (
 	"hypercube/libs/log"
 	"hypercube/libs/message"
 	"hypercube/libs/rpc"
-	"encoding/json"
 
-	"github.com/jinzhu/gorm"
-
-	"hypercube/orm/cockroach"
-	db "hypercube/model"
 )
 
 type LogicRPC struct{
-
 }
 
 var (
@@ -80,52 +74,6 @@ func (this *LogicRPC) LoginHandler(user message.UserEntry, reply *int) error {
 	return nil
 }
 
-func OfflineMessageHandler(user message.UserEntry) error {
-	conn, err := cockroach.DbConnPool.GetConnection()
-	if err != nil {
-		log.Logger.Error("Get cockroach connect error:", err)
-		return err
-	}
-	defer cockroach.DbConnPool.ReleaseConnection(conn)
-
-	mes, err := db.MessageService.GetOffLineMessage(conn, user.UserID.UserID)
-	if err != nil {
-		if err == gorm.ErrRecordNotFound {
-			log.Logger.Debug("")
-			goto Mess
-		}
-
-		log.Logger.Error("GetOffLineMessage Error %v", err)
-		return err
-	}
-	Mess:
-	for _, msg := range mes {
-		switch msg.Type {
-		case message.MessageTypePlainText:
-			content := message.PlainText{
-				From:    message.User{UserID:msg.Source},
-				To:      message.User{UserID:msg.Target},
-				Content: msg.Content,
-			}
-
-			text, err := json.Marshal(content)
-			if err != nil {
-				log.Logger.Error("OffLineMessage Marshal Error %v", err)
-				return err
-			}
-
-			mesg := &message.Message{
-				Type:       msg.Type,
-				Version:    msg.Version,
-				Content:    text,
-			}
-
-			TransmitMsg(mesg)
-		}
-	}
-
-	return nil
-}
 
 func (this *LogicRPC) LogoutHandle(user message.UserEntry, reply *int) error {
 	err := onLineUserMag.Remove(user)
@@ -147,5 +95,3 @@ func (m *LogicRPC) Add(msg *message.Message, reply *bool) error {
 
 	return nil
 }
-
-// Send calls the function of the access layer remotely, send a message to a specific user.

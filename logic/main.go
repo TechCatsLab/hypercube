@@ -29,9 +29,16 @@
 
 package main
 
-func main() {
-	go clients.Ping("AccessRPC.Ping")
-	initServer()
+import (
+	"github.com/labstack/echo"
+	"hypercube/libs/log"
+)
 
+func main() {
+	go clients.Ping()
+	initServer()
+	E := echo.New()
+
+	log.Logger.Fatal(E.Start(configuration.Addrs))
 	sigHandler.Wait()
 }
