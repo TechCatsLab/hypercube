@@ -30,15 +30,15 @@
 package main
 
 import (
-	"github.com/labstack/echo"
+	"net/http"
 	"hypercube/libs/log"
 )
 
 func main() {
 	go clients.Ping()
 	initServer()
-	E := echo.New()
 
-	log.Logger.Fatal(E.Start(configuration.Addrs))
+	log.Logger.Fatal(http.ListenAndServe(configuration.Addrs, nil))
+
 	sigHandler.Wait()
 }

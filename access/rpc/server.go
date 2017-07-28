@@ -31,6 +31,8 @@ package rpc
 
 import (
 	"net/rpc"
+	"net/http"
+	"hypercube/libs/log"
 )
 
 // InitServer initialize the RPC server.
@@ -38,4 +40,13 @@ func InitServer() {
 	newServer := rpc.NewServer()
 	newServer.Register(new(AccessRPC))
 	rpc.HandleHTTP()
+
+	go runrpc()
+}
+
+func runrpc()  {
+	err := http.ListenAndServe(":1234", nil)
+	if err != nil {
+		log.Logger.Debug(err.Error())
+	}
 }
