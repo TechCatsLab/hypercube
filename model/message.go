@@ -41,7 +41,7 @@ type MessageProvider struct {
 var MessageService *MessageProvider
 
 type Message struct {
-	Messageid		int64		`jsql:"auto_increment;"`
+	Messageid		int64		`sql:"auto_increment;primary_key;" gorm:"column:id" json:"messageid"`
 	Source    	    string		`gorm:"not null"`
 	Target		    string
 	Version         uint16

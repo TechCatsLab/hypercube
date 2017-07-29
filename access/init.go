@@ -43,9 +43,9 @@ var (
 
 func init() {
 	initSignal()
+	rpc.InitRPC()
 	HttpPprof()
 	initPrometheus()
-	rpc.InitRPC()
 }
 
 func run() {

@@ -74,13 +74,14 @@ func Send(user message.User, msg message.Message, op rp.Options) error {
 	}
 
 	client, err := clients.Get(op.Addr)
-	if err != nil {
+	if err != nil || client == nil {
 		log.Logger.Error("Clients.Get returned error: %v.", err)
 
 		return err
 	}
 
 	err = client.Call("AccessRPC.Send", &args, &ok)
+
 	if err != nil {
 		log.Logger.Error("RPC Call returned error: %v", err)
 		client.Close()
@@ -89,6 +90,7 @@ func Send(user message.User, msg message.Message, op rp.Options) error {
 	}
 
 	if !ok {
+		log.Logger.Error("Logic Call failed %v", err)
 		client.Close()
 
 		return errors.New("logic send message failed")

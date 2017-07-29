@@ -74,7 +74,7 @@ func (hub *ClientHub) Remove(user *message.User, client *Client) {
 	delete(hub.clients, user.UserID)
 }
 
-// Get a client bu user
+// Get a client by user
 func (hub *ClientHub) Get(user string) (*Client, bool) {
 	hub.mux.Lock()
 	defer hub.mux.Unlock()

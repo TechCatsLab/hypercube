@@ -38,6 +38,7 @@ import (
 	"hypercube/libs/log"
 	msg "hypercube/libs/message"
 	//"hypercube/libs/metrics/prometheus"
+	"strings"
 )
 
 // Client is a client connection.
@@ -107,12 +108,15 @@ func (client *Client) HandleLogoutMessage(message *msg.Message) error {
 		return err
 	}
 
-	client.hub.Remove(&user, client)
+	u := msg.User{
+		UserID:  strings.Trim(user.UserID, "\""),
+	}
+	client.hub.Remove(&u, client)
 	client.Close()
 	//prometheus.OnlineUserCounter.Add(-1)
 
 	userEntry := msg.UserEntry{
-		UserID:   user,
+		UserID:   u,
 		ServerIP: msg.Access{ServerIp: config.GNodeConfig.Addrs},
 	}
 

@@ -60,6 +60,8 @@ func NewHTTPServer(node *Endpoint) *HTTPServer {
 		server: echo.New(),
 	}
 
+	rpc.RPCServer.Node = server.node
+
 	server.server.Use(middleware.Logger())
 	server.server.Use(middleware.Recover())
 
@@ -134,7 +136,7 @@ func (server *HTTPServer) NewClient(ws *websocket.Conn, user *message.User, hub 
 
 	userEntry = message.UserEntry{
 		UserID:   *user,
-		ServerIP: message.Access{ServerIp: server.node.Conf.Addrs},
+		ServerIP: message.Access{ServerIp: server.node.Conf.Address},
 	}
 
 	RpcClient, err := rpc.RpcClients.Get(server.node.Conf.LogicAddrs)

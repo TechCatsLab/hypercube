@@ -87,7 +87,7 @@ func OfflineMessageHandler(user message.UserEntry) error {
 		log.Logger.Error("GetOffLineMessage Error %v", err)
 		return err
 	}
-	Mess:
+Mess:
 	for _, msg := range mes {
 		switch msg.Type {
 		case message.MessageTypePlainText:
@@ -109,7 +109,7 @@ func OfflineMessageHandler(user message.UserEntry) error {
 				Content:    text,
 			}
 
-			TransmitMsg(mesg)
+			go TransmitMsg(mesg)
 		}
 	}
 
@@ -138,6 +138,7 @@ func TransmitMsg(msg *message.Message) bool {
 		return false
 	}
 
+	log.Logger.Debug("TransmitMsg:", plainUser, len(plainUser.To.UserID))
 	serveIp, flag := onLineUserMag.Query(plainUser.To)
 	if flag {
 		op := rp.Options{
@@ -146,6 +147,7 @@ func TransmitMsg(msg *message.Message) bool {
 		}
 
 		err := Send(plainUser.To, *msg, op)
+
 		if err != nil {
 			log.Logger.Error("TransmitMsg Send Error %v", err)
 

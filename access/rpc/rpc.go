@@ -37,10 +37,12 @@ import (
 )
 
 var RpcClients *rpc.Clients
+var RPCServer *AccessRPC
 
 const RPCNumber = 10
 
 func InitRPC() {
+	RPCServer = new(AccessRPC)
 	op := rpc.Options{
 		Proto: "tcp",
 		Addr:  config.GNodeConfig.LogicAddrs,
@@ -56,7 +58,7 @@ func InitRPC() {
 
 // AccessRPC provides push functions.
 type AccessRPC struct {
-	node sender.Sender
+	Node sender.Sender
 }
 
 // Ping is general rpc keepalive interface.
@@ -71,7 +73,8 @@ func Push(user *message.User) error {
 
 // Send send a message to a specific user.
 func (access *AccessRPC) Send(args *message.Args, reply *bool) error {
-	access.node.Send(&args.User, &args.Message)
+
+	RPCServer.Node.Send(&args.User, &args.Message)
 	*reply = true
 
 	return nil
