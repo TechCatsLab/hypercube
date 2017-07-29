@@ -141,7 +141,6 @@ func (server *HTTPServer) NewClient(ws *websocket.Conn, user *message.User, hub 
 	if err != nil || RpcClient == nil {
 		log.Logger.Error("Get RpcClients Error: %v", err)
 		return err
-
 	}
 
 	err = RpcClient.Call("LogicRPC.LoginHandler", userEntry, &reply)
@@ -153,32 +152,41 @@ func (server *HTTPServer) NewClient(ws *websocket.Conn, user *message.User, hub 
 	hub.Add(user, client)
 	prometheus.OnlineUserCounter.Add(1)
 
-	defer func() {
-		server.node.clientHub().Remove(user, client)
-		prometheus.OnlineUserCounter.Add(-1)
-		log.Logger.Info("Endpoint info: ", server.node.Snapshot())
-
-		RpcClient, _ := rpc.RpcClients.Get(server.node.Conf.LogicAddrs)
-		err = RpcClient.Call("LogicRPC.LogoutHandle", userEntry, &reply)
-		if err != nil {
-			log.Logger.Error("LogicRPC.LogoutHandle Error: %v", err)
-		}
-
-		client.Close()
-	}()
-
 	for {
 		if err = ws.ReadJSON(&msg); err != nil {
 			log.Logger.Error("ReadMessage Error: %v", err)
+			server.deferExec(user, client)
 			return err
 		} else {
 			prometheus.ReceiveMessageCounter.Add(1)
-			log.Logger.Debug("ReadJSON msg", msg)
 			err = client.Handle(&msg)
 			if err != nil {
 				log.Logger.Error("Handle Message Error: %v", err)
+				server.deferExec(user, client)
 				return err
 			}
 		}
 	}
+}
+
+func (server *HTTPServer) deferExec(user *message.User, client *conn.Client)  {
+	var (
+		userEntry = message.UserEntry{
+			UserID:   *user,
+			ServerIP: message.Access{ServerIp: server.node.Conf.Addrs},
+		}
+		reply     int
+	)
+
+	server.node.clientHub().Remove(user, client)
+	prometheus.OnlineUserCounter.Add(-1)
+	log.Logger.Info("Endpoint info: ", server.node.Snapshot())
+
+	RpcClient, _ := rpc.RpcClients.Get(server.node.Conf.LogicAddrs)
+	err := RpcClient.Call("LogicRPC.LogoutHandle", userEntry, &reply)
+	if err != nil {
+		log.Logger.Error("LogicRPC.LogoutHandle Error: %v", err)
+	}
+
+	client.Close()
 }

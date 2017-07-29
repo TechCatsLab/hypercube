@@ -58,7 +58,6 @@ func NewEndpoint(conf *config.NodeConfig) *Endpoint {
 		hub:      conn.NewClientHub(),
 		shutdown: make(chan struct{}),
 	}
-
 	ep.ws = NewHTTPServer(ep)
 
 	return ep
