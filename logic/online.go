@@ -87,13 +87,13 @@ func (this *UserManager) Remove(user message.UserEntry) error {
 	return ParamErr
 }
 
-func (this *UserManager) Query(user message.User) (string, bool) {
+func (this *UserManager) Query(user message.User) (*message.Access, bool) {
 	this.mux.Lock()
 	defer this.mux.Unlock()
 
 	serverIP, ok := this.users[user]
 
-	return serverIP.ServerIp, ok
+	return serverIP, ok
 }
 
 func (this *UserManager) PrintDebugInfo() {

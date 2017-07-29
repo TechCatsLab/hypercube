@@ -38,8 +38,8 @@ import (
 	"hypercube/libs/log"
 	"hypercube/libs/message"
 	rp "hypercube/libs/rpc"
-	"hypercube/orm/cockroach"
 	db "hypercube/model"
+	database "hypercube/orm"
 )
 
 type OfflineMessage chan message.UserEntry
@@ -77,14 +77,7 @@ func QueueStart() {
 }
 
 func OfflineMessageHandler(user message.UserEntry) error {
-	conn, err := cockroach.DbConnPool.GetConnection()
-	if err != nil {
-		log.Logger.Error("Get cockroach connect error:", err)
-		return err
-	}
-	defer cockroach.DbConnPool.ReleaseConnection(conn)
-
-	mes, err := db.MessageService.GetOffLineMessage(conn, user.UserID.UserID)
+	mes, err := db.MessageService.GetOffLineMessage(user.UserID.UserID)
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			log.Logger.Debug("")
@@ -149,7 +142,7 @@ func TransmitMsg(msg *message.Message) bool {
 	if flag {
 		op := rp.Options{
 			Proto: "tcp",
-			Addr:  serveIp,
+			Addr:  serveIp.ServerIp,
 		}
 
 		err := Send(plainUser.To, *msg, op)
@@ -168,16 +161,7 @@ func HandlePlainText(msg *message.Message, isSend bool) {
 
 	json.Unmarshal(msg.Content, &content)
 
-	conn, err := cockroach.DbConnPool.GetConnection()
-	if err != nil {
-		log.Logger.Error("Get cockroach connect error:", err)
-		Queue <- msg
-
-		return
-	}
-	defer cockroach.DbConnPool.ReleaseConnection(conn)
-
-	dbs := conn.(*gorm.DB).Exec("SET DATABASE = message")
+	dbs := database.Conn
 
 	dbmsg := db.Message{
 		Source:  content.From.UserID,
@@ -189,7 +173,7 @@ func HandlePlainText(msg *message.Message, isSend bool) {
 		Created: time.Now(),
 	}
 
-	err = dbs.Create(&dbmsg).Error
+	err := dbs.Create(&dbmsg).Error
 
 	if err != nil {
 		log.Logger.Error("Insert into message error:", err)

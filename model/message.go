@@ -32,10 +32,7 @@ package message
 import (
 	"time"
 
-	// TODO: glide install this package
-	"github.com/jinzhu/gorm"
-
-	"hypercube/orm"
+	database "hypercube/orm"
 )
 
 type MessageProvider struct {
@@ -44,7 +41,7 @@ type MessageProvider struct {
 var MessageService *MessageProvider
 
 type Message struct {
-	Messageid		int64		`jsql:"auto_increment;primary_key;"`
+	Messageid		int64		`jsql:"auto_increment;"`
 	Source    	    string		`gorm:"not null"`
 	Target		    string
 	Version         uint16
@@ -54,10 +51,10 @@ type Message struct {
 	Created         time.Time
 }
 
-func (msg *MessageProvider) GetOffLineMessage(conn orm.Connection, userid string)([]Message, error) {
+func (msg *MessageProvider) GetOffLineMessage( userid string)([]Message, error) {
 	var all []Message
 
-	db := conn.(*gorm.DB).Exec("SET DATABASE = core")
+	db := database.Conn
 
 	err := db.Where("target=? AND issend=?", userid, false).Find(&all).Error
 
@@ -68,10 +65,15 @@ func (msg *MessageProvider) GetOffLineMessage(conn orm.Connection, userid string
 	return all, nil
 }
 
-func (msg *MessageProvider) ModifyMessageStatus(conn orm.Connection, msgid int64) error {
+func (msg *Message) TableName() string {
+	return "message"
+}
+
+
+func (msg *MessageProvider) ModifyMessageStatus(msgid int64) error {
 	var message Message
 
-	db := conn.(*gorm.DB).Exec("SET DATABASE = core")
+	db := database.Conn
 
 	updater := map[string]interface{}{"issend": true}
 	err := db.Model(&message).Where("messageid=? AND issend=?", msgid, true).Update(updater).Limit(1).Error

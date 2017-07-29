@@ -24,12 +24,41 @@
 
 /*
  * Revision History:
- *     Initial: 2017/07/11        Yusan Kurban
+ *     Initial: 2017/07/29        Yang Chenglong
  */
 
-package orm
+package cockroach
 
-type Pool interface {
-	GetConnection() (Connection, error)
-	ReleaseConnection(Connection)
+import (
+	"github.com/jinzhu/gorm"
+	_ "github.com/go-sql-driver/mysql"
+
+	"hypercube/libs/log"
+
+)
+
+const (
+	dbUrl = "root:123456@tcp(10.0.0.253:3606)/core?charset=utf8&parseTime=True&loc=Local"
+	dialect = "mysql"
+)
+
+var (
+	Conn *gorm.DB
+	err  error
+)
+
+func init() {
+	InitOrm(dbUrl)
 }
+
+func InitOrm(url string) {
+	Conn, err = gorm.Open(dialect, url)
+
+	if err != nil {
+		panic(err)
+	}
+
+	log.Logger.Debug("DB Connected to %s", dialect)
+}
+
+
