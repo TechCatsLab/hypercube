@@ -62,7 +62,7 @@ type AccessRPC struct {
 }
 
 // Ping is general rpc keepalive interface.
-func (access *AccessRPC)Ping(req *rpc.ReqKeepAlive, resp *rpc.RespKeepAlive) error {
+func (access *AccessRPC) Ping(req *rpc.ReqKeepAlive, resp *rpc.RespKeepAlive) error {
 	return nil
 }
 

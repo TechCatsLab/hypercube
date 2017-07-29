@@ -29,12 +29,12 @@
 package main
 
 import (
-	_"net/http/pprof"
 	"log"
 	"net/http"
+	_ "net/http/pprof"
 )
 
-func HttpPprof()  {
+func HttpPprof() {
 	go func() {
 		log.Println(http.ListenAndServe(configuration.PprofAddrs, nil))
 	}()

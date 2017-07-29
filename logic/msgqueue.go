@@ -45,9 +45,9 @@ import (
 type OfflineMessage chan message.UserEntry
 
 var (
-	Queue      chan *message.Message
-	Shutdown   chan struct{}
-    offline    OfflineMessage
+	Queue    chan *message.Message
+	Shutdown chan struct{}
+	offline  OfflineMessage
 )
 
 func initQueue() {
@@ -80,7 +80,7 @@ func OfflineMessageHandler(user message.UserEntry) error {
 	mes, err := db.MessageService.GetOffLineMessage(user.UserID.UserID)
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
-			log.Logger.Debug("")
+			log.Logger.Debug("user doesn't have OffLineMessage")
 			goto Mess
 		}
 
@@ -90,10 +90,10 @@ func OfflineMessageHandler(user message.UserEntry) error {
 Mess:
 	for _, msg := range mes {
 		switch msg.Type {
-		case message.MessageTypePlainText:
+		case message.MessageTypePlainText, message.MessageTypeEmotion:
 			content := message.PlainText{
-				From:    message.User{UserID:msg.Source},
-				To:      message.User{UserID:msg.Target},
+				From:    message.User{UserID: msg.Source},
+				To:      message.User{UserID: msg.Target},
 				Content: msg.Content,
 			}
 
@@ -104,18 +104,27 @@ Mess:
 			}
 
 			mesg := &message.Message{
-				Type:       msg.Type,
-				Version:    msg.Version,
-				Content:    text,
+				Type:    msg.Type,
+				Version: msg.Version,
+				Content: text,
 			}
 
-			go TransmitMsg(mesg)
+			id := msg.Messageid
+			go func() {
+				flag := TransmitMsg(mesg)
+				if flag {
+					err := db.MessageService.ModifyMessageStatus(id)
+					if err != nil {
+						log.Logger.Error("ModifyMessageStatus error:", err)
+						ShutDown()
+					}
+				}
+			}()
 		}
 	}
 
 	return nil
 }
-
 
 func HandleMessage(msg *message.Message) {
 	switch msg.Type {
@@ -147,7 +156,6 @@ func TransmitMsg(msg *message.Message) bool {
 		}
 
 		err := Send(plainUser.To, *msg, op)
-
 		if err != nil {
 			log.Logger.Error("TransmitMsg Send Error %v", err)
 
@@ -186,5 +194,5 @@ func HandlePlainText(msg *message.Message, isSend bool) {
 }
 
 func ShutDown() {
-	Shutdown <- struct {}{}
+	Shutdown <- struct{}{}
 }

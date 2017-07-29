@@ -37,7 +37,7 @@ import (
 
 const RPCNumber = 5
 
-type LogicRPC struct{
+type LogicRPC struct {
 }
 
 var (
@@ -74,7 +74,6 @@ func (this *LogicRPC) LoginHandler(user message.UserEntry, reply *int) error {
 	return nil
 }
 
-
 func (this *LogicRPC) LogoutHandle(user message.UserEntry, reply *int) error {
 	err := onLineUserMag.Remove(user)
 	if err != nil {
@@ -87,7 +86,6 @@ func (this *LogicRPC) LogoutHandle(user message.UserEntry, reply *int) error {
 	*reply = message.ReplySucceed
 	return nil
 }
-
 
 func (m *LogicRPC) Add(msg *message.Message, reply *bool) error {
 	Queue <- msg

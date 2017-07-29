@@ -30,12 +30,12 @@
 package log
 
 import (
-	"go.uber.org/zap"
 	"fmt"
+	"go.uber.org/zap"
 	"log"
 )
 
-type RecordLog struct {}
+type RecordLog struct{}
 
 var (
 	Logger *RecordLog
@@ -56,7 +56,7 @@ func (l *RecordLog) Debug(format string, a ...interface{}) {
 	zapLog.Debug(info, zap.Skip())
 }
 
-func (l *RecordLog) Fatal(v ...interface{}){
+func (l *RecordLog) Fatal(v ...interface{}) {
 	log.Fatal(v)
 }
 

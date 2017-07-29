@@ -30,9 +30,9 @@
 package error
 
 type httpError struct {
-	Code        int        `json:"code"`
-	Key         *string    `json:"error"`
-	Message     *string    `json:"message"`
+	Code    int     `json:"code"`
+	Key     *string `json:"error"`
+	Message *string `json:"message"`
 }
 
 func (this *httpError) Error() string {
@@ -41,8 +41,8 @@ func (this *httpError) Error() string {
 
 func NewHTTPError(code int, key string, message string) *httpError {
 	return &httpError{
-		Code: code,
-		Key: &key,
+		Code:    code,
+		Key:     &key,
 		Message: &message,
 	}
 }

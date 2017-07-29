@@ -34,10 +34,10 @@ import (
 
 	"github.com/gorilla/websocket"
 
-	"hypercube/libs/message"
 	"hypercube/access/sender"
-	"hypercube/libs/metrics/prometheus"
 	"hypercube/libs/log"
+	"hypercube/libs/message"
+	"hypercube/libs/metrics/prometheus"
 )
 
 // Session represents a client connection.
@@ -52,18 +52,18 @@ type Session struct {
 // NewSession creates a session.
 func NewSession(ws *websocket.Conn, user *message.User, sender sender.Sender, buffSize int) *Session {
 	session := &Session{
-		mq:             NewMessageQueue(buffSize),
-		ws:             ws,
-		user:           user,
-		sender:         sender,
-		shutdown:       make(chan struct{}),
+		mq:       NewMessageQueue(buffSize),
+		ws:       ws,
+		user:     user,
+		sender:   sender,
+		shutdown: make(chan struct{}),
 	}
 
 	return session
 }
 
 // PushMessage push message to queue.
-func (s *Session)PushMessage(msg *message.Message) {
+func (s *Session) PushMessage(msg *message.Message) {
 	s.mq.PushMessage(msg)
 }
 
@@ -84,7 +84,7 @@ func (s *Session) StartMessageLoop() {
 // HandleMessage handle message method.
 func (s *Session) HandleMessage(msg *message.Message) {
 	var (
-		user *message.User
+		user     *message.User
 		plainMsg message.PlainText
 		pushMsg  message.PushPlainText
 	)

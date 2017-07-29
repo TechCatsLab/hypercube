@@ -40,7 +40,7 @@ const (
 	BearerSize = 7
 )
 
-func GetUser(token *jwt.Token) (string) {
+func GetUser(token *jwt.Token) string {
 	var u message.User
 
 	claims := token.Claims.(jwt.MapClaims)

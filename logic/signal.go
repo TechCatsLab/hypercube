@@ -33,8 +33,8 @@ import (
 	"os"
 	"syscall"
 
-	"hypercube/libs/log"
 	"hypercube/libs/interrupt"
+	"hypercube/libs/log"
 )
 
 var (
@@ -42,7 +42,7 @@ var (
 )
 
 func initSignal() {
-	sigHandler = interrupt.New(finalHandler, func(){})
+	sigHandler = interrupt.New(finalHandler, func() {})
 	log.Logger.Debug("Interrupt handler initialized")
 }
 

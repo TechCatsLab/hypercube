@@ -30,11 +30,11 @@
 package rpc
 
 import (
-	"net/rpc"
 	"net"
+	"net/rpc"
 
-	"hypercube/libs/log"
 	"hypercube/access/config"
+	"hypercube/libs/log"
 )
 
 // InitServer initialize the RPC server.
@@ -45,10 +45,10 @@ func InitServer() {
 	go rpcListen()
 }
 
-func rpcListen()  {
+func rpcListen() {
 	l, err := net.Listen("tcp", config.GNodeConfig.Address)
 	if err != nil {
-		log.Logger.Error("net.Listen(\"%s\", \"%s\") error(%v)" + "tcp" + config.GNodeConfig.Address, err)
+		log.Logger.Error("net.Listen(\"%s\", \"%s\") error(%v)"+"tcp"+config.GNodeConfig.Address, err)
 		panic(err)
 	}
 

@@ -171,13 +171,13 @@ func (server *HTTPServer) NewClient(ws *websocket.Conn, user *message.User, hub 
 	}
 }
 
-func (server *HTTPServer) deferExec(user *message.User, client *conn.Client)  {
+func (server *HTTPServer) deferExec(user *message.User, client *conn.Client) {
 	var (
 		userEntry = message.UserEntry{
 			UserID:   *user,
 			ServerIP: message.Access{ServerIp: server.node.Conf.Addrs},
 		}
-		reply     int
+		reply int
 	)
 
 	server.node.clientHub().Remove(user, client)

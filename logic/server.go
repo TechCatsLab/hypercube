@@ -30,26 +30,26 @@
 package main
 
 import (
-	"net/rpc"
 	"errors"
 	"net"
+	"net/rpc"
 
 	"hypercube/libs/log"
-	rp "hypercube/libs/rpc"
 	"hypercube/libs/message"
+	rp "hypercube/libs/rpc"
 )
 
-func initServer()  {
+func initServer() {
 	rpc.Register(new(LogicRPC))
 	rpc.HandleHTTP()
 
 	go rpcListen()
 }
 
-func rpcListen()  {
+func rpcListen() {
 	l, err := net.Listen("tcp", configuration.Addrs)
 	if err != nil {
-		log.Logger.Error("net.Listen(\"%s\", \"%s\") error(%v)" + "tcp" + configuration.Addrs, err)
+		log.Logger.Error("net.Listen(\"%s\", \"%s\") error(%v)"+"tcp"+configuration.Addrs, err)
 		panic(err)
 	}
 
@@ -95,8 +95,6 @@ func Send(user message.User, msg message.Message, op rp.Options) error {
 
 		return errors.New("logic send message failed")
 	}
-
-	client.Close()
 
 	return nil
 }

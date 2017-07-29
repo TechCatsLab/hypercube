@@ -29,10 +29,10 @@
 
 package prometheus
 
-
 import (
 	"github.com/prometheus/client_golang/prometheus"
 )
+
 var (
 	OnlineUserCounter = prometheus.NewCounter(prometheus.CounterOpts{
 		Name: "onlineUser",

@@ -109,7 +109,7 @@ func (client *Client) HandleLogoutMessage(message *msg.Message) error {
 	}
 
 	u := msg.User{
-		UserID:  strings.Trim(user.UserID, "\""),
+		UserID: strings.Trim(user.UserID, "\""),
 	}
 	client.hub.Remove(&u, client)
 	client.Close()

@@ -32,6 +32,7 @@ package message
 import (
 	"time"
 
+	"hypercube/libs/log"
 	database "hypercube/orm"
 )
 
@@ -41,22 +42,23 @@ type MessageProvider struct {
 var MessageService *MessageProvider
 
 type Message struct {
-	Messageid		int64		`sql:"auto_increment;primary_key;" gorm:"column:id" json:"messageid"`
-	Source    	    string		`gorm:"not null"`
-	Target		    string
-	Version         uint16
-	Type            uint16
-	IsSend          bool		`gorm:"column:issend"`
-	Content         string
-	Created         time.Time
+	Messageid uint64 `sql:"auto_increment;primary_key;" gorm:"column:messageid" json:"messageid"`
+	Source    string `gorm:"not null"`
+	Target    string
+	Version   uint16
+	Type      uint16
+	IsSend    bool `gorm:"column:issend"`
+	Content   string
+	Created   time.Time
 }
 
-func (msg *MessageProvider) GetOffLineMessage( userid string)([]Message, error) {
+func (msg *MessageProvider) GetOffLineMessage(userid string) ([]Message, error) {
 	var all []Message
+	var message Message
 
 	db := database.Conn
 
-	err := db.Where("target=? AND issend=?", userid, false).Find(&all).Error
+	err := db.Model(&message).Where("target=? AND issend=?", userid, false).Find(&all).Error
 
 	if err != nil {
 		return all, err
@@ -69,14 +71,14 @@ func (msg *Message) TableName() string {
 	return "message"
 }
 
-
-func (msg *MessageProvider) ModifyMessageStatus(msgid int64) error {
+func (msg *MessageProvider) ModifyMessageStatus(msgid uint64) error {
 	var message Message
 
 	db := database.Conn
+	log.Logger.Debug("msgid:", msgid)
 
 	updater := map[string]interface{}{"issend": true}
-	err := db.Model(&message).Where("messageid=? AND issend=?", msgid, true).Update(updater).Limit(1).Error
+	err := db.Model(&message).Where("messageid=? AND issend=?", msgid, false).Update(updater).Limit(1).Error
 
 	if err != nil {
 		return err

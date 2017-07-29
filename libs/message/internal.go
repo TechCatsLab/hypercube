@@ -39,12 +39,12 @@ type Access struct {
 }
 
 type UserEntry struct {
-	UserID    User
-	ServerIP  Access
+	UserID   User
+	ServerIP Access
 }
 
 // Args represent a RPC argument
 type Args struct {
-	User     User
-	Message  Message
+	User    User
+	Message Message
 }

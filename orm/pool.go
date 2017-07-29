@@ -30,15 +30,14 @@
 package cockroach
 
 import (
-	"github.com/jinzhu/gorm"
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/jinzhu/gorm"
 
 	"hypercube/libs/log"
-
 )
 
 const (
-	dbUrl = "root:123456@tcp(10.0.0.253:3606)/core?charset=utf8&parseTime=True&loc=Local"
+	dbUrl   = "root:123456@tcp(10.0.0.253:3606)/core?charset=utf8&parseTime=True&loc=Local"
 	dialect = "mysql"
 )
 
@@ -60,5 +59,3 @@ func InitOrm(url string) {
 
 	log.Logger.Debug("DB Connected to %s", dialect)
 }
-
-
