@@ -29,16 +29,9 @@
 
 package main
 
-import (
-	"net/http"
-	"hypercube/libs/log"
-)
-
 func main() {
-	go clients.Ping()
+	go clients.Ping("AccessRPC.Ping")
 	initServer()
-
-	log.Logger.Fatal(http.ListenAndServe(configuration.Addrs, nil))
 
 	sigHandler.Wait()
 }

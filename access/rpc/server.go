@@ -31,22 +31,32 @@ package rpc
 
 import (
 	"net/rpc"
-	"net/http"
+	"net"
+
 	"hypercube/libs/log"
+	"hypercube/access/config"
 )
 
 // InitServer initialize the RPC server.
 func InitServer() {
-	newServer := rpc.NewServer()
-	newServer.Register(new(AccessRPC))
+	rpc.Register(new(AccessRPC))
 	rpc.HandleHTTP()
 
-	go runrpc()
+	go rpcListen()
 }
 
-func runrpc()  {
-	err := http.ListenAndServe(":1234", nil)
+func rpcListen()  {
+	l, err := net.Listen("tcp", config.GNodeConfig.Address)
 	if err != nil {
-		log.Logger.Debug(err.Error())
+		log.Logger.Error("net.Listen(\"%s\", \"%s\") error(%v)" + "tcp" + config.GNodeConfig.Address, err)
+		panic(err)
 	}
+
+	defer func() {
+		log.Logger.Info("listen rpc: \"%s\" close", config.GNodeConfig.Address)
+		if err := l.Close(); err != nil {
+			log.Logger.Error("listener.Close() error(%v)", err)
+		}
+	}()
+	rpc.Accept(l)
 }

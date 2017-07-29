@@ -33,8 +33,9 @@ import (
 	"hypercube/libs/log"
 	"hypercube/libs/message"
 	"hypercube/libs/rpc"
-
 )
+
+const RPCNumber = 5
 
 type LogicRPC struct{
 }
@@ -42,19 +43,18 @@ type LogicRPC struct{
 var (
 	options []rpc.Options
 	clients *rpc.Clients
-	logic   *LogicRPC
 )
 
 func initRPC() {
-	logic = new(LogicRPC)
-
 	for _, addr := range configuration.AccessAddrs {
 		op := rpc.Options{
 			Proto: "tcp",
 			Addr:  addr,
 		}
 
-		options = append(options, op)
+		for i := 0; i < RPCNumber; i++ {
+			options = append(options, op)
+		}
 	}
 
 	clients = rpc.Dials(options)
@@ -93,5 +93,9 @@ func (m *LogicRPC) Add(msg *message.Message, reply *bool) error {
 	Queue <- msg
 	*reply = true
 
+	return nil
+}
+
+func (access *LogicRPC) Ping(req *rpc.ReqKeepAlive, resp *rpc.RespKeepAlive) error {
 	return nil
 }
