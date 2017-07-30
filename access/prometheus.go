@@ -36,9 +36,29 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 
 	"hypercube/libs/log"
+	pro "hypercube/libs/metrics/prometheus"
+	"github.com/prometheus/client_golang/prometheus"
 )
 
 func initPrometheus() {
+	err := prometheus.Register(pro.OnlineUserCounter)
+	if err != nil {
+		log.Logger.Error("onlineUser counter couldn't be registered AGAIN, no counting will happen:", err)
+		return
+	}
+
+	err = prometheus.Register(pro.SendMessageCounter)
+	if err != nil {
+		log.Logger.Error("sendMessage counter couldn't be registered AGAIN, no counting will happen:", err)
+		return
+	}
+
+	err = prometheus.Register(pro.ReceiveMessageCounter)
+	if err != nil {
+		log.Logger.Error("resiveMessage counter couldn't be registered AGAIN, no counting will happen:", err)
+		return
+	}
+
 	go func() {
 		http.Handle("/metrics", promhttp.Handler())
 
