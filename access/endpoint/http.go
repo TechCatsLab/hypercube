@@ -190,6 +190,4 @@ func (server *HTTPServer) deferExec(user *message.User, client *conn.Client) {
 	if err != nil {
 		log.Logger.Error("LogicRPC.LogoutHandle Error: %v", err)
 	}
-
-	client.Close()
 }

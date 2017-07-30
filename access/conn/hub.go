@@ -70,6 +70,7 @@ func (hub *ClientHub) Remove(user *message.User, client *Client) {
 
 	if _, exists := hub.clients[user.UserID]; !exists {
 		log.Logger.Warn("user hasn't login!")
+		return
 	}
 
 	delete(hub.clients, user.UserID)
