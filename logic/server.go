@@ -30,7 +30,6 @@
 package main
 
 import (
-	"errors"
 	"net"
 	"net/rpc"
 
@@ -82,18 +81,11 @@ func Send(user message.User, msg message.Message, op rp.Options) error {
 
 	err = client.Call("AccessRPC.Send", &args, &ok)
 
-	if err != nil {
-		log.Logger.Error("RPC Call returned error: %v", err)
+	if err != nil || !ok  {
+		log.Logger.Error("Logic Call Send failed: %v", err)
 		client.Close()
 
 		return err
-	}
-
-	if !ok {
-		log.Logger.Error("Logic Call failed %v", err)
-		client.Close()
-
-		return errors.New("logic send message failed")
 	}
 
 	return nil
