@@ -35,11 +35,6 @@ import (
 	"hypercube/libs/message"
 )
 
-const (
-	TokenIndex = 0
-	BearerSize = 7
-)
-
 func GetUser(token *jwt.Token) string {
 	var u message.User
 

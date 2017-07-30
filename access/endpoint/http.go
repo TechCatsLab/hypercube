@@ -25,7 +25,8 @@
 /*
  * Revision History:
  *     Initial: 2017/07/06        Feng Yifei
- *      Modify: 2017/07/08        Liu Jiachang		ModifyFunction
+ *     Modify : 2017/07/08        Liu Jiachang		ModifyFunction
+ *     Modify : 2017/07/28        Yang Chenglong
  */
 
 package endpoint
@@ -132,8 +133,6 @@ func (server *HTTPServer) NewClient(ws *websocket.Conn, user *message.User, hub 
 	client := conn.NewClient(user, server.node.clientHub(), session)
 	client.StartHandleMessage()
 
-	log.Logger.Info("Endpoint info: ", server.node.Snapshot())
-
 	userEntry = message.UserEntry{
 		UserID:   *user,
 		ServerIP: message.Access{ServerIp: server.node.Conf.Address},
@@ -153,6 +152,8 @@ func (server *HTTPServer) NewClient(ws *websocket.Conn, user *message.User, hub 
 
 	hub.Add(user, client)
 	prometheus.OnlineUserCounter.Add(1)
+
+	log.Logger.Info("Endpoint info: ", server.node.Snapshot())
 
 	for {
 		if err = ws.ReadJSON(&msg); err != nil {
@@ -181,7 +182,7 @@ func (server *HTTPServer) deferExec(user *message.User, client *conn.Client) {
 	)
 
 	server.node.clientHub().Remove(user, client)
-	prometheus.OnlineUserCounter.Add(-1)
+	prometheus.OnlineUserCounter.Desc()
 	log.Logger.Info("Endpoint info: ", server.node.Snapshot())
 
 	RpcClient, _ := rpc.RpcClients.Get(server.node.Conf.LogicAddrs)

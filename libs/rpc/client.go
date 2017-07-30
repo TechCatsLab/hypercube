@@ -25,13 +25,13 @@
 /*
  * Revision History:
  *     Initial: 2017/07/05        Feng Yifei
+ *     Modify : 2017/07/28        Yang Chenglong
  */
 
 package rpc
 
 import (
 	"errors"
-	"hypercube/libs/log"
 	"net"
 	"net/rpc"
 	"time"
@@ -136,7 +136,6 @@ func (c *Client) Ping(ping string) {
 			if err = c.Call(ping, &arg, &reply); err != nil {
 				c.err = err
 				if err != rpc.ErrShutdown {
-					log.Logger.Debug("arrive--->", err)
 					c.Client.Close()
 				}
 			}

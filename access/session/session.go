@@ -25,6 +25,7 @@
 /*
  * Revision History:
  *     Initial: 2017/07/06        Feng Yifei
+ *     Modify : 2017/07/28        Yang Chenglong
  */
 
 package session
@@ -101,7 +102,6 @@ func (s *Session) HandleMessage(msg *message.Message) {
 		return
 	}
 
-	log.Logger.Debug("WriteMessage: ", plainMsg)
 	if user.UserID == s.user.UserID {
 		err := s.ws.WriteJSON(*msg)
 		if err != nil {

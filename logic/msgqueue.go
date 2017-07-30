@@ -25,6 +25,7 @@
 /*
  * Revision History:
  *     Initial: 2017/07/11        Sun Anxiang
+ *     Modify : 2017/07/28        Yang Chenglong
  */
 
 package main
@@ -80,7 +81,7 @@ func OfflineMessageHandler(user message.UserEntry) error {
 	mes, err := db.MessageService.GetOffLineMessage(user.UserID.UserID)
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
-			log.Logger.Debug("user doesn't have OffLineMessage")
+			log.Logger.Debug("User doesn't have offline messages!")
 			goto Mess
 		}
 
@@ -110,16 +111,14 @@ Mess:
 			}
 
 			id := msg.Messageid
-			go func() {
-				flag := TransmitMsg(mesg)
-				if flag {
-					err := db.MessageService.ModifyMessageStatus(id)
-					if err != nil {
-						log.Logger.Error("ModifyMessageStatus error:", err)
-						ShutDown()
-					}
+			flag := TransmitMsg(mesg)
+			if flag {
+				err := db.MessageService.ModifyMessageStatus(id)
+				if err != nil {
+					log.Logger.Error("ModifyMessageStatus error:", err)
+					ShutDown()
 				}
-			}()
+			}
 		}
 	}
 
@@ -147,7 +146,6 @@ func TransmitMsg(msg *message.Message) bool {
 		return false
 	}
 
-	log.Logger.Debug("TransmitMsg:", plainUser, len(plainUser.To.UserID))
 	serveIp, flag := onLineUserMag.Query(plainUser.To)
 	if flag {
 		op := rp.Options{

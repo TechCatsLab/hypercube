@@ -25,6 +25,7 @@
 /*
  * Revision History:
  *     Initial: 2017/07/08        Feng Yife
+ *     Modify : 2017/07/28        Yang Chenglong
  */
 
 package config
@@ -46,12 +47,8 @@ type NodeConfig struct {
 	PprofAddrs        string
 	PrometheusPort    string
 	Address           string
-	RedisAddress      string
-	SessionSecret     string
-	SessionName       string
 	CorsHosts         []string
 	SecretKey         string
-	AccessHeartRate   int
 	QueueBuffer       int
 }
 
@@ -73,12 +70,8 @@ func Load() *NodeConfig {
 		PprofAddrs:        viper.GetString("monitor.pprofAddrs"),
 		PrometheusPort:    viper.GetString("monitor.prometheusPort"),
 		Address:           viper.GetString("server.address"),
-		RedisAddress:      viper.GetString("middleware.session.address"),
-		SessionSecret:     viper.GetString("middleware.session.secret"),
-		SessionName:       viper.GetString("middleware.session.name"),
 		CorsHosts:         viper.GetStringSlice("middleware.cors.hosts"),
 		SecretKey:         viper.GetString("middleware.secretkey"),
-		AccessHeartRate:   viper.GetInt("accessHeartRate"),
 		QueueBuffer:       viper.GetInt("queueBuffer"),
 	}
 

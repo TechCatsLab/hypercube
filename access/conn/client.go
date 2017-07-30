@@ -25,6 +25,7 @@
 /*
  * Revision History:
  *     Initial: 2017/07/06        Feng Yifei
+ *     Modify : 2017/07/28        Yang Chenglong
  */
 
 package conn
@@ -37,7 +38,7 @@ import (
 	"hypercube/access/session"
 	"hypercube/libs/log"
 	msg "hypercube/libs/message"
-	//"hypercube/libs/metrics/prometheus"
+	"hypercube/libs/metrics/prometheus"
 	"strings"
 )
 
@@ -111,9 +112,6 @@ func (client *Client) HandleLogoutMessage(message *msg.Message) error {
 	u := msg.User{
 		UserID: strings.Trim(user.UserID, "\""),
 	}
-	client.hub.Remove(&u, client)
-	client.Close()
-	//prometheus.OnlineUserCounter.Add(-1)
 
 	userEntry := msg.UserEntry{
 		UserID:   u,
@@ -131,6 +129,10 @@ func (client *Client) HandleLogoutMessage(message *msg.Message) error {
 		log.Logger.Error("LogicRPC.LogoutHandle Error: %v", err)
 		return err
 	}
+
+	client.hub.Remove(&u, client)
+	client.Close()
+	prometheus.OnlineUserCounter.Desc()
 
 	return nil
 }

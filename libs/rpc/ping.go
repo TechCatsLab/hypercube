@@ -29,10 +29,6 @@
 
 package rpc
 
-const (
-	pingMethodName = "Ping"
-)
-
 // ReqKeepAlive - Keepalive request
 type ReqKeepAlive struct {
 }

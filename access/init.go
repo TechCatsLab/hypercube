@@ -25,7 +25,7 @@
 /*
  * Revision History:
  *     Initial: 2017/04/05            HeCJ
- *     AddFunction: 2017/06/04        Yang Chenglong
+ *     Modify : 2017/06/24            Yang Chenglong
  */
 
 package main

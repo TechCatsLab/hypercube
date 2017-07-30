@@ -25,6 +25,7 @@
 /*
  * Revision History:
  *     Initial: 2017/07/11        Jia Chenhui
+ *     Modify : 2017/07/28        Yang Chenglong
  */
 
 package main
@@ -35,7 +36,7 @@ import (
 	"hypercube/libs/rpc"
 )
 
-const RPCNumber = 5
+const RPCNumber = 10
 
 type LogicRPC struct {
 }
@@ -69,7 +70,6 @@ func (this *LogicRPC) LoginHandler(user message.UserEntry, reply *int) error {
 	}
 
 	offline <- user
-	onLineUserMag.PrintDebugInfo()
 	*reply = message.ReplySucceed
 	return nil
 }
@@ -82,7 +82,6 @@ func (this *LogicRPC) LogoutHandle(user message.UserEntry, reply *int) error {
 		return err
 	}
 
-	onLineUserMag.PrintDebugInfo()
 	*reply = message.ReplySucceed
 	return nil
 }
