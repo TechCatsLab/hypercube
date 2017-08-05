@@ -81,7 +81,7 @@ func Send(user message.User, msg message.Message, op rp.Options) error {
 
 	err = client.Call("AccessRPC.Send", &args, &ok)
 
-	if err != nil || !ok  {
+	if err != nil || !ok {
 		log.Logger.Error("Logic Call Send failed: %v", err)
 		client.Close()
 

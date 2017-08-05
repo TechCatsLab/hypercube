@@ -25,6 +25,7 @@
 /*
  * Revision History:
  *     Initial: 2017/07/05        Feng Yifei
+ *     Modify : 2017/07/28        Yang Chenglong
  */
 
 package message
@@ -32,7 +33,6 @@ package message
 import (
 	"time"
 
-	"hypercube/libs/log"
 	database "hypercube/orm"
 )
 
@@ -75,7 +75,6 @@ func (msg *MessageProvider) ModifyMessageStatus(msgid uint64) error {
 	var message Message
 
 	db := database.Conn
-	log.Logger.Debug("msgid:", msgid)
 
 	updater := map[string]interface{}{"issend": true}
 	err := db.Model(&message).Where("messageid=? AND issend=?", msgid, false).Update(updater).Limit(1).Error
