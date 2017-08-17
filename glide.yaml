@@ -24,3 +24,5 @@ import:
   version: v2.2.0
 - package: github.com/jinzhu/gorm
   version: v1.0
+- package: github.com/go-sql-driver/mysql
+  version: v1.3
