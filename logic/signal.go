@@ -33,8 +33,8 @@ import (
 	"os"
 	"syscall"
 
-	"hypercube/libs/interrupt"
-	"hypercube/libs/log"
+	"github.com/fengyfei/hypercube/libs/interrupt"
+	"github.com/fengyfei/hypercube/libs/log"
 )
 
 var (

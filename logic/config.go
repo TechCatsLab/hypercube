@@ -32,7 +32,7 @@ package main
 
 import (
 	"github.com/spf13/viper"
-	"hypercube/libs/log"
+	"github.com/fengyfei/hypercube/libs/log"
 )
 
 // 配置文件结构

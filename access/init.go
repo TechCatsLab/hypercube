@@ -31,9 +31,9 @@
 package main
 
 import (
-	"hypercube/access/config"
-	"hypercube/access/endpoint"
-	"hypercube/access/rpc"
+	"github.com/fengyfei/hypercube/access/config"
+	"github.com/fengyfei/hypercube/access/endpoint"
+	"github.com/fengyfei/hypercube/access/rpc"
 )
 
 var (

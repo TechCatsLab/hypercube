@@ -34,8 +34,8 @@ import (
 	"errors"
 	"sync"
 
-	"hypercube/libs/log"
-	"hypercube/libs/message"
+	"github.com/fengyfei/hypercube/libs/log"
+	"github.com/fengyfei/hypercube/libs/message"
 )
 
 // ClientHub represents a collection of client sessions.

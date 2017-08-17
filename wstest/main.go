@@ -45,7 +45,7 @@ import (
 	ui "github.com/gizak/termui"
 	"github.com/gorilla/websocket"
 
-	"hypercube/libs/message"
+	"github.com/fengyfei/hypercube/libs/message"
 )
 
 // websocket————————————————————————————————————————————————————————————————————————————

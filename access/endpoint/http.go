@@ -39,13 +39,13 @@ import (
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 
-	"hypercube/access/conn"
-	"hypercube/access/endpoint/handler"
-	"hypercube/access/rpc"
-	"hypercube/access/session"
-	"hypercube/libs/log"
-	"hypercube/libs/message"
-	"hypercube/libs/metrics/prometheus"
+	"github.com/fengyfei/hypercube/access/conn"
+	"github.com/fengyfei/hypercube/access/endpoint/handler"
+	"github.com/fengyfei/hypercube/access/rpc"
+	"github.com/fengyfei/hypercube/access/session"
+	"github.com/fengyfei/hypercube/libs/log"
+	"github.com/fengyfei/hypercube/libs/message"
+	"github.com/fengyfei/hypercube/libs/metrics/prometheus"
 )
 
 // HTTPServer represents the http server accepts the client websocket connections.

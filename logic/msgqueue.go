@@ -36,11 +36,11 @@ import (
 
 	"github.com/jinzhu/gorm"
 
-	"hypercube/libs/log"
-	"hypercube/libs/message"
-	rp "hypercube/libs/rpc"
-	db "hypercube/model"
-	database "hypercube/orm"
+	"github.com/fengyfei/hypercube/libs/log"
+	"github.com/fengyfei/hypercube/libs/message"
+	rp "github.com/fengyfei/hypercube/libs/rpc"
+	db "github.com/fengyfei/hypercube/model"
+	database "github.com/fengyfei/hypercube/orm"
 )
 
 type OfflineMessage chan message.UserEntry

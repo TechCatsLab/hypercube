@@ -32,7 +32,7 @@ package handler
 import (
 	"github.com/dgrijalva/jwt-go"
 
-	"hypercube/libs/message"
+	"github.com/fengyfei/hypercube/libs/message"
 )
 
 func GetUser(token *jwt.Token) string {

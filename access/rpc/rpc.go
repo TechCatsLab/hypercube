@@ -31,10 +31,10 @@
 package rpc
 
 import (
-	"hypercube/access/config"
-	"hypercube/access/sender"
-	"hypercube/libs/message"
-	"hypercube/libs/rpc"
+	"github.com/fengyfei/hypercube/access/config"
+	"github.com/fengyfei/hypercube/access/sender"
+	"github.com/fengyfei/hypercube/libs/message"
+	"github.com/fengyfei/hypercube/libs/rpc"
 )
 
 var RpcClients *rpc.Clients

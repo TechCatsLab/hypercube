@@ -36,8 +36,8 @@ import (
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 
 	"github.com/prometheus/client_golang/prometheus"
-	"hypercube/libs/log"
-	pro "hypercube/libs/metrics/prometheus"
+	"github.com/fengyfei/hypercube/libs/log"
+	pro "github.com/fengyfei/hypercube/libs/metrics/prometheus"
 )
 
 func initPrometheus() {

@@ -33,7 +33,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jinzhu/gorm"
 
-	"hypercube/libs/log"
+	"github.com/fengyfei/hypercube/libs/log"
 )
 
 const (

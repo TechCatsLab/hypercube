@@ -31,7 +31,7 @@
 package session
 
 import (
-	"hypercube/libs/message"
+	"github.com/fengyfei/hypercube/libs/message"
 )
 
 // MessageQueue buffers the message from or to a client.

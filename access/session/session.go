@@ -35,10 +35,10 @@ import (
 
 	"github.com/gorilla/websocket"
 
-	"hypercube/access/sender"
-	"hypercube/libs/log"
-	"hypercube/libs/message"
-	"hypercube/libs/metrics/prometheus"
+	"github.com/fengyfei/hypercube/access/sender"
+	"github.com/fengyfei/hypercube/libs/log"
+	"github.com/fengyfei/hypercube/libs/message"
+	"github.com/fengyfei/hypercube/libs/metrics/prometheus"
 )
 
 // Session represents a client connection.

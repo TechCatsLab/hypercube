@@ -34,8 +34,8 @@ import (
 	"fmt"
 	"sync"
 
-	"hypercube/libs/log"
-	"hypercube/libs/message"
+	"github.com/fengyfei/hypercube/libs/log"
+	"github.com/fengyfei/hypercube/libs/message"
 )
 
 var (

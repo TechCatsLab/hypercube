@@ -33,7 +33,7 @@ package message
 import (
 	"time"
 
-	database "hypercube/orm"
+	database "github.com/fengyfei/hypercube/orm"
 )
 
 type MessageProvider struct {
