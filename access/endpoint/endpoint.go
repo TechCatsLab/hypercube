@@ -34,7 +34,7 @@ import (
 	"fmt"
 
 	"github.com/fengyfei/hypercube/access/config"
-	"github.com/fengyfei/hypercube/access/conn"
+	"github.com/fengyfei/hypercube/libs/conn"
 	"github.com/fengyfei/hypercube/libs/log"
 	"github.com/fengyfei/hypercube/libs/message"
 )

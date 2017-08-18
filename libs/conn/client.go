@@ -35,7 +35,7 @@ import (
 
 	"github.com/fengyfei/hypercube/access/config"
 	"github.com/fengyfei/hypercube/access/rpc"
-	"github.com/fengyfei/hypercube/access/session"
+	"github.com/fengyfei/hypercube/libs/session"
 	"github.com/fengyfei/hypercube/libs/log"
 	msg "github.com/fengyfei/hypercube/libs/message"
 	"github.com/fengyfei/hypercube/libs/metrics/prometheus"
