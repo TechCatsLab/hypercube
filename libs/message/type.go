@@ -54,4 +54,10 @@ const (
 
 	// ReplyFailed - Represent a failed RPC call
 	ReplyFailed = 0x10002
+
+	// MessageSent - Represent a message already sent
+	MessageSent = 0x2001
+
+	// MessageUnsent - Represent a message hasn't sent
+	MessageUnsent = 0x2002
 )

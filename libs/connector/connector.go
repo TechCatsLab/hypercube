@@ -30,12 +30,13 @@
 package connector
 
 import (
+	"github.com/fengyfei/hypercube/libs/connector/mongo"
 	"github.com/fengyfei/hypercube/libs/message"
 )
 
 type Connector interface {
 	Initialize() error
-	Put(msg *message.Message) error
-	Get(id string, kind int) ([]message.Message, error)
-	Update(id string, kind int) error
+	Put(msg *message.Message, status int) error
+	Get(id string, status int) ([]mongo.Message, error)
+	Update(id string, status int) error
 }
