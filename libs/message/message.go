@@ -37,7 +37,6 @@ import (
 // Message - General message struct.
 type Message struct {
 	Type    uint16          `json:"type"`
-	Version uint16          `json:"version"`
 	Content json.RawMessage `json:"content"`
 }
 

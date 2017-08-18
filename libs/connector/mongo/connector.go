@@ -36,6 +36,7 @@ import (
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 
+	"github.com/fengyfei/hypercube/libs/log"
 	"github.com/fengyfei/hypercube/libs/message"
 	"github.com/fengyfei/nuts/mgo/refresh"
 )
@@ -46,9 +47,8 @@ type MgoConnector struct {
 
 type Message struct {
 	Messageid bson.ObjectId `bson:"_id"   json:"messageid"`
-	Source    string
-	Target    string
-	Version   uint16
+	From      string
+	To        string
 	Type      uint16
 	Status    int
 	Content   string
@@ -75,10 +75,12 @@ func (mongo *MgoConnector) Initialize() error {
 	}
 	mongo.session.SetMode(mgo.Monotonic, true)
 
+	log.Logger.Debug("MongoDB has Connected %v", mgoUrl)
+
 	RefChat = mongo.session.DB(dbName).C(collectionName)
 	nameIndex := mgo.Index{
-		Key:        []string{"_id"},
-		Unique:     true,
+		Key:        []string{"From"},
+		Unique:     false,
 		DropDups:   true,
 		Background: true,
 		Sparse:     true,
@@ -101,13 +103,13 @@ func (mongo *MgoConnector) Put(msg *message.Message, status int) error {
 	}
 
 	dbmsg = Message{
-		Source:  content.From.UserID,
-		Target:  content.To.UserID,
-		Type:    msg.Type,
-		Version: msg.Version,
-		Status:  status,
-		Content: content.Content,
-		Created: time.Now(),
+		Messageid: bson.NewObjectId(),
+		From:      content.From.UserID,
+		To:        content.To.UserID,
+		Type:      msg.Type,
+		Status:    status,
+		Content:   content.Content,
+		Created:   time.Now(),
 	}
 
 	return refresh.Insert(mongo.session, RefChat, &dbmsg)
@@ -116,7 +118,7 @@ func (mongo *MgoConnector) Put(msg *message.Message, status int) error {
 func (mongo *MgoConnector) Get(id string, status int) ([]Message, error) {
 	var all []Message
 
-	filter := bson.M{"_id": bson.ObjectIdHex(id), "Status": status}
+	filter := bson.M{"To": id, "Status": status}
 	err := refresh.GetMany(mongo.session, RefChat, filter, &all)
 
 	return all, err

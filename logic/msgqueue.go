@@ -32,15 +32,14 @@ package main
 
 import (
 	"encoding/json"
-	"time"
 
-	"github.com/jinzhu/gorm"
+	"gopkg.in/mgo.v2"
 
+	"github.com/fengyfei/hypercube/libs/connector"
+	"github.com/fengyfei/hypercube/libs/connector/mongo"
 	"github.com/fengyfei/hypercube/libs/log"
 	"github.com/fengyfei/hypercube/libs/message"
 	rp "github.com/fengyfei/hypercube/libs/rpc"
-	db "github.com/fengyfei/hypercube/model"
-	database "github.com/fengyfei/hypercube/orm"
 )
 
 type OfflineMessage chan message.UserEntry
@@ -49,6 +48,7 @@ var (
 	Queue    chan *message.Message
 	Shutdown chan struct{}
 	offline  OfflineMessage
+	conn     connector.Connector = &mongo.MgoConnector{}
 )
 
 func initQueue() {
@@ -57,6 +57,7 @@ func initQueue() {
 
 	offline = make(chan message.UserEntry)
 
+	conn.Initialize()
 	QueueStart()
 }
 
@@ -78,9 +79,9 @@ func QueueStart() {
 }
 
 func OfflineMessageHandler(user message.UserEntry) error {
-	mes, err := db.MessageService.GetOffLineMessage(user.UserID.UserID)
+	mes, err := conn.Get(user.UserID.UserID, message.MessageUnsent)
 	if err != nil {
-		if err == gorm.ErrRecordNotFound {
+		if err == mgo.ErrNotFound {
 			log.Logger.Debug("User doesn't have offline messages!")
 			goto Mess
 		}
@@ -93,8 +94,8 @@ Mess:
 		switch msg.Type {
 		case message.MessageTypePlainText, message.MessageTypeEmotion:
 			content := message.PlainText{
-				From:    message.User{UserID: msg.Source},
-				To:      message.User{UserID: msg.Target},
+				From:    message.User{UserID: msg.From},
+				To:      message.User{UserID: msg.To},
 				Content: msg.Content,
 			}
 
@@ -106,14 +107,13 @@ Mess:
 
 			mesg := &message.Message{
 				Type:    msg.Type,
-				Version: msg.Version,
 				Content: text,
 			}
 
 			id := msg.Messageid
 			flag := TransmitMsg(mesg)
-			if flag {
-				err := db.MessageService.ModifyMessageStatus(id)
+			if flag == message.MessageSent {
+				err = conn.Update(id.Hex(), message.MessageUnsent)
 				if err != nil {
 					log.Logger.Error("ModifyMessageStatus error:", err)
 					ShutDown()
@@ -136,14 +136,14 @@ func HandleMessage(msg *message.Message) {
 	}
 }
 
-func TransmitMsg(msg *message.Message) bool {
+func TransmitMsg(msg *message.Message) int {
 	var plainUser message.PlainText
 
 	err := json.Unmarshal(msg.Content, &plainUser)
 	if err != nil {
 		log.Logger.Error("TransmitMsg Unmarshal Error %v", err)
 
-		return false
+		return message.MessageUnsent
 	}
 
 	serveIp, flag := onLineUserMag.Query(plainUser.To)
@@ -157,31 +157,15 @@ func TransmitMsg(msg *message.Message) bool {
 		if err != nil {
 			log.Logger.Error("TransmitMsg Send Error %v", err)
 
-			return false
+			return message.MessageUnsent
 		}
 	}
 
-	return flag
+	return message.MessageSent
 }
 
-func HandlePlainText(msg *message.Message, isSend bool) {
-	var content message.PlainText
-
-	json.Unmarshal(msg.Content, &content)
-
-	dbs := database.Conn
-
-	dbmsg := db.Message{
-		Source:  content.From.UserID,
-		Target:  content.To.UserID,
-		Type:    msg.Type,
-		Version: msg.Version,
-		IsSend:  isSend,
-		Content: content.Content,
-		Created: time.Now(),
-	}
-
-	err := dbs.Create(&dbmsg).Error
+func HandlePlainText(msg *message.Message, status int) {
+	err := conn.Put(msg, status)
 
 	if err != nil {
 		log.Logger.Error("Insert into message error:", err)
