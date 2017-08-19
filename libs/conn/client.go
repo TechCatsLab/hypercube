@@ -131,7 +131,7 @@ func (client *Client) HandleLogoutMessage(message *msg.Message) error {
 		return err
 	}
 
-	client.hub.Remove(&u, client)
+	client.hub.Remove(&u)
 	client.Close()
 	prometheus.OnlineUserCounter.Desc()
 

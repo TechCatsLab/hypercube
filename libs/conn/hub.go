@@ -64,7 +64,7 @@ func (hub *ClientHub) Add(user *message.User, client *Client) {
 }
 
 // Remove a client connection
-func (hub *ClientHub) Remove(user *message.User, client *Client) {
+func (hub *ClientHub) Remove(user *message.User) {
 	hub.mux.Lock()
 	defer hub.mux.Unlock()
 

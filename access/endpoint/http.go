@@ -181,7 +181,7 @@ func (server *HTTPServer) deferExec(user *message.User, client *conn.Client) {
 		reply int
 	)
 
-	server.node.clientHub().Remove(user, client)
+	server.node.clientHub().Remove(user)
 	prometheus.OnlineUserCounter.Desc()
 	log.Logger.Info("Endpoint info: ", server.node.Snapshot())
 
