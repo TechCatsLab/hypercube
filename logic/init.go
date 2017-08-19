@@ -34,5 +34,6 @@ func init() {
 	initQueue()
 	initOnline()
 	initSignal()
+	HttpPprof()
 	initRPC()
 }

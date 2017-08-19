@@ -24,34 +24,19 @@
 
 /*
  * Revision History:
- *     Initial: 2017/07/06       Yang Chenglong
+ *     Initial: 2017/08/19        Yang Chenglong
  */
 
-package handler
+package main
 
 import (
-	"errors"
-
-	"github.com/dgrijalva/jwt-go"
-
-	"github.com/fengyfei/hypercube/libs/log"
-	"github.com/fengyfei/hypercube/libs/message"
-	"github.com/labstack/echo"
+	"log"
+	"net/http"
+	_ "net/http/pprof"
 )
 
-func GetUser(c echo.Context) (interface{}, error ){
-	var u message.User
-
-	claim := c.Get("user")
-	if claim == nil {
-		err := errors.New("Have No Claim")
-		log.Logger.Error("Get Claim Error: %v", err)
-		return nil, err
-	}
-
-	token := claim.(*jwt.Token)
-	claims := token.Claims.(jwt.MapClaims)
-	u.UserID = claims["uid"].(string)
-
-	return &u, nil
+func HttpPprof() {
+	go func() {
+		log.Println(http.ListenAndServe(configuration.PprofAddrs, nil))
+	}()
 }

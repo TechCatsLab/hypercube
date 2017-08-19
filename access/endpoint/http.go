@@ -39,13 +39,13 @@ import (
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 
-	"github.com/fengyfei/hypercube/libs/conn"
 	"github.com/fengyfei/hypercube/access/endpoint/handler"
 	"github.com/fengyfei/hypercube/access/rpc"
-	"github.com/fengyfei/hypercube/libs/session"
+	"github.com/fengyfei/hypercube/libs/conn"
 	"github.com/fengyfei/hypercube/libs/log"
 	"github.com/fengyfei/hypercube/libs/message"
 	"github.com/fengyfei/hypercube/libs/metrics/prometheus"
+	"github.com/fengyfei/hypercube/libs/session"
 )
 
 // HTTPServer represents the http server accepts the client websocket connections.
@@ -103,17 +103,14 @@ func (server *HTTPServer) serve() echo.HandlerFunc {
 			return err
 		}
 
-		claim := c.Get("user")
-		if claim == nil {
-			log.Logger.Error("Get Claim Error: %v", err)
+		u, err := handler.GetUser(c)
+		if err != nil {
 			return err
 		}
 
-		user := message.User{
-			UserID: handler.GetUser(claim.(*jwt.Token)),
-		}
+		user := u.(*message.User)
 
-		err = server.NewClient(ws, &user, server.node.clientHub(), session.NewSession(ws, &user, server.node, server.node.Conf.QueueBuffer))
+		err = server.NewClient(ws, user, server.node.clientHub(), session.NewSession(ws, user, server.node, server.node.Conf.QueueBuffer))
 		if err != nil {
 			log.Logger.Error("HTTPServer NewClient Error: %v", err)
 		}

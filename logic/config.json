@@ -4,7 +4,7 @@
   "serverAddrs": "10.0.0.116:7006",
 
   "monitor": {
-    "pprofAddrs": "localhost:6060",
+    "pprofAddrs": "10.0.0.116:6060",
     "prometheusPort": ":9400"
   }
 }
