@@ -35,10 +35,10 @@ import (
 
 	"github.com/fengyfei/hypercube/access/config"
 	"github.com/fengyfei/hypercube/access/rpc"
-	"github.com/fengyfei/hypercube/libs/session"
 	"github.com/fengyfei/hypercube/libs/log"
 	msg "github.com/fengyfei/hypercube/libs/message"
 	"github.com/fengyfei/hypercube/libs/metrics/prometheus"
+	"github.com/fengyfei/hypercube/libs/session"
 	"strings"
 )
 
@@ -124,6 +124,7 @@ func (client *Client) HandleLogoutMessage(message *msg.Message) error {
 		return err
 
 	}
+
 	err = RpcClient.Call("LogicRPC.LogoutHandle", userEntry, &reply)
 	if err != nil {
 		log.Logger.Error("LogicRPC.LogoutHandle Error: %v", err)

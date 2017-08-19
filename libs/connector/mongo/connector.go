@@ -79,7 +79,7 @@ func (mongo *MgoConnector) Initialize() error {
 
 	RefChat = mongo.session.DB(dbName).C(collectionName)
 	nameIndex := mgo.Index{
-		Key:        []string{"From"},
+		Key:        []string{"from"},
 		Unique:     false,
 		DropDups:   true,
 		Background: true,
@@ -118,15 +118,15 @@ func (mongo *MgoConnector) Put(msg *message.Message, status int) error {
 func (mongo *MgoConnector) Get(id string, status int) ([]Message, error) {
 	var all []Message
 
-	filter := bson.M{"To": id, "Status": status}
+	filter := bson.M{"to": id, "status": status}
 	err := refresh.GetMany(mongo.session, RefChat, filter, &all)
 
 	return all, err
 }
 
 func (mongo *MgoConnector) Update(id string, status int) error {
-	filter := bson.M{"_id": bson.ObjectIdHex(id), "Status": status}
-	updater := bson.M{"$set": bson.M{"Status": message.MessageSent}}
+	filter := bson.M{"_id": bson.ObjectIdHex(id), "status": status}
+	updater := bson.M{"$set": bson.M{"status": message.MessageSent}}
 
 	return refresh.Update(mongo.session, RefChat, filter, updater)
 }
