@@ -159,9 +159,11 @@ func TransmitMsg(msg *message.Message) int {
 
 			return message.MessageUnsent
 		}
+
+		return message.MessageSent
 	}
 
-	return message.MessageSent
+	return message.MessageUnsent
 }
 
 func HandlePlainText(msg *message.Message, status int) {
