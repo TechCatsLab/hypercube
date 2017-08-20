@@ -165,7 +165,7 @@ func (server *HTTPServer) NewClient(ws *websocket.Conn, user *message.User, hub 
 func (server *HTTPServer) ReadMessage(ws *websocket.Conn, client *conn.Client, user *message.User) error {
 	var msg message.Message
 
-	defer server.deferExec(user, client)
+	defer server.removeUser(user, client)
 
 	for {
 		if err := ws.ReadJSON(&msg); err != nil {
@@ -182,7 +182,7 @@ func (server *HTTPServer) ReadMessage(ws *websocket.Conn, client *conn.Client, u
 	}
 }
 
-func (server *HTTPServer) deferExec(user *message.User, client *conn.Client) {
+func (server *HTTPServer) removeUser(user *message.User, client *conn.Client) {
 	var (
 		userEntry = message.UserEntry{
 			UserID:   *user,
