@@ -103,25 +103,30 @@ func (server *HTTPServer) serve() echo.HandlerFunc {
 			return err
 		}
 
-		u, err := handler.GetUser(c)
+		user, err := handler.GetUser(c)
 		if err != nil {
 			return err
 		}
 
-		user := u.(*message.User)
-
-		err = server.NewClient(ws, user, server.node.clientHub(), session.NewSession(ws, user, server.node, server.node.Conf.QueueBuffer))
+		client, err := server.NewClient(ws, user, server.node.clientHub(), session.NewSession(ws, user, server.node, server.node.Conf.QueueBuffer))
 		if err != nil {
 			log.Logger.Error("HTTPServer NewClient Error: %v", err)
+
+			return err
+		}
+
+		err = server.ReadMessage(ws, client, user)
+		if err != nil {
+			log.Logger.Error("server ReadMessage Error: %v", err)
+			return err
 		}
 
 		return nil
 	}
 }
 
-func (server *HTTPServer) NewClient(ws *websocket.Conn, user *message.User, hub *conn.ClientHub, session *session.Session) error {
+func (server *HTTPServer) NewClient(ws *websocket.Conn, user *message.User, hub *conn.ClientHub, session *session.Session) (*conn.Client, error) {
 	var (
-		msg       message.Message
 		err       error
 		reply     int
 		userEntry message.UserEntry
@@ -137,14 +142,16 @@ func (server *HTTPServer) NewClient(ws *websocket.Conn, user *message.User, hub 
 
 	RpcClient, err := rpc.RpcClients.Get(server.node.Conf.LogicAddrs)
 	if err != nil || RpcClient == nil {
+		client.Close()
 		log.Logger.Error("Get RpcClients Error: %v", err)
-		return err
+		return nil, err
 	}
 
 	err = RpcClient.Call("LogicRPC.LoginHandler", userEntry, &reply)
 	if err != nil {
+		client.Close()
 		log.Logger.Error("LogicRPC.LoginHandler Error: %v", err)
-		return err
+		return nil, err
 	}
 
 	hub.Add(user, client)
@@ -152,17 +159,23 @@ func (server *HTTPServer) NewClient(ws *websocket.Conn, user *message.User, hub 
 
 	log.Logger.Info("Endpoint info: ", server.node.Snapshot())
 
+	return client, nil
+}
+
+func (server *HTTPServer) ReadMessage(ws *websocket.Conn, client *conn.Client, user *message.User) error {
+	var msg message.Message
+
+	defer server.deferExec(user, client)
+
 	for {
-		if err = ws.ReadJSON(&msg); err != nil {
+		if err := ws.ReadJSON(&msg); err != nil {
 			log.Logger.Error("ReadMessage Error: %v", err)
-			server.deferExec(user, client)
 			return err
 		} else {
 			prometheus.ReceiveMessageCounter.Add(1)
 			err = client.Handle(&msg)
 			if err != nil {
 				log.Logger.Error("Handle Message Error: %v", err)
-				server.deferExec(user, client)
 				return err
 			}
 		}
@@ -179,6 +192,7 @@ func (server *HTTPServer) deferExec(user *message.User, client *conn.Client) {
 	)
 
 	server.node.clientHub().Remove(user)
+	client.Close()
 	prometheus.OnlineUserCounter.Desc()
 	log.Logger.Info("Endpoint info: ", server.node.Snapshot())
 

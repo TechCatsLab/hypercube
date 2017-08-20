@@ -39,7 +39,7 @@ import (
 	"github.com/labstack/echo"
 )
 
-func GetUser(c echo.Context) (interface{}, error ){
+func GetUser(c echo.Context) (*message.User, error ){
 	var u message.User
 
 	claim := c.Get("user")
