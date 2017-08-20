@@ -55,7 +55,7 @@ func NewEndpoint(conf *config.NodeConfig) *Endpoint {
 
 	ep = &Endpoint{
 		Conf:     conf,
-		hub:      conn.NewClientHub(),
+		hub:      conn.NewClientHub(conf.QueueBuffer),
 		shutdown: make(chan struct{}),
 	}
 	ep.ws = NewHTTPServer(ep)

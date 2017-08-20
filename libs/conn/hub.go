@@ -41,14 +41,20 @@ import (
 // ClientHub represents a collection of client sessions.
 type ClientHub struct {
 	mux     sync.Mutex
+	mq      *MessageQueue
 	clients map[string]*Client
 }
 
 // NewClientHub creates a client hub.
-func NewClientHub() *ClientHub {
+func NewClientHub(buffSize int) *ClientHub {
 	return &ClientHub{
 		clients: map[string]*Client{},
+		mq:      NewMessageQueue(buffSize),
 	}
+}
+
+func (hub *ClientHub) Mq() *MessageQueue {
+	return hub.mq
 }
 
 // Add a client connection

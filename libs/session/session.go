@@ -43,21 +43,21 @@ import (
 
 // Session represents a client connection.
 type Session struct {
-	user     *message.User
-	sender   sender.Sender
-	mq       *MessageQueue
-	ws       *websocket.Conn
-	shutdown chan struct{}
+	user       *message.User
+	msgHandler sender.MsgHandler
+	sender     sender.Sender
+	ws         *websocket.Conn
+	shutdown   chan struct{}
 }
 
 // NewSession creates a session.
-func NewSession(ws *websocket.Conn, user *message.User, sender sender.Sender, buffSize int) *Session {
+func NewSession(ws *websocket.Conn, user *message.User, sender sender.Sender, msgHandler sender.MsgHandler) *Session {
 	session := &Session{
-		mq:       NewMessageQueue(buffSize),
-		ws:       ws,
-		user:     user,
-		sender:   sender,
-		shutdown: make(chan struct{}),
+		ws:         ws,
+		user:       user,
+		msgHandler: msgHandler,
+		sender:     sender,
+		shutdown:   make(chan struct{}),
 	}
 
 	return session
@@ -65,7 +65,7 @@ func NewSession(ws *websocket.Conn, user *message.User, sender sender.Sender, bu
 
 // PushMessage push message to queue.
 func (s *Session) PushMessage(msg *message.Message) {
-	s.mq.PushMessage(msg)
+	s.msgHandler.PushMessage(msg)
 }
 
 // StartMessageLoop start to handle message loop.
@@ -73,7 +73,7 @@ func (s *Session) StartMessageLoop() {
 	go func() {
 		for {
 			select {
-			case msg := <-s.mq.FetchMessage():
+			case msg := <-s.msgHandler.FetchMessage():
 				s.HandleMessage(msg)
 			case <-s.shutdown:
 				return

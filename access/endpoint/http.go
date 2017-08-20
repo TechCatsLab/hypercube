@@ -108,7 +108,7 @@ func (server *HTTPServer) serve() echo.HandlerFunc {
 			return err
 		}
 
-		client, err := server.NewClient(ws, user, server.node.clientHub(), session.NewSession(ws, user, server.node, server.node.Conf.QueueBuffer))
+		client, err := server.NewClient(ws, user, server.node.clientHub(), session.NewSession(ws, user, server.node, server.node.hub.Mq()))
 		if err != nil {
 			log.Logger.Error("HTTPServer NewClient Error: %v", err)
 

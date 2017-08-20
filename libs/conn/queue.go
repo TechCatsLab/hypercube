@@ -28,7 +28,7 @@
  *     Initial: 2017/07/07        Liu  Jiachang
  */
 
-package session
+package conn
 
 import (
 	"github.com/fengyfei/hypercube/libs/message"

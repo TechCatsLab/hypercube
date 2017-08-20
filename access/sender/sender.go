@@ -36,3 +36,8 @@ import (
 type Sender interface {
 	Send(user *message.User, msg *message.Message)
 }
+
+type MsgHandler interface {
+	PushMessage(msg *message.Message)
+	FetchMessage() <-chan *message.Message
+}
