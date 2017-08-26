@@ -46,13 +46,13 @@ var (
 
 func initOnline() {
 	onLineUserMag = &UserManager{
-		users: make(map[message.User]*message.Access),
+		users: sync.Map{},
 	}
 }
 
 type UserManager struct {
 	mux   sync.Mutex
-	users map[message.User]*message.Access
+	users sync.Map
 }
 
 func (this *UserManager) Add(user message.UserEntry) error {
@@ -60,11 +60,11 @@ func (this *UserManager) Add(user message.UserEntry) error {
 		this.mux.Lock()
 		defer this.mux.Unlock()
 
-		if _, exists := this.users[user.UserID]; exists {
+		if _, exists := this.users.Load(user.UserID); exists {
 			log.Logger.Warn("user already login!")
 		}
 
-		this.users[user.UserID] = &user.ServerIP
+		this.users.Store(user.UserID, &user.ServerIP)
 		return nil
 	}
 
@@ -76,11 +76,11 @@ func (this *UserManager) Remove(user message.UserEntry) error {
 		this.mux.Lock()
 		defer this.mux.Unlock()
 
-		if _, exists := this.users[user.UserID]; !exists {
+		if _, exists := this.users.Load(user.UserID); !exists {
 			log.Logger.Warn("user hasn't login!")
 		}
 
-		delete(this.users, user.UserID)
+		this.users.Delete(user.UserID)
 		return nil
 	}
 
@@ -91,9 +91,12 @@ func (this *UserManager) Query(user message.User) (*message.Access, bool) {
 	this.mux.Lock()
 	defer this.mux.Unlock()
 
-	serverIP, ok := this.users[user]
+	serverIP, ok := this.users.Load(user)
+	if ok == false {
+		return nil, ok
+	}
 
-	return serverIP, ok
+	return serverIP.(*message.Access), ok
 }
 
 func (this *UserManager) PrintDebugInfo() {

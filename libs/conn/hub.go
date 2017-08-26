@@ -40,15 +40,14 @@ import (
 
 // ClientHub represents a collection of client sessions.
 type ClientHub struct {
-	mux     sync.Mutex
 	mq      *MessageQueue
-	clients map[string]*Client
+	clients sync.Map
 }
 
 // NewClientHub creates a client hub.
 func NewClientHub(buffSize int) *ClientHub {
 	return &ClientHub{
-		clients: map[string]*Client{},
+		clients: sync.Map{},
 		mq:      NewMessageQueue(buffSize),
 	}
 }
@@ -59,46 +58,38 @@ func (hub *ClientHub) Mq() *MessageQueue {
 
 // Add a client connection
 func (hub *ClientHub) Add(user *message.User, client *Client) {
-	hub.mux.Lock()
-	defer hub.mux.Unlock()
-
-	if _, exists := hub.clients[user.UserID]; exists {
+	if _, exists := hub.clients.Load(user.UserID); exists {
 		log.Logger.Warn("user already login!")
 	}
 
-	hub.clients[user.UserID] = client
+	hub.clients.Store(user.UserID, client)
 }
 
 // Remove a client connection
 func (hub *ClientHub) Remove(user *message.User) {
-	hub.mux.Lock()
-	defer hub.mux.Unlock()
-
-	if _, exists := hub.clients[user.UserID]; !exists {
+	if _, exists := hub.clients.Load(user.UserID); !exists {
 		log.Logger.Warn("user hasn't login!")
 		return
 	}
 
-	delete(hub.clients, user.UserID)
+	hub.clients.Delete(user.UserID)
 }
 
 // Get a client by user
 func (hub *ClientHub) Get(user string) (*Client, bool) {
-	hub.mux.Lock()
-	defer hub.mux.Unlock()
+	client, ok := hub.clients.Load(user)
+	if ok == false {
+		return nil, ok
+	}
 
-	client, ok := hub.clients[user]
-
-	return client, ok
+	return client.(*Client), ok
 }
 
 func (hub *ClientHub) PushMessageToAll(msg *message.Message) {
-	hub.mux.Lock()
-	defer hub.mux.Unlock()
-
-	for _, c := range hub.clients {
-		c.session.PushMessage(msg)
-	}
+	hub.clients.Range(func(key, value interface{}) bool {
+		value.(*Client).session.PushMessage(msg)
+		return true
+	})
 }
 
 func (hub *ClientHub) Send(user *message.User, msg *message.Message) error {
@@ -116,12 +107,10 @@ func (hub *ClientHub) Send(user *message.User, msg *message.Message) error {
 func (hub *ClientHub) GetAllUser() []*Client {
 	var clients []*Client
 
-	hub.mux.Lock()
-	defer hub.mux.Unlock()
-
-	for _, c := range hub.clients {
-		clients = append(clients, c)
-	}
+	hub.clients.Range(func(key, value interface{}) bool {
+		clients = append(clients, value.(*Client))
+		return true
+	})
 
 	return clients
 }
