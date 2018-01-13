@@ -34,8 +34,8 @@ import (
 
 	"github.com/dgrijalva/jwt-go"
 
-	"github.com/fengyfei/hypercube/libs/log"
-	"github.com/fengyfei/hypercube/libs/message"
+	"github.com/TechCatsLab/hypercube/libs/log"
+	"github.com/TechCatsLab/hypercube/libs/message"
 	"github.com/labstack/echo"
 )
 

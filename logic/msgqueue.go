@@ -35,11 +35,11 @@ import (
 
 	"gopkg.in/mgo.v2"
 
-	"github.com/fengyfei/hypercube/libs/connector"
-	"github.com/fengyfei/hypercube/libs/connector/mongo"
-	"github.com/fengyfei/hypercube/libs/log"
-	"github.com/fengyfei/hypercube/libs/message"
-	rp "github.com/fengyfei/hypercube/libs/rpc"
+	"github.com/TechCatsLab/hypercube/libs/connector"
+	"github.com/TechCatsLab/hypercube/libs/connector/mongo"
+	"github.com/TechCatsLab/hypercube/libs/log"
+	"github.com/TechCatsLab/hypercube/libs/message"
+	rp "github.com/TechCatsLab/hypercube/libs/rpc"
 )
 
 type OfflineMessage chan message.UserEntry

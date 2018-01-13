@@ -30,8 +30,8 @@
 package connector
 
 import (
-	"github.com/fengyfei/hypercube/libs/connector/mongo"
-	"github.com/fengyfei/hypercube/libs/message"
+	"github.com/TechCatsLab/hypercube/libs/connector/mongo"
+	"github.com/TechCatsLab/hypercube/libs/message"
 )
 
 type Connector interface {

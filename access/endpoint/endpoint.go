@@ -33,10 +33,10 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/fengyfei/hypercube/access/config"
-	"github.com/fengyfei/hypercube/libs/conn"
-	"github.com/fengyfei/hypercube/libs/log"
-	"github.com/fengyfei/hypercube/libs/message"
+	"github.com/TechCatsLab/hypercube/access/config"
+	"github.com/TechCatsLab/hypercube/libs/conn"
+	"github.com/TechCatsLab/hypercube/libs/log"
+	"github.com/TechCatsLab/hypercube/libs/message"
 )
 
 // Endpoint represents a access server.

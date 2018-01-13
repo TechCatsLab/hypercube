@@ -31,9 +31,9 @@
 package main
 
 import (
-	"github.com/fengyfei/hypercube/libs/log"
-	"github.com/fengyfei/hypercube/libs/message"
-	"github.com/fengyfei/hypercube/libs/rpc"
+	"github.com/TechCatsLab/hypercube/libs/log"
+	"github.com/TechCatsLab/hypercube/libs/message"
+	"github.com/TechCatsLab/hypercube/libs/rpc"
 )
 
 const RPCNumber = 10

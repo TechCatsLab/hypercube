@@ -33,12 +33,12 @@ package conn
 import (
 	"encoding/json"
 
-	"github.com/fengyfei/hypercube/access/config"
-	"github.com/fengyfei/hypercube/access/rpc"
-	"github.com/fengyfei/hypercube/libs/log"
-	msg "github.com/fengyfei/hypercube/libs/message"
-	"github.com/fengyfei/hypercube/libs/metrics/prometheus"
-	"github.com/fengyfei/hypercube/libs/session"
+	"github.com/TechCatsLab/hypercube/access/config"
+	"github.com/TechCatsLab/hypercube/access/rpc"
+	"github.com/TechCatsLab/hypercube/libs/log"
+	msg "github.com/TechCatsLab/hypercube/libs/message"
+	"github.com/TechCatsLab/hypercube/libs/metrics/prometheus"
+	"github.com/TechCatsLab/hypercube/libs/session"
 	"strings"
 )
 

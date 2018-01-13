@@ -31,7 +31,7 @@
 package config
 
 import (
-	"github.com/fengyfei/hypercube/libs/log"
+	"github.com/TechCatsLab/hypercube/libs/log"
 
 	"github.com/spf13/viper"
 )

@@ -30,7 +30,7 @@
 package sender
 
 import (
-	"github.com/fengyfei/hypercube/libs/message"
+	"github.com/TechCatsLab/hypercube/libs/message"
 )
 
 type Sender interface {

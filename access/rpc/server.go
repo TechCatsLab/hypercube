@@ -34,8 +34,8 @@ import (
 	"net"
 	"net/rpc"
 
-	"github.com/fengyfei/hypercube/access/config"
-	"github.com/fengyfei/hypercube/libs/log"
+	"github.com/TechCatsLab/hypercube/access/config"
+	"github.com/TechCatsLab/hypercube/libs/log"
 )
 
 // InitServer initialize the RPC server.

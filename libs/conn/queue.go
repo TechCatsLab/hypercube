@@ -31,7 +31,7 @@
 package conn
 
 import (
-	"github.com/fengyfei/hypercube/libs/message"
+	"github.com/TechCatsLab/hypercube/libs/message"
 )
 
 // MessageQueue buffers the message from or to a client.

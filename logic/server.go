@@ -33,9 +33,9 @@ import (
 	"net"
 	"net/rpc"
 
-	"github.com/fengyfei/hypercube/libs/log"
-	"github.com/fengyfei/hypercube/libs/message"
-	rp "github.com/fengyfei/hypercube/libs/rpc"
+	"github.com/TechCatsLab/hypercube/libs/log"
+	"github.com/TechCatsLab/hypercube/libs/message"
+	rp "github.com/TechCatsLab/hypercube/libs/rpc"
 )
 
 func initServer() {
