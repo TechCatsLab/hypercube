@@ -58,7 +58,7 @@ type Message struct {
 const (
 	dbName         = "chat"
 	collectionName = "message"
-	mgoUrl         = "10.0.0.251:27067"
+	mgoUrl         = "127.0.0.1:27017"
 )
 
 var (
