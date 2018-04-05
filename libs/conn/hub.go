@@ -78,11 +78,11 @@ func (hub *ClientHub) Remove(user *message.User) {
 // Get a client by user
 func (hub *ClientHub) Get(user string) (*Client, bool) {
 	client, ok := hub.clients.Load(user)
-	if ok == false {
-		return nil, ok
+	if !ok {
+		return nil, false
 	}
 
-	return client.(*Client), ok
+	return client.(*Client), true
 }
 
 func (hub *ClientHub) PushMessageToAll(msg *message.Message) {

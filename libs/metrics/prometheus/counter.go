@@ -45,7 +45,7 @@ var (
 	})
 
 	ReceiveMessageCounter = prometheus.NewCounter(prometheus.CounterOpts{
-		Name: "resiveMessage",
-		Help: "Number of resiveMessage",
+		Name: "receiveMessage",
+		Help: "Number of receiveMessage",
 	})
 )

@@ -55,7 +55,7 @@ func initPrometheus() {
 
 	err = prometheus.Register(pro.ReceiveMessageCounter)
 	if err != nil {
-		log.Logger.Error("resiveMessage counter couldn't be registered AGAIN, no counting will happen:", err)
+		log.Logger.Error("receiveMessage counter couldn't be registered AGAIN, no counting will happen:", err)
 		return
 	}
 
