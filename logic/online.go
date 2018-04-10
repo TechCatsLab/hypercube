@@ -51,15 +51,11 @@ func initOnline() {
 }
 
 type UserManager struct {
-	mux   sync.Mutex
 	users sync.Map
 }
 
 func (this *UserManager) Add(user message.UserEntry) error {
 	if user.ServerIP.ServerIP != "" && user.UserID.UserID != "" {
-		this.mux.Lock()
-		defer this.mux.Unlock()
-
 		if _, exists := this.users.Load(user.UserID); exists {
 			log.Logger.Warn("user already login!")
 		}
@@ -73,9 +69,6 @@ func (this *UserManager) Add(user message.UserEntry) error {
 
 func (this *UserManager) Remove(user message.UserEntry) error {
 	if user.ServerIP.ServerIP != "" && user.UserID.UserID != "" {
-		this.mux.Lock()
-		defer this.mux.Unlock()
-
 		if _, exists := this.users.Load(user.UserID); !exists {
 			log.Logger.Warn("user hasn't login!")
 		}
@@ -88,9 +81,6 @@ func (this *UserManager) Remove(user message.UserEntry) error {
 }
 
 func (this *UserManager) Query(user message.User) (*message.Access, bool) {
-	this.mux.Lock()
-	defer this.mux.Unlock()
-
 	serverIP, ok := this.users.Load(user)
 	if !ok {
 		return nil, false
