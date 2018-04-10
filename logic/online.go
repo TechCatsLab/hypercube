@@ -39,13 +39,13 @@ import (
 )
 
 var (
-	onLineUserMag *UserManager
+	onlineUserManager *UserManager
 
 	ParamErr = errors.New("The Parametric error!")
 )
 
 func initOnline() {
-	onLineUserMag = &UserManager{
+	onlineUserManager = &UserManager{
 		users: sync.Map{},
 	}
 }
@@ -56,7 +56,7 @@ type UserManager struct {
 }
 
 func (this *UserManager) Add(user message.UserEntry) error {
-	if user.ServerIP.ServerIp != "" && user.UserID.UserID != "" {
+	if user.ServerIP.ServerIP != "" && user.UserID.UserID != "" {
 		this.mux.Lock()
 		defer this.mux.Unlock()
 
@@ -72,7 +72,7 @@ func (this *UserManager) Add(user message.UserEntry) error {
 }
 
 func (this *UserManager) Remove(user message.UserEntry) error {
-	if user.ServerIP.ServerIp != "" && user.UserID.UserID != "" {
+	if user.ServerIP.ServerIP != "" && user.UserID.UserID != "" {
 		this.mux.Lock()
 		defer this.mux.Unlock()
 
@@ -92,11 +92,11 @@ func (this *UserManager) Query(user message.User) (*message.Access, bool) {
 	defer this.mux.Unlock()
 
 	serverIP, ok := this.users.Load(user)
-	if ok == false {
-		return nil, ok
+	if !ok {
+		return nil, false
 	}
 
-	return serverIP.(*message.Access), ok
+	return serverIP.(*message.Access), true
 }
 
 func (this *UserManager) PrintDebugInfo() {

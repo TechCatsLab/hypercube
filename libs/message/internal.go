@@ -35,7 +35,7 @@ type User struct {
 }
 
 type Access struct {
-	ServerIp string
+	ServerIP string
 }
 
 type UserEntry struct {

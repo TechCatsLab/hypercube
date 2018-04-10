@@ -31,7 +31,7 @@
 package main
 
 func main() {
-	go clients.Ping("AccessRPC.Ping")
+	go rpcClients.Ping("AccessRPC.Ping")
 	initServer()
 
 	sigHandler.Wait()

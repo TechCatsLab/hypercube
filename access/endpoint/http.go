@@ -108,7 +108,7 @@ func (server *HTTPServer) serve() echo.HandlerFunc {
 			return err
 		}
 
-		client, err := server.NewClient(ws, user, server.node.clientHub(), session.NewSession(ws, user, server.node, server.node.hub.Mq()))
+		client, err := server.NewClient(user, server.node.clientHub(), session.NewSession(ws, user, server.node, server.node.hub.Mq()))
 		if err != nil {
 			log.Logger.Error("HTTPServer NewClient Error: %v", err)
 
@@ -125,7 +125,7 @@ func (server *HTTPServer) serve() echo.HandlerFunc {
 	}
 }
 
-func (server *HTTPServer) NewClient(ws *websocket.Conn, user *message.User, hub *conn.ClientHub, session *session.Session) (*conn.Client, error) {
+func (server *HTTPServer) NewClient(user *message.User, hub *conn.ClientHub, session *session.Session) (*conn.Client, error) {
 	var (
 		err       error
 		reply     int
@@ -137,17 +137,17 @@ func (server *HTTPServer) NewClient(ws *websocket.Conn, user *message.User, hub 
 
 	userEntry = message.UserEntry{
 		UserID:   *user,
-		ServerIP: message.Access{ServerIp: server.node.Conf.Address},
+		ServerIP: message.Access{ServerIP: server.node.Conf.Address},
 	}
 
-	RpcClient, err := rpc.RpcClients.Get(server.node.Conf.LogicAddrs)
-	if err != nil || RpcClient == nil {
+	rpcClient, err := rpc.RpcClients.Get(server.node.Conf.LogicAddrs)
+	if err != nil || rpcClient == nil {
 		client.Close()
-		log.Logger.Error("Get RpcClients Error: %v", err)
+		log.Logger.Error("Get rpcClients Error: %v", err)
 		return nil, err
 	}
 
-	err = RpcClient.Call("LogicRPC.LoginHandler", userEntry, &reply)
+	err = rpcClient.Call("LogicRPC.LoginHandler", userEntry, &reply)
 	if err != nil {
 		client.Close()
 		log.Logger.Error("LogicRPC.LoginHandler Error: %v", err)
@@ -186,7 +186,7 @@ func (server *HTTPServer) removeUser(user *message.User, client *conn.Client) {
 	var (
 		userEntry = message.UserEntry{
 			UserID:   *user,
-			ServerIP: message.Access{ServerIp: server.node.Conf.Addrs},
+			ServerIP: message.Access{ServerIP: server.node.Conf.Addrs},
 		}
 		reply int
 	)

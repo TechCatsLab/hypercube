@@ -44,7 +44,7 @@ func GetUser(c echo.Context) (*message.User, error ){
 
 	claim := c.Get("user")
 	if claim == nil {
-		err := errors.New("Have No Claim")
+		err := errors.New("have no claim")
 		log.Logger.Error("Get Claim Error: %v", err)
 		return nil, err
 	}

@@ -54,7 +54,6 @@ var (
 func initQueue() {
 	Queue = make(chan *message.Message, 100)
 	Shutdown = make(chan struct{})
-
 	offline = make(chan message.UserEntry)
 
 	conn.Initialize()
@@ -79,18 +78,18 @@ func QueueStart() {
 }
 
 func OfflineMessageHandler(user message.UserEntry) error {
-	mes, err := conn.Get(user.UserID.UserID, message.MessageUnsent)
+	messages, err := conn.Get(user.UserID.UserID, message.MessageUnsent)
 	if err != nil {
 		if err == mgo.ErrNotFound {
 			log.Logger.Debug("User doesn't have offline messages!")
-			goto Mess
+			return nil
 		}
 
 		log.Logger.Error("GetOffLineMessage Error %v", err)
 		return err
 	}
-Mess:
-	for _, msg := range mes {
+
+	for _, msg := range messages {
 		switch msg.Type {
 		case message.MessageTypePlainText, message.MessageTypeEmotion:
 			content := message.PlainText{
@@ -101,18 +100,18 @@ Mess:
 
 			text, err := json.Marshal(content)
 			if err != nil {
-				log.Logger.Error("OffLineMessage Marshal Error %v", err)
+				log.Logger.Error("OfflineMessage Marshal Error %v", err)
 				return err
 			}
 
-			mesg := &message.Message{
+			m := &message.Message{
 				Type:    msg.Type,
 				Content: text,
 			}
 
 			id := msg.Messageid
-			flag := TransmitMsg(mesg)
-			if flag == message.MessageSent {
+			status := TransmitMsg(m)
+			if status == message.MessageSent {
 				err = conn.Update(id.Hex(), message.MessageUnsent)
 				if err != nil {
 					log.Logger.Error("ModifyMessageStatus error:", err)
@@ -128,32 +127,32 @@ Mess:
 func HandleMessage(msg *message.Message) {
 	switch msg.Type {
 	case message.MessageTypePlainText, message.MessageTypeEmotion:
-		flag := TransmitMsg(msg)
+		status := TransmitMsg(msg)
 
-		HandlePlainText(msg, flag)
+		HandlePlainText(msg, status)
 	default:
 		log.Logger.Debug("Not recognized message type!")
 	}
 }
 
 func TransmitMsg(msg *message.Message) int {
-	var plainUser message.PlainText
+	var plainText message.PlainText
 
-	err := json.Unmarshal(msg.Content, &plainUser)
+	err := json.Unmarshal(msg.Content, &plainText)
 	if err != nil {
 		log.Logger.Error("TransmitMsg Unmarshal Error %v", err)
 
 		return message.MessageUnsent
 	}
 
-	serveIp, flag := onLineUserMag.Query(plainUser.To)
-	if flag {
+	serverIP, isOnline := onlineUserManager.Query(plainText.To)
+	if isOnline {
 		op := rp.Options{
 			Proto: "tcp",
-			Addr:  serveIp.ServerIp,
+			Addr:  serverIP.ServerIP,
 		}
 
-		err := Send(plainUser.To, *msg, op)
+		err := Send(plainText.To, *msg, op)
 		if err != nil {
 			log.Logger.Error("TransmitMsg Send Error %v", err)
 
@@ -171,8 +170,9 @@ func HandlePlainText(msg *message.Message, status int) {
 
 	if err != nil {
 		log.Logger.Error("Insert into message error:", err)
-		Queue <- msg
 
+		// TODO: 消息已经发送成功，这里只是存入数据库时失败。
+		// TODO：解决思路：先把未存入数据库的消息放入缓存，再统一存入数据库。
 		return
 	}
 }

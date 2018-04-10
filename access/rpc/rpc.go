@@ -69,7 +69,6 @@ func (access *AccessRPC) Ping(req *rpc.ReqKeepAlive, resp *rpc.RespKeepAlive) er
 
 // Send send a message to a specific user.
 func (access *AccessRPC) Send(args *message.Args, reply *bool) error {
-
 	RPCServer.Node.Send(&args.User, &args.Message)
 	*reply = true
 

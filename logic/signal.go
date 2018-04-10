@@ -59,7 +59,7 @@ func finalHandler(sig os.Signal) {
 	case syscall.SIGALRM:
 		log.Logger.Info("Signal alrm captured")
 
-		onLineUserMag.PrintDebugInfo()
+		onlineUserManager.PrintDebugInfo()
 		return
 	}
 }

@@ -42,8 +42,8 @@ type LogicRPC struct {
 }
 
 var (
-	options []rpc.Options
-	clients *rpc.Clients
+	options    []rpc.Options
+	rpcClients *rpc.Clients
 )
 
 func initRPC() {
@@ -58,11 +58,11 @@ func initRPC() {
 		}
 	}
 
-	clients = rpc.Dials(options)
+	rpcClients = rpc.Dials(options)
 }
 
-func (this *LogicRPC) LoginHandler(user message.UserEntry, reply *int) error {
-	err := onLineUserMag.Add(user)
+func (lr *LogicRPC) LoginHandler(user message.UserEntry, reply *int) error {
+	err := onlineUserManager.Add(user)
 	if err != nil {
 		log.Logger.Error("LoginHandle Add Error %+v: ", err)
 		*reply = message.ReplyFailed
@@ -74,8 +74,8 @@ func (this *LogicRPC) LoginHandler(user message.UserEntry, reply *int) error {
 	return nil
 }
 
-func (this *LogicRPC) LogoutHandle(user message.UserEntry, reply *int) error {
-	err := onLineUserMag.Remove(user)
+func (lr *LogicRPC) LogoutHandle(user message.UserEntry, reply *int) error {
+	err := onlineUserManager.Remove(user)
 	if err != nil {
 		log.Logger.Error("LogoutHandle Error %v", err)
 		*reply = message.ReplyFailed
@@ -86,13 +86,13 @@ func (this *LogicRPC) LogoutHandle(user message.UserEntry, reply *int) error {
 	return nil
 }
 
-func (m *LogicRPC) Add(msg *message.Message, reply *bool) error {
+func (lr *LogicRPC) Add(msg *message.Message, reply *bool) error {
 	Queue <- msg
 	*reply = true
 
 	return nil
 }
 
-func (access *LogicRPC) Ping(req *rpc.ReqKeepAlive, resp *rpc.RespKeepAlive) error {
+func (lr *LogicRPC) Ping(req *rpc.ReqKeepAlive, resp *rpc.RespKeepAlive) error {
 	return nil
 }
