@@ -1,10 +1,10 @@
 {
   "accessAddrs": ["127.0.0.1:1234"],
 
-  "serverAddrs": "127.0.0.1:7006",
+  "serverAddr": "127.0.0.1:7006",
 
   "monitor": {
-    "pprofAddrs": "127.0.0.1:6061",
+    "pprofAddr": "127.0.0.1:6061",
     "prometheusPort": ":9400"
   }
 }

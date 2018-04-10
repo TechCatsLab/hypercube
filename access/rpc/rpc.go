@@ -46,7 +46,7 @@ func InitRPC() {
 	RPCServer = new(AccessRPC)
 	op := rpc.Options{
 		Proto: "tcp",
-		Addr:  config.GNodeConfig.LogicAddrs,
+		Addr:  config.GNodeConfig.LogicAddr,
 	}
 	options := make([]rpc.Options, RPCNumber)
 

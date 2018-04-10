@@ -46,14 +46,14 @@ func initServer() {
 }
 
 func rpcListen() {
-	l, err := net.Listen("tcp", configuration.Addrs)
+	l, err := net.Listen("tcp", configuration.Addr)
 	if err != nil {
-		log.Logger.Error("net.Listen(\"%s\", \"%s\") error(%v)"+"tcp"+configuration.Addrs, err)
+		log.Logger.Error("net.Listen(\"%s\", \"%s\") error(%v)"+"tcp"+configuration.Addr, err)
 		panic(err)
 	}
 
 	defer func() {
-		log.Logger.Info("listen rpc: \"%s\" close", configuration.Addrs)
+		log.Logger.Info("listen rpc: \"%s\" close", configuration.Addr)
 		if err := l.Close(); err != nil {
 			log.Logger.Error("listener.Close() error(%v)", err)
 		}

@@ -36,6 +36,6 @@ import (
 
 func HttpPprof() {
 	go func() {
-		log.Println(http.ListenAndServe(configuration.PprofAddrs, nil))
+		log.Println(http.ListenAndServe(configuration.PprofAddr, nil))
 	}()
 }

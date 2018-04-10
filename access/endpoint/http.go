@@ -137,10 +137,10 @@ func (server *HTTPServer) NewClient(user *message.User, hub *conn.ClientHub, ses
 
 	userEntry = message.UserEntry{
 		UserID:   *user,
-		ServerIP: message.Access{ServerIP: server.node.Conf.Address},
+		ServerIP: message.Access{ServerIP: server.node.Conf.RPCAddr},
 	}
 
-	rpcClient, err := rpc.RpcClients.Get(server.node.Conf.LogicAddrs)
+	rpcClient, err := rpc.RpcClients.Get(server.node.Conf.LogicAddr)
 	if err != nil || rpcClient == nil {
 		client.Close()
 		log.Logger.Error("Get rpcClients Error: %v", err)
@@ -186,7 +186,7 @@ func (server *HTTPServer) removeUser(user *message.User, client *conn.Client) {
 	var (
 		userEntry = message.UserEntry{
 			UserID:   *user,
-			ServerIP: message.Access{ServerIP: server.node.Conf.Addrs},
+			ServerIP: message.Access{ServerIP: server.node.Conf.ServerAddr},
 		}
 		reply int
 	)
@@ -196,7 +196,7 @@ func (server *HTTPServer) removeUser(user *message.User, client *conn.Client) {
 	prometheus.OnlineUserCounter.Desc()
 	log.Logger.Info("Endpoint info: ", server.node.Snapshot())
 
-	RpcClient, _ := rpc.RpcClients.Get(server.node.Conf.LogicAddrs)
+	RpcClient, _ := rpc.RpcClients.Get(server.node.Conf.LogicAddr)
 	err := RpcClient.Call("LogicRPC.LogoutHandle", userEntry, &reply)
 	if err != nil {
 		log.Logger.Error("LogicRPC.LogoutHandle Error: %v", err)

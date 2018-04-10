@@ -37,9 +37,9 @@ import (
 
 // 配置文件结构
 type LogicLayerConfig struct {
-	Addrs          string
+	Addr           string
 	AccessAddrs    []string
-	PprofAddrs     string
+	PprofAddr      string
 	PrometheusPort string
 }
 
@@ -56,9 +56,9 @@ func readConfiguration() {
 	}
 
 	configuration = &LogicLayerConfig{
-		Addrs:          viper.GetString("serverAddrs"),
+		Addr:           viper.GetString("serverAddr"),
 		AccessAddrs:    viper.GetStringSlice("accessAddrs"),
-		PprofAddrs:     viper.GetString("monitor.pprofAddrs"),
+		PprofAddr:      viper.GetString("monitor.pprofAddr"),
 		PrometheusPort: viper.GetString("monitor.prometheusPort"),
 	}
 }

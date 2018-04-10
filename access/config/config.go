@@ -40,13 +40,13 @@ var GNodeConfig *NodeConfig
 
 // NodeConfig is used to config the access endpoint
 type NodeConfig struct {
-	Addrs             string
-	LogicAddrs        string
+	ServerAddr        string
+	LogicAddr         string
 	WSReadBufferSize  int
 	WSWriteBufferSize int
-	PprofAddrs        string
+	PprofAddr         string
 	PrometheusPort    string
-	Address           string
+	RPCAddr           string
 	CorsHosts         []string
 	SecretKey         string
 	QueueBuffer       int
@@ -63,15 +63,15 @@ func Load() *NodeConfig {
 	}
 
 	GNodeConfig = &NodeConfig{
-		Addrs:             viper.GetString("accessAddrs"),
-		LogicAddrs:        viper.GetString("logicAddrs"),
+		ServerAddr:        viper.GetString("accessServerAddr"),
+		LogicAddr:         viper.GetString("logicAddr"),
 		WSReadBufferSize:  viper.GetInt("websocket.readBufferSize"),
 		WSWriteBufferSize: viper.GetInt("websocket.writeBufferSize"),
-		PprofAddrs:        viper.GetString("monitor.pprofAddrs"),
+		PprofAddr:         viper.GetString("monitor.pprofAddr"),
 		PrometheusPort:    viper.GetString("monitor.prometheusPort"),
-		Address:           viper.GetString("server.address"),
+		RPCAddr:           viper.GetString("rpcServer.addr"),
 		CorsHosts:         viper.GetStringSlice("middleware.cors.hosts"),
-		SecretKey:         viper.GetString("middleware.secretkey"),
+		SecretKey:         viper.GetString("middleware.secretKey"),
 		QueueBuffer:       viper.GetInt("queueBuffer"),
 	}
 

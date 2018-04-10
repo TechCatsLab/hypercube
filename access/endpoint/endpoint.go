@@ -73,7 +73,7 @@ func (ep *Endpoint) Send(user *message.User, msg *message.Message) {
 
 // Run starts the access server.
 func (ep *Endpoint) Run() error {
-	log.Logger.Info("run %v", ep.ws.server.Start(ep.Conf.Addrs))
+	log.Logger.Info("run %v", ep.ws.server.Start(ep.Conf.ServerAddr))
 
 	select {
 	case <-ep.shutdown:

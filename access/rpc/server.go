@@ -47,14 +47,14 @@ func InitServer() {
 }
 
 func rpcListen() {
-	l, err := net.Listen("tcp", config.GNodeConfig.Address)
+	l, err := net.Listen("tcp", config.GNodeConfig.RPCAddr)
 	if err != nil {
-		log.Logger.Error("net.Listen(\"%s\", \"%s\") error(%v)"+"tcp"+config.GNodeConfig.Address, err)
+		log.Logger.Error("net.Listen(\"%s\", \"%s\") error(%v)"+"tcp"+config.GNodeConfig.RPCAddr, err)
 		panic(err)
 	}
 
 	defer func() {
-		log.Logger.Info("listen rpc: \"%s\" close", config.GNodeConfig.Address)
+		log.Logger.Info("listen rpc: \"%s\" close", config.GNodeConfig.RPCAddr)
 		if err := l.Close(); err != nil {
 			log.Logger.Error("listener.Close() error(%v)", err)
 		}

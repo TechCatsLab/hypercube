@@ -1,7 +1,7 @@
 {
-  "accessAddrs": "127.0.0.1:7000",
+  "accessServerAddr": "127.0.0.1:7000",
 
-  "logicAddrs": "127.0.0.1:7006",
+  "logicAddr": "127.0.0.1:7006",
 
   "websocket": {
     "readBufferSize": 4096,
@@ -9,12 +9,12 @@
   },
 
   "monitor": {
-    "pprofAddrs": "localhost:6060",
+    "pprofAddr": "localhost:6060",
     "prometheusPort": ":9200"
   },
 
-  "server": {
-    "address": "127.0.0.1:1234"
+  "rpcServer": {
+    "addr": "127.0.0.1:1234"
   },
 
   "middleware": {
@@ -22,7 +22,7 @@
       "hosts": ["https://labstack.com", "https://labstack.net"]
     },
 
-    "secretkey": "PXL0we7gqrgskjnPwiXXwVeXY4pFGvcnq4zImdN1L4"
+    "secretKey": "PXL0we7gqrgskjnPwiXXwVeXY4pFGvcnq4zImdN1L4"
   },
 
   "queueBuffer": 100

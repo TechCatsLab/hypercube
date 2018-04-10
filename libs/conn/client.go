@@ -74,7 +74,7 @@ func (client *Client) Handle(message *msg.Message) error {
 
 	switch message.Type {
 	case msg.MessageTypePushPlainText, msg.MessageTypePlainText, msg.MessageTypeEmotion:
-		rpcClient, err := rpc.RpcClients.Get(config.GNodeConfig.LogicAddrs)
+		rpcClient, err := rpc.RpcClients.Get(config.GNodeConfig.LogicAddr)
 		if err != nil {
 			log.Logger.Error("Handle Get RpcClients Error: %v", err)
 			return err
@@ -115,10 +115,10 @@ func (client *Client) HandleLogoutMessage(message *msg.Message) error {
 
 	userEntry := msg.UserEntry{
 		UserID:   u,
-		ServerIP: msg.Access{ServerIP: config.GNodeConfig.Addrs},
+		ServerIP: msg.Access{ServerIP: config.GNodeConfig.ServerAddr},
 	}
 
-	rpcClient, err := rpc.RpcClients.Get(config.GNodeConfig.LogicAddrs)
+	rpcClient, err := rpc.RpcClients.Get(config.GNodeConfig.LogicAddr)
 	if err != nil {
 		log.Logger.Error("HandleLogoutMessage Get RpcClients Error: %v", err)
 		return err
